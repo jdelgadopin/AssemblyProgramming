@@ -1,0 +1,33 @@
+     1                                 %line 1+1 switch_dif.asm
+     2                                 [segment .data]
+     3 00000000 [0000000000000000]      switch: dq case0
+     4 00000008 [0000000000000000]      dq case1
+     5 00000010 [0000000000000000]      dq case2
+     6 00000018 [0000000000000000]      dq case3
+     7                                 
+     8 00000020 0200000000000000        i: dq 2
+     9                                 
+    10                                 [segment .text]
+    11                                 [global _start]
+    12                                 
+    13                                 _start:
+    14 00000000 488B0425[00000000]      mov rax, [i]
+    15 00000008 488D1425[00000000]      lea rdx, [switch]
+    16 00000010 FF24C2                  jmp [rdx+rax*8]
+    17                                 case0:
+    18 00000013 48C7C364000000          mov rbx, 100
+    19 0000001A EB19                    jmp end
+    20                                 case1:
+    21 0000001C 48C7C365000000          mov rbx, 101
+    22 00000023 EB10                    jmp end
+    23                                 case2:
+    24 00000025 48C7C366000000          mov rbx, 102
+    25 0000002C EB07                    jmp end
+    26                                 case3:
+    27 0000002E 48C7C367000000          mov rbx, 103
+    28 00000035 EBFE                    jmp end
+    29                                 end:
+    30 00000037 4831FF                  xor rdi,rdi
+    31 0000003A 6A3C                    push 0x3c
+    32 0000003C 58                      pop rax
+    33 0000003D 0F05                    syscall

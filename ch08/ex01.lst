@@ -1,0 +1,33 @@
+     1                                 %line 1+1 ex01.asm
+     2                                 [section .data]
+     3 00000000 17000000FCFFFFFF0A-    v1 dd 23, -4, 10
+     4 00000000 000000             
+     5 0000000C 0C0000000C000000EA-    v2 dd 12, 12, -22
+     6 0000000C FFFFFF             
+     7 00000018 0300                   dim dw 3
+     8 0000001A 0000000000000000       pe dq 0
+     9                                 [section .text]
+    10                                 [global _start]
+    11                                 
+    12                                 _start:
+    13 00000000 66C12425[00000000]-     shl word [dim], 2
+    14 00000000 02                 
+    15                                 
+    16 00000009 4D31C0                  xor r8, r8
+    17 0000000C 4831C9                  xor rcx, rcx
+    18                                 iter:
+    19 0000000F 663B0C25[00000000]      cmp cx, word [dim]
+    20 00000017 7D18                    jge end
+    21 00000019 486381[00000000]        movsxd rax, dword [v1+rcx]
+    22 00000020 486399[00000000]        movsxd rbx, dword [v2+rcx]
+    23 00000027 48F7EB                  imul rbx
+    24 0000002A 4901C0                  add r8, rax
+    25 0000002D 6683C104                add cx, 4
+    26 00000031 EBDA                    jmp iter
+    27                                 end:
+    28 00000033 4C890425[00000000]      mov [pe], r8
+    29                                 
+    30 0000003B 4831FF                  xor rdi,rdi
+    31 0000003E 6A3C                    push 0x3c
+    32 00000040 58                      pop rax
+    33 00000041 0F05                    syscall

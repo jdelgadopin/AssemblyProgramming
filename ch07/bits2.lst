@@ -1,0 +1,29 @@
+     1                                 %line 1+1 bits2.asm
+     2                                 [segment .bss]
+     3 00000000 <gap>                  set resq 10
+     4                                 [segment .text]
+     5                                 [global main]
+     6                                 main:
+     7 00000000 55                      push rbp
+     8 00000001 4889E5                  mov rbp, rsp
+     9 00000004 480FBA2C25[00000000]-     bts qword [set], 4
+    10 00000004 04                 
+    11 0000000E 480FBA2C25[00000000]-     bts qword [set], 7
+    12 0000000E 07                 
+    13 00000018 480FBA2C25[00000000]-     bts qword [set], 8
+    14 00000018 08                 
+    15 00000022 480FBA2C25[08000000]-     bts qword [set+8], 12
+    16 00000022 0C                 
+    17 0000002C 48C7C04C000000          mov rax, 76
+    18 00000033 4889C3                  mov rbx, rax
+    19 00000036 48C1EB06                shr rbx, 6
+    20 0000003A 4889C1                  mov rcx, rax
+    21 0000003D 4883E13F                and rcx, 0x3f
+    22 00000041 31D2                    xor edx, edx
+    23 00000043 480FA30CDD[00000000]      bt [set+8*rbx], rcx
+    24 0000004C 0F92D2                  setc dl
+    25 0000004F 480FAB0CDD[00000000]      bts [set+8*rbx], rcx
+    26 00000058 480FB30CDD[00000000]      btr [set+8*rbx], rcx
+    27 00000061 4831C0                  xor rax, rax
+    28 00000064 C9                      leave
+    29 00000065 C3                      ret

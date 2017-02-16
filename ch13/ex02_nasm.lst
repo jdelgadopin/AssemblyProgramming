@@ -1,0 +1,783 @@
+     1                                  ;;; ---------------------------------------------------------------------
+     2                                  
+     3                                  	SECTION .bss
+     4 00000000 <res 00000100>          cmnd		resb	256	; input string
+     5 00000100 <res 00000008>          element		resq	1
+     6 00000108 <res 00000008>          set1		resq	1
+     7 00000110 <res 00000008>          set2		resq	1
+     8 00000118 <res 00000008>          _sets		resq	1	; address of the set of sets
+     9                                  	
+    10                                  ;;; ---------------------------------------------------------------------
+    11                                  	
+    12                                          SECTION .bss
+    13                                  	
+    14                                  	struc Set
+    15 00000000 <res 00000008>          s_size:		resq	1 	; set size
+    16 00000008 <res 00000008>          s_set:		resq	1	; address of the bit-array
+    17                                  	endstruc
+    18                                  
+    19                                  	struc Sets
+    20 00000000 <res 00000008>          sts_size	resq	1
+    21 00000008 <res 00000008>          sts_sets	resq	1
+    22                                  	endstruc
+    23                                  	
+    24                                  ;;; ---------------------------------------------------------------------
+    25                                  
+    26                                          SECTION .data
+    27                                  		
+    28 00000000 253235357300            readcmnd	db	"%255s",0
+    29 00000006 256400                  param		db	"%d",0	
+    30 00000009 456E74657220636F6D-     prompt 		db	"Enter command (add, remove, test, union, intersect, print, quit): ",0
+    31 00000012 6D616E642028616464-
+    32 0000001B 2C2072656D6F76652C-
+    33 00000024 20746573742C20756E-
+    34 0000002D 696F6E2C20696E7465-
+    35 00000036 72736563742C207072-
+    36 0000003F 696E742C2071756974-
+    37 00000048 293A2000           
+    38 0000004C 456E74657220656C65-     promptelem	db	"Enter element: ",0
+    39 00000055 6D656E743A2000     
+    40 0000005C 456E74657220736574-     promptset	db	"Enter set: ",0
+    41 00000065 3A2000             
+    42 00000068 25642000                printelem	db	"%d ",0
+    43 0000006C 0A00                    linefd		db	0xa,0
+    44                                  
+    45 0000006E 61646400                _add		db	"add",0
+    46 00000072 256420616464656420-     _added		db	"%d added to set %d",0xa,0	
+    47 0000007B 746F20736574202564-
+    48 00000084 0A00               
+    49 00000086 72656D6F766500          _remove		db	"remove",0
+    50 0000008D 25642072656D6F7665-     _removed	db	"%d removed from set %d",0xa,0
+    51 00000096 642066726F6D207365-
+    52 0000009F 742025640A00       
+    53 000000A5 7465737400              _test		db	"test",0
+    54 000000AA 25642062656C6F6E67-     _belongs	db	"%d belongs to the set %d",0xa,0
+    55 000000B3 7320746F2074686520-
+    56 000000BC 7365742025640A00   
+    57 000000C4 2564206E6F74206265-     _notbelongs	db	"%d not belongs to the set %d",0xa,0
+    58 000000CD 6C6F6E677320746F20-
+    59 000000D6 746865207365742025-
+    60 000000DF 640A00             
+    61 000000E2 756E696F6E00            _union		db	"union",0
+    62 000000E8 74686520656C656D65-     _joined		db	"the elements of set %d now also belong to set %d",0xa,0
+    63 000000F1 6E7473206F66207365-
+    64 000000FA 74202564206E6F7720-
+    65 00000103 616C736F2062656C6F-
+    66 0000010C 6E6720746F20736574-
+    67 00000115 2025640A00         
+    68 0000011A 696E74657273656374-     _intersect	db	"intersect",0
+    69 00000123 00                 
+    70 00000124 736574202564206861-     _intersected	db	"set %d has been intersected with set %d",0xa,0
+    71 0000012D 73206265656E20696E-
+    72 00000136 746572736563746564-
+    73 0000013F 207769746820736574-
+    74 00000148 2025640A00         
+    75 0000014D 7072696E7400            _print		db	"print",0
+    76 00000153 7175697400              _quit		db	"quit",0
+    77                                  
+    78                                  ;;; ---------------------------------------------------------------------
+    79                                  
+    80                                  	SECTION .text
+    81                                          global  main		; MUST be linked with gcc (not ld)
+    82                                  	
+    83                                          extern  scanf, printf, malloc, free, atol
+    84                                  
+    85                                  ;;; ---------------------------------------------------------------------
+    86                                  
+    87                                  read_command:
+    88 00000000 55                      	push 	rbp
+    89 00000001 4889E5                  	mov	rbp, rsp
+    90                                  .beg_rc: ;; print command prompt
+    91 00000004 488D3C25[09000000]      	lea	rdi, [prompt]
+    92 0000000C 31C0                    	xor	eax, eax
+    93 0000000E E8(00000000)            	call 	printf
+    94                                  	;; initialize the 256 bytes of command to 0
+    95 00000013 30C0                    	xor	al, al
+    96 00000015 B900010000              	mov	rcx, 256
+    97 0000001A 488D3C25[00000000]      	lea	rdi, [cmnd]
+    98 00000022 F3AA                    	rep	stosb
+    99                                  	;; read command
+   100 00000024 488D3C25[00000000]      	lea	rdi, [readcmnd]
+   101 0000002C 488D3425[00000000]      	lea	rsi, [cmnd]
+   102 00000034 31C0                    	xor	eax, eax
+   103 00000036 E8(00000000)            	call	scanf
+   104                                  	;; check what command has been given
+   105                                  	;; has it been 'add'?
+   106 0000003B 488D3425[00000000]      	lea	rsi, [cmnd] 	; address of name
+   107 00000043 488D3C25[6E000000]      	lea	rdi, [_add]	; address of the constant string 'add\0'
+   108 0000004B B905000000              	mov	rcx, 5		; chars in 'add\0' + 1
+   109 00000050 F3A6                    	repe	cmpsb		; compare both strings
+   110 00000052 4883F900                	cmp	rcx, 0
+   111 00000056 750A                    	jne	.lb_rem		; if not equal check 'remove' 
+   112 00000058 B800000000              	mov	rax, 0
+   113 0000005D E9E0000000              	jmp 	.end_rc
+   114                                  .lb_rem:;; has it been 'remove'?
+   115 00000062 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   116 0000006A 488D3C25[86000000]      	lea	rdi, [_remove]	; address of the constant string 'remove\0'
+   117 00000072 B908000000              	mov	rcx, 8		; chars in 'remove\0' + 1
+   118 00000077 F3A6                    	repe	cmpsb		; compare both strings
+   119 00000079 4883F900                	cmp	rcx, 0
+   120 0000007D 750A                    	jne	.lb_tst		; if not equal check 'test' 
+   121 0000007F B801000000              	mov	rax, 1
+   122 00000084 E9B9000000              	jmp 	.end_rc
+   123                                  .lb_tst:;; has it been 'test'?
+   124 00000089 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   125 00000091 488D3C25[A5000000]      	lea	rdi, [_test]	; address of the constant string 'test\0'
+   126 00000099 B906000000              	mov	rcx, 6		; chars in 'test\0' + 1
+   127 0000009E F3A6                    	repe	cmpsb		; compare both strings
+   128 000000A0 4883F900                	cmp	rcx, 0
+   129 000000A4 750A                    	jne	.lb_uni		; if not equal check 'union' 
+   130 000000A6 B802000000              	mov	rax, 2
+   131 000000AB E992000000              	jmp 	.end_rc
+   132                                  .lb_uni:;; has it been 'union'?
+   133 000000B0 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   134 000000B8 488D3C25[E2000000]      	lea	rdi, [_union]	; address of the constant string 'union\0'
+   135 000000C0 B907000000              	mov	rcx, 7		; chars in 'union\0' + 1
+   136 000000C5 F3A6                    	repe	cmpsb		; compare both strings
+   137 000000C7 4883F900                	cmp	rcx, 0
+   138 000000CB 7507                    	jne	.lb_int		; if not equal check 'intersect' 
+   139 000000CD B803000000              	mov	rax, 3
+   140 000000D2 EB6E                    	jmp 	.end_rc
+   141                                  .lb_int:;; has it been 'intersect'?
+   142 000000D4 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   143 000000DC 488D3C25[1A010000]      	lea	rdi, [_intersect] ; address of the constant string 'intersect\0'
+   144 000000E4 B90B000000              	mov	rcx, 11		; chars in 'intersect\0' + 1
+   145 000000E9 F3A6                    	repe	cmpsb		; compare both strings
+   146 000000EB 4883F900                	cmp	rcx, 0
+   147 000000EF 7507                    	jne	.lb_pri		; if not equal check 'print' 
+   148 000000F1 B804000000              	mov	rax, 4
+   149 000000F6 EB4A                    	jmp 	.end_rc
+   150                                  .lb_pri:;; has it been 'print'?
+   151 000000F8 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   152 00000100 488D3C25[4D010000]      	lea	rdi, [_print]	; address of the constant string 'print\0'
+   153 00000108 B907000000              	mov	rcx, 7		; chars in 'print\0' + 1
+   154 0000010D F3A6                    	repe	cmpsb		; compare both strings
+   155 0000010F 4883F900                	cmp	rcx, 0
+   156 00000113 7507                    	jne	.lb_qu		; if not equal check 'quit' 
+   157 00000115 B805000000              	mov	rax, 5
+   158 0000011A EB26                    	jmp 	.end_rc
+   159                                  .lb_qu:	;; has it been 'quit'?
+   160 0000011C 488D3425[00000000]      	lea	rsi, [cmnd]	; address of name
+   161 00000124 488D3C25[53010000]      	lea	rdi, [_quit]	; address of the constant string 'quit\0'
+   162 0000012C B906000000              	mov	rcx, 6		; chars in 'quit\0' + 1
+   163 00000131 F3A6                    	repe	cmpsb		; compare both strings
+   164 00000133 4883F900                	cmp	rcx, 0
+   165 00000137 0F85C7FEFFFF            	jne	.beg_rc		; if not equal start again 
+   166 0000013D B806000000              	mov	rax, 6
+   167                                  .end_rc:	
+   168 00000142 C9                      	leave
+   169 00000143 C3                      	ret
+   170                                  	
+   171                                  ;;; ---------------------------------------------------------------------
+   172                                  
+   173                                  fun_add:
+   174 00000144 55                      	push 	rbp
+   175 00000145 4889E5                  	mov	rbp, rsp
+   176 00000148 53                      	push	rbx
+   177 00000149 4154                    	push	r12
+   178 0000014B 4155                    	push	r13
+   179                                  
+   180                                  	;; read parameters
+   181 0000014D 488D3C25[4C000000]      	lea	rdi, [promptelem]
+   182 00000155 31C0                    	xor	eax, eax
+   183 00000157 E8(00000000)            	call 	printf
+   184 0000015C 488D3C25[06000000]      	lea	rdi, [param]
+   185 00000164 488D3425[00010000]      	lea 	rsi, [element]
+   186 0000016C 31C0                    	xor	eax, eax
+   187 0000016E E8(00000000)            	call 	scanf
+   188                                  	;; check if [element] is in range
+   189                                  	;; if not, start again
+   190 00000173 488B1C25[18010000]      	mov	rbx, [_sets]
+   191 0000017B 488B5B08                	mov	rbx, [rbx+sts_sets] 	; assuming there is at least 1 set, rbx is pointing at that set
+   192 0000017F 488B1B                  	mov	rbx, [rbx+s_size]
+   193 00000182 4C8B2425[00010000]      	mov	r12, qword [element]
+   194 0000018A 4983FC00                	cmp	r12, 0
+   195 0000018E 0F8CB9000000            	jl	.end_add
+   196 00000194 4939DC                  	cmp	r12, rbx
+   197 00000197 0F8DB0000000            	jge	.end_add
+   198                                  	;; now we know [element] is a set element
+   199 0000019D 488D3C25[5C000000]      	lea	rdi, [promptset]
+   200 000001A5 31C0                    	xor	eax, eax
+   201 000001A7 E8(00000000)            	call 	printf
+   202 000001AC 488D3C25[06000000]      	lea	rdi, [param]
+   203 000001B4 488D3425[08010000]      	lea 	rsi, [set1]
+   204 000001BC 31C0                    	xor	eax, eax
+   205 000001BE E8(00000000)            	call 	scanf	
+   206                                  	;; check if [set1] is in range
+   207                                  	;; if not, start again
+   208 000001C3 488B1C25[18010000]      	mov	rbx, [_sets]
+   209 000001CB 488B1B                  	mov	rbx, [rbx+sts_size]
+   210 000001CE 4C8B2425[08010000]      	mov	r12, qword [set1]
+   211 000001D6 4983FC00                	cmp	r12, 0
+   212 000001DA 7C71                    	jl	.end_add
+   213 000001DC 4939DC                  	cmp	r12, rbx
+   214 000001DF 7D6C                    	jge	.end_add
+   215                                  	;; now we know [set1] is a set number
+   216                                  
+   217 000001E1 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   218 000001E9 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   219 000001ED 4831D2                  	xor 	rdx, rdx
+   220 000001F0 488B0425[08010000]      	mov	rax, qword [set1]
+   221 000001F8 B910000000              	mov	rcx, Set_size
+   222 000001FD 48F7E1                  	mul	rcx
+   223 00000200 4801C3                  	add	rbx, rax			; rbx <-- Sets.sts_sets + set1 x Set_size
+   224 00000203 488B5308                	mov	rdx, [rbx + s_set]
+   225                                  	
+   226                                  	;; let's add [element] to set [set1]
+   227 00000207 488B0425[00010000]      	mov	rax, [element]
+   228 0000020F 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   229 00000213 4C8B2425[00010000]      	mov	r12, [element]
+   230 0000021B 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   231 0000021F 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   232 00000223 4D0FA3E5                	bt	r13, r12
+   233 00000227 7224                    	jc	.end_add	
+   234                                  
+   235 00000229 4C0FAB24C2              	bts	qword [rdx+8*rax], r12	; the element is added
+   236 0000022E 488D3C25[72000000]      	lea	rdi, [_added]
+   237 00000236 488B3425[00010000]      	mov	rsi, [element]
+   238 0000023E 488B1425[08010000]      	mov	rdx, [set1]
+   239 00000246 31C0                    	xor	eax, eax
+   240 00000248 E8(00000000)            	call 	printf
+   241                                  
+   242                                  .end_add:	
+   243 0000024D 415D                    	pop	r13
+   244 0000024F 415C                    	pop 	r12
+   245 00000251 5B                      	pop	rbx
+   246 00000252 C9                      	leave
+   247 00000253 C3                      	ret
+   248                                  	
+   249                                  ;;; ---------------------------------------------------------------------
+   250                                  
+   251                                  fun_remove:
+   252 00000254 55                      	push 	rbp
+   253 00000255 4889E5                  	mov	rbp, rsp
+   254 00000258 53                      	push	rbx
+   255 00000259 4154                    	push	r12
+   256 0000025B 4155                    	push	r13
+   257                                  
+   258                                  	;; read parameters
+   259 0000025D 488D3C25[4C000000]      	lea	rdi, [promptelem]
+   260 00000265 31C0                    	xor	eax, eax
+   261 00000267 E8(00000000)            	call 	printf
+   262 0000026C 488D3C25[06000000]      	lea	rdi, [param]
+   263 00000274 488D3425[00010000]      	lea 	rsi, [element]
+   264 0000027C 31C0                    	xor	eax, eax
+   265 0000027E E8(00000000)            	call 	scanf
+   266                                  	;; check if [element] is in range
+   267                                  	;; if not, start again
+   268 00000283 488B1C25[18010000]      	mov	rbx, [_sets]
+   269 0000028B 488B5B08                	mov	rbx, [rbx+sts_sets] 	; assuming there is at least 1 set, rbx is pointing at that set
+   270 0000028F 488B1B                  	mov	rbx, [rbx+s_size]
+   271 00000292 4C8B2425[00010000]      	mov	r12, qword [element]
+   272 0000029A 4983FC00                	cmp	r12, 0
+   273 0000029E 0F8CB9000000            	jl	.end_remove
+   274 000002A4 4939DC                  	cmp	r12, rbx
+   275 000002A7 0F8DB0000000            	jge	.end_remove
+   276                                  	;; now we know [element] is a set element
+   277 000002AD 488D3C25[5C000000]      	lea	rdi, [promptset]
+   278 000002B5 31C0                    	xor	eax, eax
+   279 000002B7 E8(00000000)            	call 	printf
+   280 000002BC 488D3C25[06000000]      	lea	rdi, [param]
+   281 000002C4 488D3425[08010000]      	lea 	rsi, [set1]
+   282 000002CC 31C0                    	xor	eax, eax
+   283 000002CE E8(00000000)            	call 	scanf	
+   284                                  	;; check if [set1] is in range
+   285                                  	;; if not, start again
+   286 000002D3 488B1C25[18010000]      	mov	rbx, [_sets]
+   287 000002DB 488B1B                  	mov	rbx, [rbx+sts_size]
+   288 000002DE 4C8B2425[08010000]      	mov	r12, qword [set1]
+   289 000002E6 4983FC00                	cmp	r12, 0
+   290 000002EA 7C71                    	jl	.end_remove
+   291 000002EC 4939DC                  	cmp	r12, rbx
+   292 000002EF 7D6C                    	jge	.end_remove
+   293                                  	;; now we know [set1] is a set number
+   294                                  
+   295 000002F1 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   296 000002F9 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   297 000002FD 4831D2                  	xor 	rdx, rdx
+   298 00000300 488B0425[08010000]      	mov	rax, qword [set1]
+   299 00000308 B910000000              	mov	rcx, Set_size
+   300 0000030D 48F7E1                  	mul	rcx
+   301 00000310 4801C3                  	add	rbx, rax			; rbx <-- Sets.sts_sets + set1 x Set_size
+   302 00000313 488B5308                	mov	rdx, [rbx + s_set]
+   303                                  
+   304                                  	;; let's remove [element] from the set [set1]
+   305 00000317 488B0425[00010000]      	mov	rax, [element]
+   306 0000031F 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   307 00000323 4C8B2425[00010000]      	mov	r12, [element]
+   308 0000032B 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   309 0000032F 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   310 00000333 4D0FA3E5                	bt	r13, r12
+   311 00000337 7324                    	jnc	.end_remove
+   312                                  	
+   313 00000339 4C0FB324C2              	btr	qword [rdx+8*rax], r12	; the element is removed
+   314 0000033E 488D3C25[8D000000]      	lea	rdi, [_removed]
+   315 00000346 488B3425[00010000]      	mov	rsi, [element]
+   316 0000034E 488B1425[08010000]      	mov	rdx, [set1]
+   317 00000356 31C0                    	xor	eax, eax
+   318 00000358 E8(00000000)            	call 	printf
+   319                                  
+   320                                  .end_remove:
+   321 0000035D 415D                    	pop	r13
+   322 0000035F 415C                    	pop 	r12
+   323 00000361 5B                      	pop	rbx
+   324 00000362 C9                      	leave
+   325 00000363 C3                      	ret
+   326                                  	
+   327                                  ;;; ---------------------------------------------------------------------
+   328                                  
+   329                                  fun_test:
+   330 00000364 55                      	push 	rbp
+   331 00000365 4889E5                  	mov	rbp, rsp
+   332 00000368 53                      	push	rbx
+   333 00000369 4154                    	push	r12
+   334 0000036B 4155                    	push	r13
+   335                                  
+   336                                  	;; read parameters
+   337 0000036D 488D3C25[4C000000]      	lea	rdi, [promptelem]
+   338 00000375 31C0                    	xor	eax, eax
+   339 00000377 E8(00000000)            	call 	printf
+   340 0000037C 488D3C25[06000000]      	lea	rdi, [param]
+   341 00000384 488D3425[00010000]      	lea 	rsi, [element]
+   342 0000038C 31C0                    	xor	eax, eax
+   343 0000038E E8(00000000)            	call 	scanf
+   344                                  	;; check if [element] is in range
+   345                                  	;; if not, start again
+   346 00000393 488B1C25[18010000]      	mov	rbx, [_sets]
+   347 0000039B 488B5B08                	mov	rbx, [rbx+sts_sets] 	; assuming there is at least 1 set, rbx is pointing at that set
+   348 0000039F 488B1B                  	mov	rbx, [rbx+s_size]
+   349 000003A2 4C8B2425[00010000]      	mov	r12, qword [element]
+   350 000003AA 4983FC00                	cmp	r12, 0
+   351 000003AE 0F8CBE000000            	jl	.end_test
+   352 000003B4 4939DC                  	cmp	r12, rbx
+   353 000003B7 0F8DB5000000            	jge	.end_test
+   354                                  	;; now we know [element] is a set element
+   355 000003BD 488D3C25[5C000000]      	lea	rdi, [promptset]
+   356 000003C5 31C0                    	xor	eax, eax
+   357 000003C7 E8(00000000)            	call 	printf
+   358 000003CC 488D3C25[06000000]      	lea	rdi, [param]
+   359 000003D4 488D3425[08010000]      	lea 	rsi, [set1]
+   360 000003DC 31C0                    	xor	eax, eax
+   361 000003DE E8(00000000)            	call 	scanf	
+   362                                  	;; check if [set1] is in range
+   363                                  	;; if not, start again
+   364 000003E3 488B1C25[18010000]      	mov	rbx, [_sets]
+   365 000003EB 488B1B                  	mov	rbx, [rbx+sts_size]
+   366 000003EE 4C8B2425[08010000]      	mov	r12, qword [set1]
+   367 000003F6 4983FC00                	cmp	r12, 0
+   368 000003FA 7C76                    	jl	.end_test
+   369 000003FC 4939DC                  	cmp	r12, rbx
+   370 000003FF 7D71                    	jge	.end_test
+   371                                  	;; now we know [set1] is a set number
+   372                                  
+   373 00000401 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   374 00000409 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   375 0000040D 4831D2                  	xor 	rdx, rdx
+   376 00000410 488B0425[08010000]      	mov	rax, qword [set1]
+   377 00000418 B910000000              	mov	rcx, Set_size
+   378 0000041D 48F7E1                  	mul	rcx
+   379 00000420 4801C3                  	add	rbx, rax			; rbx <-- Sets.sts_sets + set1 x Set_size
+   380 00000423 488B5308                	mov	rdx, [rbx + s_set]
+   381                                  
+   382                                  	;; let's test whether [element] belongs to the set [set1]
+   383 00000427 488B0425[00010000]      	mov	rax, [element]
+   384 0000042F 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   385 00000433 4C8B2425[00010000]      	mov	r12, [element]
+   386 0000043B 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   387 0000043F 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   388 00000443 4D0FA3E5                	bt	r13, r12
+   389 00000447 730A                    	jnc	.is_not_there		; the element wasn't there
+   390 00000449 488D3C25[AA000000]      	lea	rdi, [_belongs]
+   391 00000451 EB08                    	jmp	.write
+   392                                  .is_not_there:
+   393 00000453 488D3C25[C4000000]      	lea	rdi, [_notbelongs]
+   394                                  .write:
+   395 0000045B 488B3425[00010000]      	mov	rsi, [element]
+   396 00000463 488B1425[08010000]      	mov	rdx, [set1]
+   397 0000046B 31C0                    	xor	eax, eax
+   398 0000046D E8(00000000)            	call 	printf
+   399                                  
+   400                                  .end_test:
+   401 00000472 415D                    	pop	r13
+   402 00000474 415C                    	pop 	r12
+   403 00000476 5B                      	pop	rbx
+   404 00000477 C9                      	leave
+   405 00000478 C3                      	ret
+   406                                  	
+   407                                  ;;; ---------------------------------------------------------------------
+   408                                  
+   409                                  fun_union:
+   410 00000479 55                      	push 	rbp
+   411 0000047A 4889E5                  	mov	rbp, rsp
+   412 0000047D 53                      	push	rbx
+   413 0000047E 4154                    	push	r12
+   414 00000480 4155                    	push	r13
+   415                                  
+   416                                  	;; read parameters
+   417 00000482 488D3C25[5C000000]      	lea	rdi, [promptset]
+   418 0000048A 31C0                    	xor	eax, eax
+   419 0000048C E8(00000000)            	call 	printf
+   420 00000491 488D3C25[06000000]      	lea	rdi, [param]
+   421 00000499 488D3425[08010000]      	lea 	rsi, [set1]
+   422 000004A1 31C0                    	xor	eax, eax
+   423 000004A3 E8(00000000)            	call 	scanf
+   424                                  	;; check if [set1] is in range
+   425                                  	;; if not, start again
+   426 000004A8 488B1C25[18010000]      	mov	rbx, [_sets]
+   427 000004B0 488B1B                  	mov	rbx, [rbx+sts_size]
+   428 000004B3 4C8B2425[08010000]      	mov	r12, qword [set1]
+   429 000004BB 4983FC00                	cmp	r12, 0
+   430 000004BF 0F8CD7000000            	jl	.end_union
+   431 000004C5 4939DC                  	cmp	r12, rbx
+   432 000004C8 0F8DCE000000            	jge	.end_union
+   433                                  	;; now we know [set1] is a set number
+   434 000004CE 488D3C25[5C000000]      	lea	rdi, [promptset]
+   435 000004D6 31C0                    	xor	eax, eax
+   436 000004D8 E8(00000000)            	call 	printf
+   437 000004DD 488D3C25[06000000]      	lea	rdi, [param]
+   438 000004E5 488D3425[10010000]      	lea 	rsi, [set2]
+   439 000004ED 31C0                    	xor	eax, eax
+   440 000004EF E8(00000000)            	call 	scanf	
+   441                                  	;; check if [set2] is in range
+   442                                  	;; if not, start again
+   443 000004F4 488B1C25[18010000]      	mov	rbx, [_sets]
+   444 000004FC 488B1B                  	mov	rbx, [rbx+sts_size]
+   445 000004FF 4C8B2425[10010000]      	mov	r12, qword [set2]
+   446 00000507 4983FC00                	cmp	r12, 0
+   447 0000050B 0F8C8B000000            	jl	.end_union
+   448 00000511 4939DC                  	cmp	r12, rbx
+   449 00000514 0F8D82000000            	jge	.end_union
+   450                                  	;; now we know [set2] is a set number
+   451                                  
+   452 0000051A 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   453 00000522 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   454 00000526 4989DC                  	mov	r12, rbx
+   455 00000529 4831D2                  	xor 	rdx, rdx
+   456 0000052C 488B0425[08010000]      	mov	rax, qword [set1]
+   457 00000534 B910000000              	mov	rcx, Set_size
+   458 00000539 48F7E1                  	mul	rcx
+   459 0000053C 4801C3                  	add	rbx, rax		; rbx <-- Sets.sts_sets + set1 x Set_size
+   460 0000053F 4831D2                  	xor 	rdx, rdx
+   461 00000542 488B0425[10010000]      	mov	rax, qword [set2]
+   462 0000054A B910000000              	mov	rcx, Set_size
+   463 0000054F 48F7E1                  	mul	rcx	
+   464 00000552 4901C4                  	add	r12, rax		; r12 <-- Sets.sts_sets + set2 x Set_size
+   465                                  
+   466                                  	;; get to the data
+   467 00000555 4C8B2B                  	mov	r13, [rbx+s_size]
+   468 00000558 49C1ED03                	shr	r13, 3			
+   469 0000055C 49FFC5                  	inc	r13			; r13 <-- s_size/8 + 1 -- bytes in every set size
+   470 0000055F 488B5B08                	mov	rbx, [rbx+s_set]
+   471 00000563 4D8B642408              	mov	r12, [r12+s_set]
+   472                                  
+   473 00000568 4831C9                  	xor 	rcx, rcx
+   474                                  .un_loop:				; or [set1], [set2] - byte a byte 
+   475 0000056B 4C39E9                  	cmp	rcx, r13
+   476 0000056E 7D0D                    	jge	.prt_union
+   477 00000570 458A040C                	mov	r8b, byte [r12+rcx]
+   478 00000574 4408040B                	or	byte [rbx+rcx], r8b	
+   479 00000578 48FFC1                  	inc 	rcx
+   480 0000057B EBEE                    	jmp	.un_loop	
+   481                                  
+   482                                  .prt_union:	
+   483 0000057D 488D3C25[E8000000]      	lea	rdi, [_joined]
+   484 00000585 488B3425[10010000]      	mov	rsi, [set2]
+   485 0000058D 488B1425[08010000]      	mov	rdx, [set1]
+   486 00000595 31C0                    	xor	eax, eax
+   487 00000597 E8(00000000)            	call 	printf
+   488                                  	
+   489                                  .end_union:
+   490 0000059C 415D                    	pop	r13
+   491 0000059E 415C                    	pop 	r12
+   492 000005A0 5B                      	pop	rbx
+   493 000005A1 C9                      	leave
+   494 000005A2 C3                      	ret
+   495                                  	
+   496                                  ;;; ---------------------------------------------------------------------
+   497                                  
+   498                                  fun_intersection:
+   499 000005A3 55                      	push 	rbp
+   500 000005A4 4889E5                  	mov	rbp, rsp
+   501 000005A7 53                      	push	rbx
+   502 000005A8 4154                    	push	r12
+   503 000005AA 4155                    	push	r13
+   504                                  
+   505                                  	;; read parameters
+   506 000005AC 488D3C25[5C000000]      	lea	rdi, [promptset]
+   507 000005B4 31C0                    	xor	eax, eax
+   508 000005B6 E8(00000000)            	call 	printf
+   509 000005BB 488D3C25[06000000]      	lea	rdi, [param]
+   510 000005C3 488D3425[08010000]      	lea 	rsi, [set1]
+   511 000005CB 31C0                    	xor	eax, eax
+   512 000005CD E8(00000000)            	call 	scanf
+   513                                  	;; check if [set1] is in range
+   514                                  	;; if not, start again
+   515 000005D2 488B1C25[18010000]      	mov	rbx, [_sets]
+   516 000005DA 488B1B                  	mov	rbx, [rbx+sts_size]
+   517 000005DD 4C8B2425[08010000]      	mov	r12, qword [set1]
+   518 000005E5 4983FC00                	cmp	r12, 0
+   519 000005E9 0F8CD7000000            	jl	.end_intersection
+   520 000005EF 4939DC                  	cmp	r12, rbx
+   521 000005F2 0F8DCE000000            	jge	.end_intersection
+   522                                  	;; now we know [set1] is a set number
+   523 000005F8 488D3C25[5C000000]      	lea	rdi, [promptset]
+   524 00000600 31C0                    	xor	eax, eax
+   525 00000602 E8(00000000)            	call 	printf
+   526 00000607 488D3C25[06000000]      	lea	rdi, [param]
+   527 0000060F 488D3425[10010000]      	lea 	rsi, [set2]
+   528 00000617 31C0                    	xor	eax, eax
+   529 00000619 E8(00000000)            	call 	scanf	
+   530                                  	;; check if [set2] is in range
+   531                                  	;; if not, start again
+   532 0000061E 488B1C25[18010000]      	mov	rbx, [_sets]
+   533 00000626 488B1B                  	mov	rbx, [rbx+sts_size]
+   534 00000629 4C8B2425[10010000]      	mov	r12, qword [set2]
+   535 00000631 4983FC00                	cmp	r12, 0
+   536 00000635 0F8C8B000000            	jl	.end_intersection
+   537 0000063B 4939DC                  	cmp	r12, rbx
+   538 0000063E 0F8D82000000            	jge	.end_intersection
+   539                                  	;; now we know [set2] is a set number
+   540                                  
+   541 00000644 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   542 0000064C 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   543 00000650 4989DC                  	mov	r12, rbx
+   544 00000653 4831D2                  	xor 	rdx, rdx
+   545 00000656 488B0425[08010000]      	mov	rax, qword [set1]
+   546 0000065E B910000000              	mov	rcx, Set_size
+   547 00000663 48F7E1                  	mul	rcx
+   548 00000666 4801C3                  	add	rbx, rax		; rbx <-- Sets.sts_sets + set1 x Set_size
+   549 00000669 4831D2                  	xor 	rdx, rdx
+   550 0000066C 488B0425[10010000]      	mov	rax, qword [set2]
+   551 00000674 B910000000              	mov	rcx, Set_size
+   552 00000679 48F7E1                  	mul	rcx	
+   553 0000067C 4901C4                  	add	r12, rax		; r12 <-- Sets.sts_sets + set2 x Set_size
+   554                                  
+   555                                  	;; get to the data
+   556 0000067F 4C8B2B                  	mov	r13, [rbx+s_size]
+   557 00000682 49C1ED03                	shr	r13, 3			
+   558 00000686 49FFC5                  	inc	r13			; r13 <-- s_size/8 + 1 -- bytes in every set size
+   559 00000689 488B5B08                	mov	rbx, [rbx+s_set]
+   560 0000068D 4D8B642408              	mov	r12, [r12+s_set]
+   561                                  
+   562 00000692 4831C9                  	xor 	rcx, rcx
+   563                                  .in_loop:				; and [set1], [set2] - byte a byte 
+   564 00000695 4C39E9                  	cmp	rcx, r13
+   565 00000698 7D0D                    	jge	.pr_intersection
+   566 0000069A 458A040C                	mov	r8b, byte [r12+rcx]
+   567 0000069E 4420040B                	and	byte [rbx+rcx], r8b	
+   568 000006A2 48FFC1                  	inc 	rcx
+   569 000006A5 EBEE                    	jmp	.in_loop	
+   570                                  
+   571                                  .pr_intersection:	
+   572 000006A7 488D3C25[24010000]      	lea	rdi, [_intersected]
+   573 000006AF 488B3425[08010000]      	mov	rsi, [set1]
+   574 000006B7 488B1425[10010000]      	mov	rdx, [set2]
+   575 000006BF 31C0                    	xor	eax, eax
+   576 000006C1 E8(00000000)            	call 	printf
+   577                                  	
+   578                                  .end_intersection:
+   579 000006C6 415D                    	pop	r13
+   580 000006C8 415C                    	pop 	r12
+   581 000006CA 5B                      	pop	rbx
+   582 000006CB C9                      	leave
+   583 000006CC C3                      	ret
+   584                                  	
+   585                                  ;;; ---------------------------------------------------------------------
+   586                                  	
+   587                                  fun_print:
+   588 000006CD 55                      	push 	rbp
+   589 000006CE 4889E5                  	mov	rbp, rsp
+   590 000006D1 53                      	push	rbx
+   591 000006D2 4154                    	push	r12
+   592 000006D4 4155                    	push	r13
+   593 000006D6 4156                    	push	r14
+   594 000006D8 4157                    	push	r15
+   595                                  
+   596                                  	;; read parameters
+   597 000006DA 488D3C25[5C000000]      	lea	rdi, [promptset]
+   598 000006E2 31C0                    	xor	eax, eax
+   599 000006E4 E8(00000000)            	call 	printf
+   600 000006E9 488D3C25[06000000]      	lea	rdi, [param]
+   601 000006F1 488D3425[08010000]      	lea 	rsi, [set1]
+   602 000006F9 31C0                    	xor	eax, eax
+   603 000006FB E8(00000000)            	call 	scanf
+   604                                  	;; check if [set1] is in range
+   605                                  	;; if not, start again
+   606 00000700 488B1C25[18010000]      	mov	rbx, [_sets]
+   607 00000708 488B1B                  	mov	rbx, [rbx+sts_size]
+   608 0000070B 4C8B2425[08010000]      	mov	r12, qword [set1]
+   609 00000713 4983FC00                	cmp	r12, 0
+   610 00000717 0F8C8B000000            	jl	.end_print
+   611 0000071D 4939DC                  	cmp	r12, rbx
+   612 00000720 0F8D82000000            	jge	.end_print
+   613                                  	;; now we know [set1] is a set number
+   614                                  
+   615 00000726 488B1C25[18010000]      	mov	rbx, qword [_sets]
+   616 0000072E 488B5B08                	mov	rbx, qword [rbx+sts_sets]
+   617 00000732 4831D2                  	xor 	rdx, rdx
+   618 00000735 488B0425[08010000]      	mov	rax, qword [set1]
+   619 0000073D B910000000              	mov	rcx, Set_size
+   620 00000742 48F7E1                  	mul	rcx
+   621 00000745 4801C3                  	add	rbx, rax		; rbx <-- Sets.sts_sets + set1 x Set_size
+   622                                  
+   623                                  	;; get to the data
+   624 00000748 4C8B3B                  	mov	r15, [rbx+s_size]
+   625 0000074B 49C1EF03                	shr	r15, 3			
+   626 0000074F 49FFC7                  	inc	r15			; r15 <-- s_size/8 + 1 -- bytes in every set size
+   627                                  
+   628 00000752 4D31E4                  	xor 	r12, r12		; byte counter
+   629 00000755 4D31F6                  	xor	r14, r14		; bit counter
+   630                                  .pr_loop:				 
+   631 00000758 4D39FC                  	cmp	r12, r15
+   632 0000075B 7D3C                    	jge	.e_print
+   633 0000075D 4D31ED                  	xor	r13, r13
+   634                                  .bit_lp:
+   635 00000760 4983FD08                	cmp	r13, 8
+   636 00000764 7D2E                    	jge	.e_bit
+   637 00000766 4C3B33                  	cmp	r14, [rbx+s_size]
+   638 00000769 7D2E                    	jge	.e_print
+   639 0000076B 488B5308                	mov	rdx, [rbx+s_set]
+   640 0000076F 4A0FB61422              	movzx	rdx, byte [rdx+r12]
+   641 00000774 4C0FA3EA                	bt	rdx, r13
+   642 00000778 7312                    	jnc	.ct_bit
+   643 0000077A 488D3C25[68000000]      	lea	rdi, [printelem]
+   644 00000782 4C89F6                  	mov	rsi, r14
+   645 00000785 31C0                    	xor	eax, eax
+   646 00000787 E8(00000000)            	call 	printf
+   647                                  .ct_bit:
+   648 0000078C 49FFC5                  	inc	r13
+   649 0000078F 49FFC6                  	inc	r14
+   650 00000792 EBCC                    	jmp	.bit_lp
+   651                                  .e_bit:
+   652 00000794 49FFC4                  	inc 	r12
+   653 00000797 EBBF                    	jmp	.pr_loop	
+   654                                  .e_print:
+   655 00000799 488D3C25[6C000000]      	lea	rdi, [linefd]
+   656 000007A1 31C0                    	xor	eax, eax
+   657 000007A3 E8(00000000)            	call 	printf
+   658                                  	
+   659                                  .end_print:	
+   660 000007A8 415F                    	pop	r15
+   661 000007AA 415E                    	pop	r14
+   662 000007AC 415D                    	pop	r13
+   663 000007AE 415C                    	pop 	r12
+   664 000007B0 5B                      	pop	rbx
+   665 000007B1 C9                      	leave
+   666 000007B2 C3                      	ret
+   667                                  	
+   668                                  ;;; ---------------------------------------------------------------------
+   669                                  
+   670                                  main:
+   671 000007B3 55                      	push	rbp
+   672 000007B4 4889E5                  	mov	rbp, rsp
+   673 000007B7 53                      	push	rbx		; save rbx
+   674 000007B8 4154                    	push	r12		; save r12
+   675 000007BA 4155                    	push	r13		; save r13
+   676 000007BC 4156                    	push	r14		; save r14
+   677                                  
+   678                                  	;; create an instance of Sets from the sets size entered in the command line
+   679                                  	;; -----------------------------------------------------------------------
+   680                                  	;; read sets size from command line
+   681 000007BE 4889F3                  	mov	rbx, rsi
+   682 000007C1 4883C308                	add	rbx, 8		; assuming argc=3, rbx is the address of argv[1]
+   683 000007C5 488B3B                  	mov	rdi, [rbx]	; rdi <- content of argv[1]
+   684 000007C8 E8(00000000)            	call	atol
+   685 000007CD 4989C4                  	mov	r12, rax	; save number of sets in r12
+   686 000007D0 4883C308                	add	rbx, 8		; assuming argc=3, rbx is the address of argv[2]
+   687 000007D4 488B3B                  	mov	rdi, [rbx]	; rdi <- content of argv[2]
+   688 000007D7 E8(00000000)            	call	atol
+   689 000007DC 4989C5                  	mov	r13, rax	; save each set size in r13
+   690                                  	;; create an instance of Sets
+   691 000007DF BF10000000              	mov	rdi, Sets_size
+   692 000007E4 E8(00000000)            	call	malloc
+   693 000007E9 48890425[18010000]      	mov	[_sets], rax	; save set address
+   694                                  	;; save set size in the corresp. field
+   695 000007F1 488B1C25[18010000]      	mov	rbx, [_sets]
+   696 000007F9 4C8923                  	mov	[rbx+sts_size], r12
+   697                                  	;; now I reserve memory for every set
+   698 000007FC 4831D2                  	xor	rdx, rdx
+   699 000007FF 4C89E0                  	mov	rax, r12
+   700 00000802 B910000000              	mov	rcx, Set_size
+   701 00000807 48F7E1                  	mul	rcx		; rax <-- number of sets x size of a set
+   702 0000080A 4889C7                  	mov	rdi, rax
+   703 0000080D E8(00000000)            	call 	malloc
+   704 00000812 48894308                	mov	[rbx+sts_sets], rax
+   705                                  	;; now, the instance of Sets is complete, we must initialize every set
+   706 00000816 4D31F6                  	xor	r14, r14
+   707 00000819 4C8B6308                	mov	r12, [rbx+sts_sets]
+   708                                  .loop:
+   709 0000081D 4C3B33                  	cmp	r14, qword [rbx+sts_size]
+   710 00000820 7D21                    	jge	.again
+   711 00000822 4D892C24                	mov	[r12+s_size], r13
+   712 00000826 4C89EF                  	mov	rdi, r13       	; how many bytes do I need?
+   713 00000829 48C1EF03                	shr	rdi, 3	       	; rdi <-- s_size/8
+   714 0000082D 48FFC7                  	inc	rdi		; rdi <-- s_size/8 + 1 (bytes I need)	
+   715 00000830 E8(00000000)            	call	malloc
+   716 00000835 4989442408              	mov	[r12+s_set], rax
+   717 0000083A 4983C410                	add	r12, Set_size
+   718 0000083E 49FFC6                  	inc	r14
+   719 00000841 EBDA                    	jmp	.loop
+   720                                  	;; now, the instance of Sets is complete, with every set initialized
+   721                                  	;; -----------------------------------------------------------------
+   722                                  	
+   723                                  .again:
+   724 00000843 E8B8F7FFFF              	call 	read_command
+   725                                  	;; rax contains 0, 1, 2, 3, 4, 5 or 6
+   726                                  	;; check for quit
+   727 00000848 4883F806                	cmp	rax, 6
+   728 0000084C 7448                    	je	.end
+   729                                  .nxt_ad:
+   730 0000084E 4883F800                	cmp	rax, 0
+   731 00000852 7507                    	jne	.nxt_re
+   732 00000854 E8EBF8FFFF              	call	fun_add
+   733 00000859 EBE8                    	jmp  	.again	
+   734                                  .nxt_re:
+   735 0000085B 4883F801                	cmp 	rax, 1
+   736 0000085F 7507                    	jne 	.nxt_te
+   737 00000861 E8EEF9FFFF              	call	fun_remove
+   738 00000866 EBDB                    	jmp 	.again
+   739                                  .nxt_te:
+   740 00000868 4883F802                	cmp	rax, 2
+   741 0000086C 7507                    	jne 	.nxt_un
+   742 0000086E E8F1FAFFFF              	call	fun_test
+   743 00000873 EBCE                    	jmp	.again	
+   744                                  .nxt_un:
+   745 00000875 4883F803                	cmp 	rax, 3
+   746 00000879 7507                    	jne 	.nxt_in
+   747 0000087B E8F9FBFFFF              	call	fun_union
+   748 00000880 EBC1                    	jmp 	.again
+   749                                  .nxt_in:
+   750 00000882 4883F804                	cmp 	rax, 4
+   751 00000886 7507                    	jne 	.nxt_pr
+   752 00000888 E816FDFFFF              	call	fun_intersection
+   753 0000088D EBB4                    	jmp 	.again
+   754                                  .nxt_pr:  ;; no need to check if rax = 5, sure it is
+   755 0000088F E839FEFFFF              	call	fun_print
+   756 00000894 EBAD                    	jmp 	.again
+   757                                  .end:
+   758                                  	
+   759                                  	;; we should free all mallocs
+   760                                  	;; first, free each individual set
+   761 00000896 488B1C25[18010000]      	mov	rbx, [_sets]
+   762 0000089E 4C8B6308                	mov	r12, [rbx+sts_sets]
+   763 000008A2 4D31F6                  	xor	r14, r14
+   764                                  .loopf:
+   765 000008A5 4C3B33                  	cmp	r14, qword [rbx+sts_size]
+   766 000008A8 7D13                    	jge	.freeSets
+   767 000008AA 498B7C2408              	mov	rdi, [r12+s_set]
+   768 000008AF E8(00000000)            	call	free
+   769 000008B4 4983C410                	add	r12, Set_size
+   770 000008B8 49FFC6                  	inc	r14
+   771 000008BB EBE8                    	jmp	.loopf
+   772                                  	;; then, free the Sets structure
+   773                                  .freeSets:
+   774 000008BD 488B3C25[18010000]      	mov	rdi, [_sets]
+   775 000008C5 E8(00000000)            	call	free
+   776                                  	
+   777 000008CA 415E                    	pop	r14		; restore r14
+   778 000008CC 415D                    	pop	r13		; restore r13
+   779 000008CE 415C                    	pop	r12		; restore r12
+   780 000008D0 5B                      	pop	rbx		; restore rbx
+   781 000008D1 C9                      	leave
+   782 000008D2 C3                      	ret
+   783                                  	

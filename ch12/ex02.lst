@@ -1,0 +1,125 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 
+     3                                 
+     4                                 blocksize equ 512
+     5                                 
+     6                                 
+     7                                 
+     8                                 [section .bss]
+     9 00000000 <gap>                  fdinput resd 1
+    10 00000004 <gap>                  buffer resb blocksize
+    11 00000204 <gap>                  lines resq 1
+    12 0000020C <gap>                  words resq 1
+    13 00000214 <gap>                  bytes resq 1
+    14                                 
+    15                                 
+    16                                 
+    17                                 [section .data]
+    18 00000000 72656164206661696C-    printerror db "read failure",0xa,0
+    19 00000000 7572650A00         
+    20 0000000E 2573202D2D20256420-    results db "%s -- %d lines -- %d words -- %d bytes",0xa,0
+    21 0000000E 6C696E6573202D2D20-
+    22 0000000E 256420776F72647320-
+    23 0000000E 2D2D20256420627974-
+    24 0000000E 65730A00           
+    25                                 
+    26                                 
+    27                                 
+    28                                 [section .text]
+    29                                 [global main]
+    30                                 
+    31                                 [extern printf]
+    32                                 %line 25+0 ex02.asm
+    33                                 [extern open]
+    34                                 [extern read]
+    35                                 [extern close]
+    36                                 %line 26+1 ex02.asm
+    37                                 main:
+    38 00000000 55                      push rbp
+    39 00000001 4889E5                  mov rbp, rsp
+    40 00000004 53                      push rbx
+    41 00000005 4154                    push r12
+    42 00000007 4155                    push r13
+    43                                 
+    44 00000009 4889F3                  mov rbx, rsi
+    45 0000000C 4883C308                add rbx, 8
+    46                                 .start_loop:
+    47 00000010 488B33                  mov rsi, [rbx]
+    48 00000013 4883FE00                cmp rsi, 0
+    49 00000017 0F8405010000            je .end_loop
+    50 0000001D 4889F7                  mov rdi, rsi
+    51 00000020 BE00000000              mov esi, 0x0
+    52 00000025 E8(F6FFFFFF)            call open
+    53 0000002A 83F800                  cmp eax, 0
+    54 0000002D 0F8CE6000000            jl .next_file
+    55 00000033 890425[00000000]        mov [fdinput], eax
+    56                                 
+    57 0000003A 48C70425[00000000]-     mov qword [lines], 0
+    58 0000003A 00000000           
+    59 00000046 48C70425[00000000]-     mov qword [words], 0
+    60 00000046 00000000           
+    61 00000052 48C70425[00000000]-     mov qword [bytes], 0
+    62 00000052 00000000           
+    63 0000005E 4D31ED                  xor r13, r13
+    64                                 .next_chunk:
+    65 00000061 488B3C25[00000000]      mov rdi, [fdinput]
+    66 00000069 488D3425[00000000]      lea rsi, [buffer]
+    67 00000071 48C7C200020000          mov rdx, blocksize
+    68 00000078 E8(F6FFFFFF)            call read
+    69 0000007D 83F800                  cmp eax, 0
+    70 00000080 7E65                    jle .close_file
+    71 00000082 4989C4                  mov r12, rax
+    72 00000085 4C012425[00000000]      add qword [bytes], r12
+    73 0000008D 4831C9                  xor rcx, rcx
+    74                                 .next_byte:
+    75 00000090 4C39E1                  cmp rcx, r12
+    76 00000093 7D4D                    jge .end_chunk
+    77                                 .skip_spaces:
+    78                                 
+    79 00000095 80B9[00000000]20        cmp byte [buffer+rcx], 0x20
+    80 0000009C 7514                    jne .not_a_space
+    81 0000009E 4983FD00                cmp r13, 0x0
+    82 000000A2 7409                    je .after_space_1
+    83 000000A4 4D31ED                  xor r13, r13
+    84 000000A7 48FF0425[00000000]      inc qword [words]
+    85                                 .after_space_1:
+    86 000000AF 48FFC1                  inc rcx
+    87 000000B2 EBDA                    jmp .next_byte
+    88                                 .not_a_space:
+    89 000000B4 80B9[00000000]0A        cmp byte [buffer+rcx], 0xa
+    90 000000BB 7519                    jne .not_new_line
+    91 000000BD 4983FD00                cmp r13, 0x0
+    92 000000C1 7409                    je .after_space_2
+    93 000000C3 4D31ED                  xor r13, r13
+    94 000000C6 48FF0425[00000000]      inc qword [words]
+    95                                 .after_space_2:
+    96 000000CE 48FF0425[00000000]      inc qword [lines]
+    97 000000D6 EB05                    jmp .cont
+    98                                 .not_new_line:
+    99 000000D8 49C7C501000000          mov r13, 0x1
+   100                                 .cont:
+   101 000000DF 48FFC1                  inc rcx
+   102 000000E2 EBAA                    jmp .next_byte
+   103                                 .end_chunk:
+   104 000000E4 E973FFFFFF              jmp .next_chunk
+   105                                 .close_file:
+   106 000000E9 8B3C25[00000000]        mov edi, [fdinput]
+   107 000000F0 E8(F6FFFFFF)            call close
+   108                                 
+   109 000000F5 488D3C25[00000000]      lea rdi, [results]
+   110 000000FD 488B33                  mov rsi, [rbx]
+   111 00000100 488B1425[00000000]      mov rdx, [lines]
+   112 00000108 488B0C25[00000000]      mov rcx, [words]
+   113 00000110 4C8B0425[00000000]      mov r8, [bytes]
+   114 00000118 31C0                    xor eax, eax
+   115 0000011A E8(F6FFFFFF)            call printf
+   116                                 .next_file:
+   117 0000011F 4883C308                add rbx, 8
+   118 00000123 E9E3FEFFFF              jmp .start_loop
+   119                                 .end_loop:
+   120 00000128 415D                    pop r13
+   121 0000012A 415C                    pop r12
+   122 0000012C 5B                      pop rbx
+   123 0000012D C9                      leave
+   124 0000012E C3                      ret
+   125                                 

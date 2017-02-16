@@ -1,0 +1,34 @@
+     1                                 %line 1+1 ex05.asm
+     2                                 [segment .data]
+     3                                 
+     4 00000000 ECDD1FEF552B63BF       dat dq -0.00234
+     5 00000008 0000                   exp dw 0
+     6 0000000A 00                     sgn db 0
+     7 0000000B 0000000000000000       mnt dq 0
+     8                                 
+     9                                 [segment .text]
+    10                                 [global _start]
+    11                                 _start:
+    12 00000000 55                      push rbp
+    13 00000001 4889E5                  mov rbp, rsp
+    14                                 
+    15 00000004 488B0425[00000000]      mov rax, [dat]
+    16 0000000C 48D1C0                  rol rax, 1
+    17 0000000F 4883E001                and rax, 0x1
+    18 00000013 880425[00000000]        mov [sgn], al
+    19                                 
+    20 0000001A 488B0425[00000000]      mov rax, [dat]
+    21 00000022 48C1C00C                rol rax, 12
+    22 00000026 4825FF070000            and rax, 0x7FF
+    23 0000002C 482DFF030000            sub rax, 0x3FF
+    24 00000032 66890425[00000000]      mov [exp], ax
+    25                                 
+    26 0000003A 488B0425[00000000]      mov rax, [dat]
+    27 00000042 48C1E00C                shl rax, 12
+    28 00000046 48C1E80C                shr rax, 12
+    29 0000004A 480FBAE834              bts rax, 52
+    30 0000004F 48890425[00000000]      mov [mnt], rax
+    31                                 
+    32 00000057 4831C0                  xor rax, rax
+    33 0000005A C9                      leave
+    34 0000005B C3                      ret

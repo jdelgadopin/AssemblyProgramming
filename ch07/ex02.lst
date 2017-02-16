@@ -1,0 +1,21 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 [segment .data]
+     3                                 
+     4 00000000 EFCDAB0000000000       a dq 0xABCDEF
+     5 00000008 BADCFE0000000000       b dq 0xFEDCBA
+     6                                 
+     7                                 [segment .text]
+     8                                 [global _start]
+     9                                 _start:
+    10 00000000 55                      push rbp
+    11 00000001 4889E5                  mov rbp, rsp
+    12                                 
+    13 00000004 488B0425[00000000]      mov rax, [a]
+    14 0000000C 48330425[00000000]      xor rax, [b]
+    15 00000014 48310425[00000000]      xor [b], rax
+    16 0000001C 48330425[00000000]      xor rax, [b]
+    17 00000024 48890425[00000000]      mov [a], rax
+    18                                 
+    19 0000002C 4831C0                  xor rax, rax
+    20 0000002F C9                      leave
+    21 00000030 C3                      ret

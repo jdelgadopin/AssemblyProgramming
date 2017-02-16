@@ -1,0 +1,42 @@
+     1                                 %line 1+1 ex03.asm
+     2                                 [section .data]
+     3 00000000 170000000A00000004-    vt dd 23, 10, 4, 0, 13, 15, 20, 1, -3, 3
+     4 00000000 000000000000000D00-
+     5 00000000 00000F000000140000-
+     6 00000000 0001000000FDFFFFFF-
+     7 00000000 03000000           
+     8 00000028 0A000000               sz dd 10
+     9                                 
+    10                                 [section .text]
+    11                                 [global _start]
+    12                                 
+    13                                 _start:
+    14 00000000 C12425[00000000]02      shl dword [sz], 2
+    15                                 
+    16 00000008 6631C0                 s_do: xor ax, ax
+    17                                 
+    18 0000000B 31C9                    xor ecx, ecx
+    19 0000000D 390C25[00000000]       s_for: cmp dword [sz], ecx
+    20 00000014 7433                    je e_do
+    21                                 
+    22 00000016 678B99[04000000]        mov ebx, dword [vt + ecx + 4]
+    23 0000001D 673999[00000000]        cmp dword [vt + ecx], ebx
+    24 00000024 7E1E                    jle e_for
+    25                                 
+    26 00000026 673399[00000000]        xor ebx, dword [vt + ecx]
+    27 0000002D 673199[00000000]        xor dword [vt + ecx] , ebx
+    28 00000034 673399[00000000]        xor ebx, dword [vt + ecx]
+    29 0000003B 678999[04000000]        mov dword [vt + ecx + 4], ebx
+    30                                 
+    31 00000042 6683C801                or ax, 0x1
+    32                                 
+    33 00000046 83C104                 e_for: add ecx, 4
+    34 00000049 EBC0                    jmp s_for
+    35                                 
+    36 0000004B 660FBAE000             e_do: bt ax, 0
+    37 00000050 72B4                    jc s_do
+    38                                 
+    39 00000052 4831FF                  xor rdi,rdi
+    40 00000055 6A3C                    push 0x3c
+    41 00000057 58                      pop rax
+    42 00000058 0F05                    syscall

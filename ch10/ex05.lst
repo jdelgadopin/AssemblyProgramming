@@ -1,0 +1,346 @@
+     1                                 %line 1+1 ex05.asm
+     2                                 
+     3                                 
+     4                                 [section .bss]
+     5 00000000 <gap>                  set_sum resw 20
+     6 00000028 <gap>                  sum resw 1
+     7 0000002A <gap>                  sizeset resb 1
+     8                                 
+     9 0000002B <gap>                  solution resw 20
+    10                                 
+    11 00000053 <gap>                  Q resq 1
+    12 0000005B <gap>                  Qrows resq 1
+    13 00000063 <gap>                  Qcols resq 1
+    14                                 
+    15 0000006B <gap>                  auxneg resq 1
+    16 00000073 <gap>                  auxpos resq 1
+    17                                 
+    18                                 [section .data]
+    19 00000000 25642000               outp db "%d ",0
+    20 00000004 256400                 inp db "%d",0
+    21 00000007 546865726520697320-    nosol db "There is no solution",0
+    22 00000007 6E6F20736F6C757469-
+    23 00000007 6F6E00             
+    24 0000001C 256420697320746865-    sol db "%d is the sum of: ",0
+    25 0000001C 2073756D206F663A20-
+    26 0000001C 00                 
+    27 0000002F 0A00                   lnfd db 0xa,0
+    28                                 
+    29                                 [section .text]
+    30                                 [global main]
+    31                                 
+    32                                 [extern printf]
+    33                                 %line 27+0 ex05.asm
+    34                                 [extern scanf]
+    35                                 [extern malloc]
+    36                                 %line 28+1 ex05.asm
+    37                                 
+    38                                 
+    39                                 
+    40                                 read_data:
+    41 00000000 55                      push rbp
+    42 00000001 4889E5                  mov rbp, rsp
+    43 00000004 53                      push rbx
+    44 00000005 4154                    push r12
+    45                                 
+    46 00000007 488D3C25[00000000]      lea rdi, [inp]
+    47 0000000F 488D3425[00000000]      lea rsi, [sum]
+    48 00000017 31C0                    xor eax, eax
+    49 00000019 E8(F6FFFFFF)            call scanf
+    50 0000001E 4883F801                cmp rax, 1
+    51 00000022 7528                    jne .end_frd
+    52 00000024 30DB                    xor bl, bl
+    53 00000026 4C8D2425[00000000]      lea r12, [set_sum]
+    54                                 .for_rd:
+    55 0000002E 488D3C25[00000000]      lea rdi, [inp]
+    56 00000036 4C89E6                  mov rsi, r12
+    57 00000039 31C0                    xor eax, eax
+    58 0000003B E8(F6FFFFFF)            call scanf
+    59 00000040 4883F801                cmp rax, 1
+    60 00000044 7506                    jne .end_frd
+    61 00000046 FEC3                    inc bl
+    62 00000048 4983C402                add r12, 2
+    63 0000004C EBDE                    jmp .for_rd
+    64                                 .end_frd:
+    65 0000004E 881C25[00000000]        mov byte [sizeset], bl
+    66                                 
+    67 00000055 415C                    pop r12
+    68 00000057 5B                      pop rbx
+    69 00000058 C9                      leave
+    70 00000059 C3                      ret
+    71                                 
+    72                                 
+    73                                 
+    74                                 initialize:
+    75 0000005A 55                      push rbp
+    76 0000005B 4889E5                  mov rbp, rsp
+    77 0000005E 53                      push rbx
+    78 0000005F 4154                    push r12
+    79                                 
+    80 00000061 488D3C25[00000000]      lea rdi, [set_sum]
+    81 00000069 480FB63425[00000000]      movzx rsi, byte [sizeset]
+    82 00000072 4831C0                  xor rax, rax
+    83 00000075 4831DB                  xor rbx, rbx
+    84 00000078 4831C9                  xor rcx, rcx
+    85                                 .loop:
+    86 0000007B 4839F1                  cmp rcx, rsi
+    87 0000007E 7421                    je .end_loop
+    88                                 
+    89 00000080 66C78409[00000000]-     mov word [solution+2*rcx], 0
+    90 00000080 0000               
+    91                                 
+    92 0000008A 4C0FBF144F              movsx r10, word [rdi+2*rcx]
+    93 0000008F 66833C4F00              cmp word [rdi+2*rcx], 0
+    94 00000094 7F03                    jg .positive
+    95 00000096 4C01D3                  add rbx, r10
+    96 00000099 EB01                    jmp .cont
+    97                                 .positive:
+    98 0000009B 4C01D0                  add rax, r10
+    99                                 .cont:
+   100 0000009E 48FFC1                  inc rcx
+   101 000000A1 EBD6                    jmp .loop
+   102                                 .end_loop:
+   103 000000A3 48891C25[00000000]      mov [auxneg], rbx
+   104 000000AB 48890425[00000000]      mov [auxpos], rax
+   105                                 
+   106 000000B3 48893425[00000000]      mov [Qrows], rsi
+   107 000000BB 4829D8                  sub rax, rbx
+   108 000000BE 48FFC0                  inc rax
+   109 000000C1 48890425[00000000]      mov [Qcols], rax
+   110 000000C9 4831D2                  xor rdx, rdx
+   111 000000CC 48F7E6                  mul rsi
+   112 000000CF 4889C3                  mov rbx, rax
+   113 000000D2 4889C7                  mov rdi, rax
+   114 000000D5 E8(F6FFFFFF)            call malloc
+   115 000000DA 48890425[00000000]      mov [Q], rax
+   116                                 
+   117 000000E2 4831C9                  xor rcx, rcx
+   118                                 .initQ:
+   119 000000E5 4839D9                  cmp rcx, rbx
+   120 000000E8 7D07                    jge .endinitQ
+   121 000000EA C6040800                mov byte [rax+rcx], 0
+   122 000000EE 48FFC1                  inc rcx
+   123 000000F1 EBF0                    jmp .initQ
+   124                                 .endinitQ:
+   125                                 
+   126 000000F3 415C                    pop r12
+   127 000000F5 5B                      pop rbx
+   128 000000F6 C9                      leave
+   129 000000F7 C3                      ret
+   130                                 
+   131                                 
+   132                                 
+   133                                 compute_Q:
+   134 000000F8 55                      push rbp
+   135 000000F9 4889E5                  mov rbp, rsp
+   136 000000FC 53                      push rbx
+   137 000000FD 4154                    push r12
+   138                                 
+   139                                 
+   140 000000FF 488B3C25[00000000]      mov rdi, [Q]
+   141 00000107 4D31C9                  xor r9, r9
+   142                                 .init_row:
+   143 0000010A 4C3B0C25[00000000]      cmp r9, [Qcols]
+   144 00000112 7D1D                    jge .end_init_row
+   145 00000114 488B1C25[00000000]      mov rbx, [auxneg]
+   146 0000011C 4C01CB                  add rbx, r9
+   147 0000011F 663B1C25[00000000]      cmp bx, word [set_sum]
+   148 00000127 7503                    jne .cont_init_row
+   149 00000129 42800C0F01              or byte [rdi+r9], 0x1
+   150                                 .cont_init_row:
+   151 0000012E 49FFC1                  inc r9
+   152 00000131 EBD5                    jmp .init_row
+   153                                 .end_init_row:
+   154                                 
+   155                                 
+   156 00000133 4D31C0                  xor r8, r8
+   157 00000136 49FFC0                  inc r8
+   158                                 .looprows:
+   159 00000139 4C3B0425[00000000]      cmp r8, [Qrows]
+   160 00000141 0F8DA8000000            jge .endrows
+   161 00000147 4D31C9                  xor r9, r9
+   162                                 .loopcols:
+   163 0000014A 4C3B0C25[00000000]      cmp r9, [Qcols]
+   164 00000152 0F8D8F000000            jge .endcols
+   165                                 
+   166 00000158 4D31D2                  xor r10, r10
+   167 0000015B 4C89C0                  mov rax, r8
+   168 0000015E 48FFC8                  dec rax
+   169 00000161 4831D2                  xor rdx, rdx
+   170 00000164 48F72425[00000000]      mul qword [Qcols]
+   171 0000016C 4C01C8                  add rax, r9
+   172 0000016F 448A1407                mov r10b, byte [rdi+rax]
+   173                                 
+   174 00000173 4D31DB                  xor r11, r11
+   175 00000176 488B1C25[00000000]      mov rbx, [auxneg]
+   176 0000017E 4C01CB                  add rbx, r9
+   177 00000181 66433B9C00[00000000]      cmp bx, word [set_sum+2*r8]
+   178 0000018A 7502                    jne .cont2ndterm
+   179 0000018C 4180CB01                or r11b, 0x1
+   180                                 .cont2ndterm:
+   181                                 
+   182 00000190 4D31E4                  xor r12, r12
+   183 00000193 4C89C0                  mov rax, r8
+   184 00000196 48FFC8                  dec rax
+   185 00000199 4831D2                  xor rdx, rdx
+   186 0000019C 48F72425[00000000]      mul qword [Qcols]
+   187 000001A4 4C89CB                  mov rbx, r9
+   188 000001A7 4B0FBF8C00[00000000]      movsx rcx, word [set_sum+2*r8]
+   189 000001B0 4829CB                  sub rbx, rcx
+   190 000001B3 4883FB00                cmp rbx, 0
+   191 000001B7 7C0F                    jl .cont3rdterm
+   192 000001B9 483B1C25[00000000]      cmp rbx, [Qcols]
+   193 000001C1 7D05                    jge .cont3rdterm
+   194 000001C3 4801D8                  add rax, rbx
+   195 000001C6 448A2407                mov r12b, byte [rdi+rax]
+   196                                 .cont3rdterm:
+   197                                 
+   198 000001CA 4508DA                  or r10b, r11b
+   199 000001CD 4508E2                  or r10b, r12b
+   200 000001D0 4C89C0                  mov rax, r8
+   201 000001D3 4831D2                  xor rdx, rdx
+   202 000001D6 48F72425[00000000]      mul qword [Qcols]
+   203 000001DE 4C01C8                  add rax, r9
+   204 000001E1 44881407                mov byte [rdi+rax], r10b
+   205 000001E5 49FFC1                  inc r9
+   206 000001E8 E958FFFFFF              jmp .loopcols
+   207                                 .endcols:
+   208 000001ED 49FFC0                  inc r8
+   209 000001F0 E93FFFFFFF              jmp .looprows
+   210                                 .endrows:
+   211 000001F5 415C                    pop r12
+   212 000001F7 5B                      pop rbx
+   213 000001F8 C9                      leave
+   214 000001F9 C3                      ret
+   215                                 
+   216                                 
+   217                                 
+   218                                 find_solution:
+   219 000001FA 55                      push rbp
+   220 000001FB 4889E5                  mov rbp, rsp
+   221 000001FE 53                      push rbx
+   222 000001FF 4154                    push r12
+   223                                 
+   224 00000201 488B3C25[00000000]      mov rdi, [Q]
+   225 00000209 4C0FBF2425[00000000]      movsx r12, word [sum]
+   226 00000212 4D89E0                  mov r8, r12
+   227 00000215 4C2B0425[00000000]      sub r8, [auxneg]
+   228 0000021D 4D31C9                  xor r9, r9
+   229 00000220 488B0C25[00000000]      mov rcx, [Qrows]
+   230 00000228 48FFC9                  dec rcx
+   231                                 .do:
+   232                                 .while:
+   233 0000022B 4883F900                cmp rcx, 0
+   234 0000022F 7C1A                    jl .endwhile
+   235 00000231 4889C8                  mov rax, rcx
+   236 00000234 4831D2                  xor rdx, rdx
+   237 00000237 48F72425[00000000]      mul qword [Qcols]
+   238 0000023F 4C01C0                  add rax, r8
+   239 00000242 803C0700                cmp byte [rdi+rax], 0
+   240 00000246 7403                    je .endwhile
+   241 00000248 48FFC9                  dec rcx
+   242 0000024B EBDC                    jmp .while
+   243                                 .endwhile:
+   244 0000024D 48FFC1                  inc rcx
+   245 00000250 480FBF8409[00000000]      movsx rax, word [set_sum+2*rcx]
+   246 00000259 66898409[00000000]      mov word [solution+2*rcx], ax
+   247 00000261 4929C0                  sub r8, rax
+   248 00000264 4901C1                  add r9, rax
+   249 00000267 4883F900                cmp rcx, 0
+   250 0000026B 7E05                    jle .enddo
+   251 0000026D 4D39E1                  cmp r9, r12
+   252 00000270 7400                    je .enddo
+   253 00000272 EBB5                    jmp .do
+   254                                 .enddo:
+   255 00000274 415C                    pop r12
+   256 00000276 5B                      pop rbx
+   257 00000277 C9                      leave
+   258 00000278 C3                      ret
+   259                                 
+   260                                 
+   261                                 
+   262                                 main:
+   263 00000279 55                      push rbp
+   264 0000027A 4889E5                  mov rbp, rsp
+   265                                 
+   266                                 
+   267 0000027D 53                      push rbx
+   268 0000027E 4154                    push r12
+   269 00000280 4155                    push r13
+   270                                 
+   271 00000282 E874FDFFFF              call read_data
+   272                                 
+   273                                 
+   274 00000287 E8C9FDFFFF              call initialize
+   275                                 
+   276                                 
+   277                                 
+   278 0000028C 4C0FBF2425[00000000]      movsx r12, word [sum]
+   279 00000295 4C3B2425[00000000]      cmp r12, [auxneg]
+   280 0000029D 0F8CA8000000            jl .nosolution
+   281 000002A3 4C3B2425[00000000]      cmp r12, [auxpos]
+   282 000002AB 0F8F9A000000            jg .nosolution
+   283                                 
+   284                                 
+   285 000002B1 E83DFEFFFF              call compute_Q
+   286                                 
+   287                                 
+   288                                 
+   289 000002B6 48833C25[00000000]-     cmp qword [Qrows], 0
+   290 000002B6 00                 
+   291 000002BF 0F8486000000            je .nosolution
+   292 000002C5 488B0C25[00000000]      mov rcx, [Qcols]
+   293 000002CD 488B0425[00000000]      mov rax, [Qrows]
+   294 000002D5 48FFC8                  dec rax
+   295 000002D8 4831D2                  xor rdx, rdx
+   296 000002DB 48F7E1                  mul rcx
+   297 000002DE 480FBF0C25[00000000]      movsx rcx, word [sum]
+   298 000002E7 482B0C25[00000000]      sub rcx, [auxneg]
+   299 000002EF 4801C8                  add rax, rcx
+   300 000002F2 488B3C25[00000000]      mov rdi, [Q]
+   301 000002FA 803C0700                cmp byte [rdi + rax], 0
+   302 000002FE 744F                    je .nosolution
+   303                                 
+   304                                 
+   305 00000300 E8F0FEFFFF              call find_solution
+   306                                 
+   307                                 
+   308                                 
+   309                                 
+   310 00000305 488D3C25[00000000]      lea rdi, [sol]
+   311 0000030D 480FBF3425[00000000]      movsx rsi, word [sum]
+   312 00000316 31C0                    xor eax, eax
+   313 00000318 E8(F6FFFFFF)            call printf
+   314                                 
+   315 0000031D 4831DB                  xor rbx, rbx
+   316                                 .solution:
+   317 00000320 3A1C25[00000000]        cmp bl, byte [sizeset]
+   318 00000327 7D35                    jge .end
+   319 00000329 6683BC1B[00000000]-     cmp word [solution+2*rbx],0
+   320 00000329 00                 
+   321 00000332 7416                    je .noprint
+   322 00000334 488D3C25[00000000]      lea rdi, [outp]
+   323 0000033C 480FBFB41B[00000000]      movsx rsi, word [solution+2*rbx]
+   324 00000345 31C0                    xor eax, eax
+   325 00000347 E8(F6FFFFFF)            call printf
+   326                                 .noprint:
+   327 0000034C 48FFC3                  inc rbx
+   328 0000034F EBCD                    jmp .solution
+   329                                 
+   330                                 .nosolution:
+   331 00000351 488D3C25[00000000]      lea rdi, [nosol]
+   332 00000359 31C0                    xor eax, eax
+   333 0000035B E8(F6FFFFFF)            call printf
+   334                                 .end:
+   335 00000360 488D3C25[00000000]      lea rdi, [lnfd]
+   336 00000368 31C0                    xor eax, eax
+   337 0000036A E8(F6FFFFFF)            call printf
+   338                                 
+   339                                 
+   340 0000036F 415D                    pop r13
+   341 00000371 415C                    pop r12
+   342 00000373 5B                      pop rbx
+   343                                 
+   344 00000374 C9                      leave
+   345 00000375 C3                      ret
+   346                                 

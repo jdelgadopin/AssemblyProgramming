@@ -1,0 +1,141 @@
+     1                                 %line 1+1 ex01_qsort.asm
+     2                                 [section .data]
+     3 00000000 25642000               pr_write db "%d ",0
+     4 00000004 0A00                   linefd db 0xa,0
+     5                                 
+     6                                 [section .text]
+     7                                 [global main]
+     8                                 
+     9                                 [extern printf]
+    10                                 %line 8+0 ex01_qsort.asm
+    11                                 [extern rand]
+    12                                 [extern malloc]
+    13                                 [extern atol]
+    14                                 [extern qsort]
+    15                                 %line 9+1 ex01_qsort.asm
+    16                                 
+    17                                 
+    18                                 
+    19                                 create_data:
+    20                                 
+    21                                 
+    22                                 .array equ 0
+    23                                 .size equ 8
+    24                                 .r12 equ 16
+    25                                 .rbx equ 24
+    26 00000000 55                      push rbp
+    27 00000001 4889E5                  mov rbp, rsp
+    28 00000004 4883EC20                sub rsp, 32
+    29 00000008 48895C2418              mov [rsp+.rbx], rbx
+    30 0000000D 4C89642410              mov [rsp+.r12], r12
+    31 00000012 48897C2408              mov [rsp+.size], rdi
+    32 00000017 48C1E702                shl rdi, 2
+    33 0000001B E8(F6FFFFFF)            call malloc
+    34 00000020 48890424                mov [rsp+.array], rax
+    35 00000024 488B1C24                mov rbx, [rsp+.array]
+    36 00000028 4D31E4                  xor r12, r12
+    37                                 .for:
+    38 0000002B 4C3B642408              cmp r12, [rsp+.size]
+    39 00000030 7D19                    jge .end
+    40 00000032 E8(F6FFFFFF)            call rand
+    41 00000037 4831D2                  xor rdx, rdx
+    42 0000003A 49C7C010270000          mov r8, 10000
+    43 00000041 49F7F8                  idiv r8
+    44 00000044 428914A3                mov dword [rbx+4*r12], edx
+    45 00000048 49FFC4                  inc r12
+    46 0000004B EBDC                    jmp .for
+    47                                 .end:
+    48 0000004D 488B0424                mov rax, [rsp+.array]
+    49 00000051 4C8B642410              mov r12, [rsp+.r12]
+    50 00000056 488B5C2418              mov rbx, [rsp+.rbx]
+    51 0000005B C9                      leave
+    52 0000005C C3                      ret
+    53                                 
+    54                                 
+    55                                 
+    56                                 compare:
+    57                                 
+    58 0000005D 55                      push rbp
+    59 0000005E 4889E5                  mov rbp, rsp
+    60 00000061 8B07                    mov eax, dword [rdi]
+    61 00000063 2B06                    sub eax, dword [rsi]
+    62 00000065 C9                      leave
+    63 00000066 C3                      ret
+    64                                 
+    65                                 sort_data:
+    66                                 
+    67                                 
+    68                                 
+    69 00000067 55                      push rbp
+    70 00000068 4889E5                  mov rbp, rsp
+    71                                 
+    72 0000006B 48C7C204000000          mov rdx, 4
+    73 00000072 488D0C25[00000000]      lea rcx, [compare]
+    74 0000007A E8(F6FFFFFF)            call qsort
+    75 0000007F C9                      leave
+    76 00000080 C3                      ret
+    77                                 
+    78                                 
+    79                                 
+    80                                 print_data:
+    81                                 
+    82                                 
+    83                                 .array equ 0
+    84                                 .size equ 8
+    85                                 .r12 equ 16
+    86 00000081 55                      push rbp
+    87 00000082 4889E5                  mov rbp, rsp
+    88 00000085 4883EC20                sub rsp, 32
+    89 00000089 4C89642410              mov [rsp+.r12], r12
+    90 0000008E 4889742408              mov [rsp+.size], rsi
+    91 00000093 48893C24                mov [rsp+.array], rdi
+    92 00000097 4D31E4                  xor r12, r12
+    93                                 .for:
+    94 0000009A 4C3B642408              cmp r12, [rsp+.size]
+    95 0000009F 7D1A                    jge .end
+    96 000000A1 488B0C24                mov rcx, [rsp+.array]
+    97 000000A5 488D3C25[00000000]      lea rdi, [pr_write]
+    98 000000AD 4A8B34A1                mov rsi, [rcx+4*r12]
+    99 000000B1 31C0                    xor eax, eax
+   100 000000B3 E8(F6FFFFFF)            call printf
+   101 000000B8 49FFC4                  inc r12
+   102 000000BB EBDB                    jmp .for
+   103                                 .end:
+   104 000000BD 488D3C25[00000000]      lea rdi, [linefd]
+   105 000000C5 31C0                    xor eax, eax
+   106 000000C7 E8(F6FFFFFF)            call printf
+   107 000000CC 4C8B642410              mov r12, [rsp+.r12]
+   108 000000D1 C9                      leave
+   109 000000D2 C3                      ret
+   110                                 
+   111                                 
+   112                                 
+   113                                 main:
+   114 000000D3 55                      push rbp
+   115 000000D4 4889E5                  mov rbp, rsp
+   116 000000D7 4883EC10                sub rsp, 16
+   117 000000DB 4889F1                  mov rcx, rsi
+   118 000000DE 4883C108                add rcx, 8
+   119 000000E2 488B39                  mov rdi, [rcx]
+   120 000000E5 E8(F6FFFFFF)            call atol
+   121 000000EA 50                      push rax
+   122 000000EB 4889C7                  mov rdi, rax
+   123 000000EE E808FFFFFF              call create_data
+   124 000000F3 50                      push rax
+   125                                 
+   126                                 
+   127 000000F4 488B3C24                mov rdi, [rsp]
+   128 000000F8 488B742408              mov rsi, [rsp+8]
+   129 000000FD E87AFFFFFF              call print_data
+   130                                 
+   131 00000102 488B3C24                mov rdi, [rsp]
+   132 00000106 488B742408              mov rsi, [rsp+8]
+   133 0000010B E852FFFFFF              call sort_data
+   134                                 
+   135 00000110 488B3C24                mov rdi, [rsp]
+   136 00000114 488B742408              mov rsi, [rsp+8]
+   137 00000119 E85EFFFFFF              call print_data
+   138                                 
+   139 0000011E C9                      leave
+   140 0000011F C3                      ret
+   141                                 

@@ -1,0 +1,795 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 
+     3                                 
+     4                                 [section .bss]
+     5 00000000 <gap>                  cmnd resb 256
+     6 00000100 <gap>                  element resq 1
+     7 00000108 <gap>                  set1 resq 1
+     8 00000110 <gap>                  set2 resq 1
+     9 00000118 <gap>                  _sets resq 1
+    10                                 
+    11                                 
+    12                                 
+    13                                 [section .bss]
+    14                                 
+    15                                 [absolute 0]
+    16                                 %line 14+0 ex02.asm
+    17                                 Set:
+    18                                 %line 15+1 ex02.asm
+    19                                 s_size: resq 1
+    20                                 s_set: resq 1
+    21                                 Set_size EQU $ - Set
+    22                                 %line 17+0 ex02.asm
+    23                                 [section .bss]
+    24                                 %line 18+1 ex02.asm
+    25                                 
+    26                                 Sets_size equ 16
+    27                                 sts_size equ 0
+    28                                 sts_sets equ 8
+    29                                 
+    30                                 
+    31                                 
+    32                                 [section .data]
+    33                                 
+    34 00000000 253235357300           readcmnd db "%255s",0
+    35 00000006 256400                 param db "%d",0
+    36 00000009 456E74657220636F6D-    prompt db "Enter command (add, remove, test, union, intersect, print, quit): ",0
+    37 00000009 6D616E642028616464-
+    38 00000009 2C2072656D6F76652C-
+    39 00000009 20746573742C20756E-
+    40 00000009 696F6E2C20696E7465-
+    41 00000009 72736563742C207072-
+    42 00000009 696E742C2071756974-
+    43 00000009 293A2000           
+    44 0000004C 456E74657220656C65-    promptelem db "Enter element: ",0
+    45 0000004C 6D656E743A2000     
+    46 0000005C 456E74657220736574-    promptset db "Enter set: ",0
+    47 0000005C 3A2000             
+    48 00000068 25642000               printelem db "%d ",0
+    49 0000006C 0A00                   linefd db 0xa,0
+    50                                 
+    51 0000006E 61646400               _add db "add",0
+    52 00000072 256420616464656420-    _added db "%d added to set %d",0xa,0
+    53 00000072 746F20736574202564-
+    54 00000072 0A00               
+    55 00000086 72656D6F766500         _remove db "remove",0
+    56 0000008D 25642072656D6F7665-    _removed db "%d removed from set %d",0xa,0
+    57 0000008D 642066726F6D207365-
+    58 0000008D 742025640A00       
+    59 000000A5 7465737400             _test db "test",0
+    60 000000AA 25642062656C6F6E67-    _belongs db "%d belongs to the set %d",0xa,0
+    61 000000AA 7320746F2074686520-
+    62 000000AA 7365742025640A00   
+    63 000000C4 2564206E6F74206265-    _notbelongs db "%d not belongs to the set %d",0xa,0
+    64 000000C4 6C6F6E677320746F20-
+    65 000000C4 746865207365742025-
+    66 000000C4 640A00             
+    67 000000E2 756E696F6E00           _union db "union",0
+    68 000000E8 74686520656C656D65-    _joined db "the elements of set %d now also belong to set %d",0xa,0
+    69 000000E8 6E7473206F66207365-
+    70 000000E8 74202564206E6F7720-
+    71 000000E8 616C736F2062656C6F-
+    72 000000E8 6E6720746F20736574-
+    73 000000E8 2025640A00         
+    74 0000011A 696E74657273656374-    _intersect db "intersect",0
+    75 0000011A 00                 
+    76 00000124 736574202564206861-    _intersected db "set %d has been intersected with set %d",0xa,0
+    77 00000124 73206265656E20696E-
+    78 00000124 746572736563746564-
+    79 00000124 207769746820736574-
+    80 00000124 2025640A00         
+    81 0000014D 7072696E7400           _print db "print",0
+    82 00000153 7175697400             _quit db "quit",0
+    83                                 
+    84                                 
+    85                                 
+    86                                 [section .text]
+    87                                 [global main]
+    88                                 
+    89                                 [extern scanf]
+    90                                 %line 54+0 ex02.asm
+    91                                 [extern printf]
+    92                                 [extern malloc]
+    93                                 [extern free]
+    94                                 [extern atol]
+    95                                 %line 55+1 ex02.asm
+    96                                 
+    97                                 
+    98                                 
+    99                                 read_command:
+   100 00000000 55                      push rbp
+   101 00000001 4889E5                  mov rbp, rsp
+   102                                 .beg_rc:
+   103 00000004 488D3C25[00000000]      lea rdi, [prompt]
+   104 0000000C 31C0                    xor eax, eax
+   105 0000000E E8(F6FFFFFF)            call printf
+   106                                 
+   107 00000013 30C0                    xor al, al
+   108 00000015 48C7C100010000          mov rcx, 256
+   109 0000001C 488D3C25[00000000]      lea rdi, [cmnd]
+   110 00000024 F3AA                    rep stosb
+   111                                 
+   112 00000026 488D3C25[00000000]      lea rdi, [readcmnd]
+   113 0000002E 488D3425[00000000]      lea rsi, [cmnd]
+   114 00000036 31C0                    xor eax, eax
+   115 00000038 E8(F6FFFFFF)            call scanf
+   116                                 
+   117                                 
+   118 0000003D 488D3425[00000000]      lea rsi, [cmnd]
+   119 00000045 488D3C25[00000000]      lea rdi, [_add]
+   120 0000004D 48C7C105000000          mov rcx, 5
+   121 00000054 F3A6                    repe cmpsb
+   122 00000056 4883F900                cmp rcx, 0
+   123 0000005A 750A                    jne .lb_rem
+   124 0000005C 48C7C000000000          mov rax, 0
+   125 00000063 E9F3000000              jmp .end_rc
+   126                                 .lb_rem:
+   127 00000068 488D3425[00000000]      lea rsi, [cmnd]
+   128 00000070 488D3C25[00000000]      lea rdi, [_remove]
+   129 00000078 48C7C108000000          mov rcx, 8
+   130 0000007F F3A6                    repe cmpsb
+   131 00000081 4883F900                cmp rcx, 0
+   132 00000085 750A                    jne .lb_tst
+   133 00000087 48C7C001000000          mov rax, 1
+   134 0000008E E9C8000000              jmp .end_rc
+   135                                 .lb_tst:
+   136 00000093 488D3425[00000000]      lea rsi, [cmnd]
+   137 0000009B 488D3C25[00000000]      lea rdi, [_test]
+   138 000000A3 48C7C106000000          mov rcx, 6
+   139 000000AA F3A6                    repe cmpsb
+   140 000000AC 4883F900                cmp rcx, 0
+   141 000000B0 750A                    jne .lb_uni
+   142 000000B2 48C7C002000000          mov rax, 2
+   143 000000B9 E99D000000              jmp .end_rc
+   144                                 .lb_uni:
+   145 000000BE 488D3425[00000000]      lea rsi, [cmnd]
+   146 000000C6 488D3C25[00000000]      lea rdi, [_union]
+   147 000000CE 48C7C107000000          mov rcx, 7
+   148 000000D5 F3A6                    repe cmpsb
+   149 000000D7 4883F900                cmp rcx, 0
+   150 000000DB 7507                    jne .lb_int
+   151 000000DD 48C7C003000000          mov rax, 3
+   152 000000E4 EB78                    jmp .end_rc
+   153                                 .lb_int:
+   154 000000E6 488D3425[00000000]      lea rsi, [cmnd]
+   155 000000EE 488D3C25[00000000]      lea rdi, [_intersect]
+   156 000000F6 48C7C10B000000          mov rcx, 11
+   157 000000FD F3A6                    repe cmpsb
+   158 000000FF 4883F900                cmp rcx, 0
+   159 00000103 7507                    jne .lb_pri
+   160 00000105 48C7C004000000          mov rax, 4
+   161 0000010C EB50                    jmp .end_rc
+   162                                 .lb_pri:
+   163 0000010E 488D3425[00000000]      lea rsi, [cmnd]
+   164 00000116 488D3C25[00000000]      lea rdi, [_print]
+   165 0000011E 48C7C107000000          mov rcx, 7
+   166 00000125 F3A6                    repe cmpsb
+   167 00000127 4883F900                cmp rcx, 0
+   168 0000012B 7507                    jne .lb_qu
+   169 0000012D 48C7C005000000          mov rax, 5
+   170 00000134 EB28                    jmp .end_rc
+   171                                 .lb_qu:
+   172 00000136 488D3425[00000000]      lea rsi, [cmnd]
+   173 0000013E 488D3C25[00000000]      lea rdi, [_quit]
+   174 00000146 48C7C106000000          mov rcx, 6
+   175 0000014D F3A6                    repe cmpsb
+   176 0000014F 4883F900                cmp rcx, 0
+   177 00000153 0F85A5FEFFFF            jne .beg_rc
+   178 00000159 48C7C006000000          mov rax, 6
+   179                                 .end_rc:
+   180 00000160 C9                      leave
+   181 00000161 C3                      ret
+   182                                 
+   183                                 
+   184                                 
+   185                                 fun_add:
+   186 00000162 55                      push rbp
+   187 00000163 4889E5                  mov rbp, rsp
+   188 00000166 53                      push rbx
+   189 00000167 4154                    push r12
+   190 00000169 4155                    push r13
+   191                                 
+   192                                 
+   193 0000016B 488D3C25[00000000]      lea rdi, [promptelem]
+   194 00000173 31C0                    xor eax, eax
+   195 00000175 E8(F6FFFFFF)            call printf
+   196 0000017A 488D3C25[00000000]      lea rdi, [param]
+   197 00000182 488D3425[00000000]      lea rsi, [element]
+   198 0000018A 31C0                    xor eax, eax
+   199 0000018C E8(F6FFFFFF)            call scanf
+   200                                 
+   201                                 
+   202 00000191 488B1C25[00000000]      mov rbx, [_sets]
+   203 00000199 488B5B08                mov rbx, [rbx+sts_sets]
+   204 0000019D 488B1B                  mov rbx, [rbx+s_size]
+   205 000001A0 4C8B2425[00000000]      mov r12, qword [element]
+   206 000001A8 4983FC00                cmp r12, 0
+   207 000001AC 0F8CB5000000            jl .end_add
+   208 000001B2 4939DC                  cmp r12, rbx
+   209 000001B5 0F8DAC000000            jge .end_add
+   210                                 
+   211 000001BB 488D3C25[00000000]      lea rdi, [promptset]
+   212 000001C3 31C0                    xor eax, eax
+   213 000001C5 E8(F6FFFFFF)            call printf
+   214 000001CA 488D3C25[00000000]      lea rdi, [param]
+   215 000001D2 488D3425[00000000]      lea rsi, [set1]
+   216 000001DA 31C0                    xor eax, eax
+   217 000001DC E8(F6FFFFFF)            call scanf
+   218                                 
+   219                                 
+   220 000001E1 488B1C25[00000000]      mov rbx, [_sets]
+   221 000001E9 488B1B                  mov rbx, [rbx+sts_size]
+   222 000001EC 4C8B2425[00000000]      mov r12, qword [set1]
+   223 000001F4 4983FC00                cmp r12, 0
+   224 000001F8 7C71                    jl .end_add
+   225 000001FA 4939DC                  cmp r12, rbx
+   226 000001FD 7D6C                    jge .end_add
+   227                                 
+   228                                 
+   229 000001FF 488B1C25[00000000]      mov rbx, qword [_sets]
+   230 00000207 488B5B08                mov rbx, qword [rbx+sts_sets]
+   231 0000020B 4831D2                  xor rdx, rdx
+   232 0000020E 488B0425[00000000]      mov rax, qword [set1]
+   233 00000216 48C7C110000000          mov rcx, Set_size
+   234 0000021D 48F7E1                  mul rcx
+   235 00000220 4801C3                  add rbx, rax
+   236 00000223 488B5308                mov rdx, [rbx + s_set]
+   237                                 
+   238                                 
+   239 00000227 488B0425[00000000]      mov rax, [element]
+   240 0000022F 48C1E806                shr rax, 6
+   241 00000233 4C8B2425[00000000]      mov r12, [element]
+   242 0000023B 4983E43F                and r12, 0x3F
+   243 0000023F 4C8B2CC2                mov r13, qword [rdx+8*rax]
+   244 00000243 4D0FA3E5                bt r13, r12
+   245 00000247 7222                    jc .end_add
+   246                                 
+   247 00000249 4C0FAB24C2              bts qword [rdx+8*rax], r12
+   248 0000024E 488D3C25[00000000]      lea rdi, [_added]
+   249 00000256 488B3425[00000000]      mov rsi, [element]
+   250 0000025E 488B1425[00000000]      mov rdx, [set1]
+   251 00000266 31C0                    xor eax, eax
+   252 00000268 E8(F6FFFFFF)            call printf
+   253                                 
+   254                                 .end_add:
+   255 0000026D 415D                    pop r13
+   256 0000026F 415C                    pop r12
+   257 00000271 5B                      pop rbx
+   258 00000272 C9                      leave
+   259 00000273 C3                      ret
+   260                                 
+   261                                 
+   262                                 
+   263                                 fun_remove:
+   264 00000274 55                      push rbp
+   265 00000275 4889E5                  mov rbp, rsp
+   266 00000278 53                      push rbx
+   267 00000279 4154                    push r12
+   268 0000027B 4155                    push r13
+   269                                 
+   270                                 
+   271 0000027D 488D3C25[00000000]      lea rdi, [promptelem]
+   272 00000285 31C0                    xor eax, eax
+   273 00000287 E8(F6FFFFFF)            call printf
+   274 0000028C 488D3C25[00000000]      lea rdi, [param]
+   275 00000294 488D3425[00000000]      lea rsi, [element]
+   276 0000029C 31C0                    xor eax, eax
+   277 0000029E E8(F6FFFFFF)            call scanf
+   278                                 
+   279                                 
+   280 000002A3 488B1C25[00000000]      mov rbx, [_sets]
+   281 000002AB 488B5B08                mov rbx, [rbx+sts_sets]
+   282 000002AF 488B1B                  mov rbx, [rbx+s_size]
+   283 000002B2 4C8B2425[00000000]      mov r12, qword [element]
+   284 000002BA 4983FC00                cmp r12, 0
+   285 000002BE 0F8CB5000000            jl .end_remove
+   286 000002C4 4939DC                  cmp r12, rbx
+   287 000002C7 0F8DAC000000            jge .end_remove
+   288                                 
+   289 000002CD 488D3C25[00000000]      lea rdi, [promptset]
+   290 000002D5 31C0                    xor eax, eax
+   291 000002D7 E8(F6FFFFFF)            call printf
+   292 000002DC 488D3C25[00000000]      lea rdi, [param]
+   293 000002E4 488D3425[00000000]      lea rsi, [set1]
+   294 000002EC 31C0                    xor eax, eax
+   295 000002EE E8(F6FFFFFF)            call scanf
+   296                                 
+   297                                 
+   298 000002F3 488B1C25[00000000]      mov rbx, [_sets]
+   299 000002FB 488B1B                  mov rbx, [rbx+sts_size]
+   300 000002FE 4C8B2425[00000000]      mov r12, qword [set1]
+   301 00000306 4983FC00                cmp r12, 0
+   302 0000030A 7C71                    jl .end_remove
+   303 0000030C 4939DC                  cmp r12, rbx
+   304 0000030F 7D6C                    jge .end_remove
+   305                                 
+   306                                 
+   307 00000311 488B1C25[00000000]      mov rbx, qword [_sets]
+   308 00000319 488B5B08                mov rbx, qword [rbx+sts_sets]
+   309 0000031D 4831D2                  xor rdx, rdx
+   310 00000320 488B0425[00000000]      mov rax, qword [set1]
+   311 00000328 48C7C110000000          mov rcx, Set_size
+   312 0000032F 48F7E1                  mul rcx
+   313 00000332 4801C3                  add rbx, rax
+   314 00000335 488B5308                mov rdx, [rbx + s_set]
+   315                                 
+   316                                 
+   317 00000339 488B0425[00000000]      mov rax, [element]
+   318 00000341 48C1E806                shr rax, 6
+   319 00000345 4C8B2425[00000000]      mov r12, [element]
+   320 0000034D 4983E43F                and r12, 0x3F
+   321 00000351 4C8B2CC2                mov r13, qword [rdx+8*rax]
+   322 00000355 4D0FA3E5                bt r13, r12
+   323 00000359 7322                    jnc .end_remove
+   324                                 
+   325 0000035B 4C0FB324C2              btr qword [rdx+8*rax], r12
+   326 00000360 488D3C25[00000000]      lea rdi, [_removed]
+   327 00000368 488B3425[00000000]      mov rsi, [element]
+   328 00000370 488B1425[00000000]      mov rdx, [set1]
+   329 00000378 31C0                    xor eax, eax
+   330 0000037A E8(F6FFFFFF)            call printf
+   331                                 
+   332                                 .end_remove:
+   333 0000037F 415D                    pop r13
+   334 00000381 415C                    pop r12
+   335 00000383 5B                      pop rbx
+   336 00000384 C9                      leave
+   337 00000385 C3                      ret
+   338                                 
+   339                                 
+   340                                 
+   341                                 fun_test:
+   342 00000386 55                      push rbp
+   343 00000387 4889E5                  mov rbp, rsp
+   344 0000038A 53                      push rbx
+   345 0000038B 4154                    push r12
+   346 0000038D 4155                    push r13
+   347                                 
+   348                                 
+   349 0000038F 488D3C25[00000000]      lea rdi, [promptelem]
+   350 00000397 31C0                    xor eax, eax
+   351 00000399 E8(F6FFFFFF)            call printf
+   352 0000039E 488D3C25[00000000]      lea rdi, [param]
+   353 000003A6 488D3425[00000000]      lea rsi, [element]
+   354 000003AE 31C0                    xor eax, eax
+   355 000003B0 E8(F6FFFFFF)            call scanf
+   356                                 
+   357                                 
+   358 000003B5 488B1C25[00000000]      mov rbx, [_sets]
+   359 000003BD 488B5B08                mov rbx, [rbx+sts_sets]
+   360 000003C1 488B1B                  mov rbx, [rbx+s_size]
+   361 000003C4 4C8B2425[00000000]      mov r12, qword [element]
+   362 000003CC 4983FC00                cmp r12, 0
+   363 000003D0 0F8CBA000000            jl .end_test
+   364 000003D6 4939DC                  cmp r12, rbx
+   365 000003D9 0F8DB1000000            jge .end_test
+   366                                 
+   367 000003DF 488D3C25[00000000]      lea rdi, [promptset]
+   368 000003E7 31C0                    xor eax, eax
+   369 000003E9 E8(F6FFFFFF)            call printf
+   370 000003EE 488D3C25[00000000]      lea rdi, [param]
+   371 000003F6 488D3425[00000000]      lea rsi, [set1]
+   372 000003FE 31C0                    xor eax, eax
+   373 00000400 E8(F6FFFFFF)            call scanf
+   374                                 
+   375                                 
+   376 00000405 488B1C25[00000000]      mov rbx, [_sets]
+   377 0000040D 488B1B                  mov rbx, [rbx+sts_size]
+   378 00000410 4C8B2425[00000000]      mov r12, qword [set1]
+   379 00000418 4983FC00                cmp r12, 0
+   380 0000041C 7C76                    jl .end_test
+   381 0000041E 4939DC                  cmp r12, rbx
+   382 00000421 7D71                    jge .end_test
+   383                                 
+   384                                 
+   385 00000423 488B1C25[00000000]      mov rbx, qword [_sets]
+   386 0000042B 488B5B08                mov rbx, qword [rbx+sts_sets]
+   387 0000042F 4831D2                  xor rdx, rdx
+   388 00000432 488B0425[00000000]      mov rax, qword [set1]
+   389 0000043A 48C7C110000000          mov rcx, Set_size
+   390 00000441 48F7E1                  mul rcx
+   391 00000444 4801C3                  add rbx, rax
+   392 00000447 488B5308                mov rdx, [rbx + s_set]
+   393                                 
+   394                                 
+   395 0000044B 488B0425[00000000]      mov rax, [element]
+   396 00000453 48C1E806                shr rax, 6
+   397 00000457 4C8B2425[00000000]      mov r12, [element]
+   398 0000045F 4983E43F                and r12, 0x3F
+   399 00000463 4C8B2CC2                mov r13, qword [rdx+8*rax]
+   400 00000467 4D0FA3E5                bt r13, r12
+   401 0000046B 7308                    jnc .is_not_there
+   402 0000046D 488D3C25[00000000]      lea rdi, [_belongs]
+   403 00000475 EB06                    jmp .write
+   404                                 .is_not_there:
+   405 00000477 488D3C25[00000000]      lea rdi, [_notbelongs]
+   406                                 .write:
+   407 0000047F 488B3425[00000000]      mov rsi, [element]
+   408 00000487 488B1425[00000000]      mov rdx, [set1]
+   409 0000048F 31C0                    xor eax, eax
+   410 00000491 E8(F6FFFFFF)            call printf
+   411                                 
+   412                                 .end_test:
+   413 00000496 415D                    pop r13
+   414 00000498 415C                    pop r12
+   415 0000049A 5B                      pop rbx
+   416 0000049B C9                      leave
+   417 0000049C C3                      ret
+   418                                 
+   419                                 
+   420                                 
+   421                                 fun_union:
+   422 0000049D 55                      push rbp
+   423 0000049E 4889E5                  mov rbp, rsp
+   424 000004A1 53                      push rbx
+   425 000004A2 4154                    push r12
+   426 000004A4 4155                    push r13
+   427                                 
+   428                                 
+   429 000004A6 488D3C25[00000000]      lea rdi, [promptset]
+   430 000004AE 31C0                    xor eax, eax
+   431 000004B0 E8(F6FFFFFF)            call printf
+   432 000004B5 488D3C25[00000000]      lea rdi, [param]
+   433 000004BD 488D3425[00000000]      lea rsi, [set1]
+   434 000004C5 31C0                    xor eax, eax
+   435 000004C7 E8(F6FFFFFF)            call scanf
+   436                                 
+   437                                 
+   438 000004CC 488B1C25[00000000]      mov rbx, [_sets]
+   439 000004D4 488B1B                  mov rbx, [rbx+sts_size]
+   440 000004D7 4C8B2425[00000000]      mov r12, qword [set1]
+   441 000004DF 4983FC00                cmp r12, 0
+   442 000004E3 0F8CD5000000            jl .end_union
+   443 000004E9 4939DC                  cmp r12, rbx
+   444 000004EC 0F8DCC000000            jge .end_union
+   445                                 
+   446 000004F2 488D3C25[00000000]      lea rdi, [promptset]
+   447 000004FA 31C0                    xor eax, eax
+   448 000004FC E8(F6FFFFFF)            call printf
+   449 00000501 488D3C25[00000000]      lea rdi, [param]
+   450 00000509 488D3425[00000000]      lea rsi, [set2]
+   451 00000511 31C0                    xor eax, eax
+   452 00000513 E8(F6FFFFFF)            call scanf
+   453                                 
+   454                                 
+   455 00000518 488B1C25[00000000]      mov rbx, [_sets]
+   456 00000520 488B1B                  mov rbx, [rbx+sts_size]
+   457 00000523 4C8B2425[00000000]      mov r12, qword [set2]
+   458 0000052B 4983FC00                cmp r12, 0
+   459 0000052F 0F8C89000000            jl .end_union
+   460 00000535 4939DC                  cmp r12, rbx
+   461 00000538 0F8D80000000            jge .end_union
+   462                                 
+   463                                 
+   464 0000053E 488B1C25[00000000]      mov rbx, qword [_sets]
+   465 00000546 488B5B08                mov rbx, qword [rbx+sts_sets]
+   466 0000054A 4989DC                  mov r12, rbx
+   467 0000054D 4831D2                  xor rdx, rdx
+   468 00000550 488B0425[00000000]      mov rax, qword [set1]
+   469 00000558 48C7C110000000          mov rcx, Set_size
+   470 0000055F 48F7E1                  mul rcx
+   471 00000562 4801C3                  add rbx, rax
+   472 00000565 4831D2                  xor rdx, rdx
+   473 00000568 488B0425[00000000]      mov rax, qword [set2]
+   474 00000570 48C7C110000000          mov rcx, Set_size
+   475 00000577 48F7E1                  mul rcx
+   476 0000057A 4901C4                  add r12, rax
+   477                                 
+   478                                 
+   479 0000057D 4C8B2B                  mov r13, [rbx+s_size]
+   480 00000580 49C1ED03                shr r13, 3
+   481 00000584 49FFC5                  inc r13
+   482 00000587 488B5B08                mov rbx, [rbx+s_set]
+   483 0000058B 4D8B642408              mov r12, [r12+s_set]
+   484                                 
+   485 00000590 4831C9                  xor rcx, rcx
+   486                                 .un_loop:
+   487 00000593 4C39E9                  cmp rcx, r13
+   488 00000596 7D0B                    jge .prt_union
+   489 00000598 458A040C                mov r8b, byte [r12+rcx]
+   490 0000059C 4408040B                or byte [rbx+rcx], r8b
+   491 000005A0 48FFC1                  inc rcx
+   492 000005A3 EBEC                    jmp .un_loop
+   493                                 
+   494                                 .prt_union:
+   495 000005A5 488D3C25[00000000]      lea rdi, [_joined]
+   496 000005AD 488B3425[00000000]      mov rsi, [set2]
+   497 000005B5 488B1425[00000000]      mov rdx, [set1]
+   498 000005BD 31C0                    xor eax, eax
+   499 000005BF E8(F6FFFFFF)            call printf
+   500                                 
+   501                                 .end_union:
+   502 000005C4 415D                    pop r13
+   503 000005C6 415C                    pop r12
+   504 000005C8 5B                      pop rbx
+   505 000005C9 C9                      leave
+   506 000005CA C3                      ret
+   507                                 
+   508                                 
+   509                                 
+   510                                 fun_intersection:
+   511 000005CB 55                      push rbp
+   512 000005CC 4889E5                  mov rbp, rsp
+   513 000005CF 53                      push rbx
+   514 000005D0 4154                    push r12
+   515 000005D2 4155                    push r13
+   516                                 
+   517                                 
+   518 000005D4 488D3C25[00000000]      lea rdi, [promptset]
+   519 000005DC 31C0                    xor eax, eax
+   520 000005DE E8(F6FFFFFF)            call printf
+   521 000005E3 488D3C25[00000000]      lea rdi, [param]
+   522 000005EB 488D3425[00000000]      lea rsi, [set1]
+   523 000005F3 31C0                    xor eax, eax
+   524 000005F5 E8(F6FFFFFF)            call scanf
+   525                                 
+   526                                 
+   527 000005FA 488B1C25[00000000]      mov rbx, [_sets]
+   528 00000602 488B1B                  mov rbx, [rbx+sts_size]
+   529 00000605 4C8B2425[00000000]      mov r12, qword [set1]
+   530 0000060D 4983FC00                cmp r12, 0
+   531 00000611 0F8CD5000000            jl .end_intersection
+   532 00000617 4939DC                  cmp r12, rbx
+   533 0000061A 0F8DCC000000            jge .end_intersection
+   534                                 
+   535 00000620 488D3C25[00000000]      lea rdi, [promptset]
+   536 00000628 31C0                    xor eax, eax
+   537 0000062A E8(F6FFFFFF)            call printf
+   538 0000062F 488D3C25[00000000]      lea rdi, [param]
+   539 00000637 488D3425[00000000]      lea rsi, [set2]
+   540 0000063F 31C0                    xor eax, eax
+   541 00000641 E8(F6FFFFFF)            call scanf
+   542                                 
+   543                                 
+   544 00000646 488B1C25[00000000]      mov rbx, [_sets]
+   545 0000064E 488B1B                  mov rbx, [rbx+sts_size]
+   546 00000651 4C8B2425[00000000]      mov r12, qword [set2]
+   547 00000659 4983FC00                cmp r12, 0
+   548 0000065D 0F8C89000000            jl .end_intersection
+   549 00000663 4939DC                  cmp r12, rbx
+   550 00000666 0F8D80000000            jge .end_intersection
+   551                                 
+   552                                 
+   553 0000066C 488B1C25[00000000]      mov rbx, qword [_sets]
+   554 00000674 488B5B08                mov rbx, qword [rbx+sts_sets]
+   555 00000678 4989DC                  mov r12, rbx
+   556 0000067B 4831D2                  xor rdx, rdx
+   557 0000067E 488B0425[00000000]      mov rax, qword [set1]
+   558 00000686 48C7C110000000          mov rcx, Set_size
+   559 0000068D 48F7E1                  mul rcx
+   560 00000690 4801C3                  add rbx, rax
+   561 00000693 4831D2                  xor rdx, rdx
+   562 00000696 488B0425[00000000]      mov rax, qword [set2]
+   563 0000069E 48C7C110000000          mov rcx, Set_size
+   564 000006A5 48F7E1                  mul rcx
+   565 000006A8 4901C4                  add r12, rax
+   566                                 
+   567                                 
+   568 000006AB 4C8B2B                  mov r13, [rbx+s_size]
+   569 000006AE 49C1ED03                shr r13, 3
+   570 000006B2 49FFC5                  inc r13
+   571 000006B5 488B5B08                mov rbx, [rbx+s_set]
+   572 000006B9 4D8B642408              mov r12, [r12+s_set]
+   573                                 
+   574 000006BE 4831C9                  xor rcx, rcx
+   575                                 .in_loop:
+   576 000006C1 4C39E9                  cmp rcx, r13
+   577 000006C4 7D0B                    jge .pr_intersection
+   578 000006C6 458A040C                mov r8b, byte [r12+rcx]
+   579 000006CA 4420040B                and byte [rbx+rcx], r8b
+   580 000006CE 48FFC1                  inc rcx
+   581 000006D1 EBEC                    jmp .in_loop
+   582                                 
+   583                                 .pr_intersection:
+   584 000006D3 488D3C25[00000000]      lea rdi, [_intersected]
+   585 000006DB 488B3425[00000000]      mov rsi, [set1]
+   586 000006E3 488B1425[00000000]      mov rdx, [set2]
+   587 000006EB 31C0                    xor eax, eax
+   588 000006ED E8(F6FFFFFF)            call printf
+   589                                 
+   590                                 .end_intersection:
+   591 000006F2 415D                    pop r13
+   592 000006F4 415C                    pop r12
+   593 000006F6 5B                      pop rbx
+   594 000006F7 C9                      leave
+   595 000006F8 C3                      ret
+   596                                 
+   597                                 
+   598                                 
+   599                                 fun_print:
+   600 000006F9 55                      push rbp
+   601 000006FA 4889E5                  mov rbp, rsp
+   602 000006FD 53                      push rbx
+   603 000006FE 4154                    push r12
+   604 00000700 4155                    push r13
+   605 00000702 4156                    push r14
+   606 00000704 4157                    push r15
+   607                                 
+   608                                 
+   609 00000706 488D3C25[00000000]      lea rdi, [promptset]
+   610 0000070E 31C0                    xor eax, eax
+   611 00000710 E8(F6FFFFFF)            call printf
+   612 00000715 488D3C25[00000000]      lea rdi, [param]
+   613 0000071D 488D3425[00000000]      lea rsi, [set1]
+   614 00000725 31C0                    xor eax, eax
+   615 00000727 E8(F6FFFFFF)            call scanf
+   616                                 
+   617                                 
+   618 0000072C 488B1C25[00000000]      mov rbx, [_sets]
+   619 00000734 488B1B                  mov rbx, [rbx+sts_size]
+   620 00000737 4C8B2425[00000000]      mov r12, qword [set1]
+   621 0000073F 4983FC00                cmp r12, 0
+   622 00000743 0F8C87000000            jl .end_print
+   623 00000749 4939DC                  cmp r12, rbx
+   624 0000074C 0F8D7E000000            jge .end_print
+   625                                 
+   626                                 
+   627 00000752 488B1C25[00000000]      mov rbx, qword [_sets]
+   628 0000075A 488B5B08                mov rbx, qword [rbx+sts_sets]
+   629 0000075E 4831D2                  xor rdx, rdx
+   630 00000761 488B0425[00000000]      mov rax, qword [set1]
+   631 00000769 48C7C110000000          mov rcx, Set_size
+   632 00000770 48F7E1                  mul rcx
+   633 00000773 4801C3                  add rbx, rax
+   634                                 
+   635                                 
+   636 00000776 4C8B3B                  mov r15, [rbx+s_size]
+   637 00000779 49C1EF03                shr r15, 3
+   638 0000077D 49FFC7                  inc r15
+   639                                 
+   640 00000780 4D31E4                  xor r12, r12
+   641 00000783 4D31F6                  xor r14, r14
+   642                                 .pr_loop:
+   643 00000786 4D39FC                  cmp r12, r15
+   644 00000789 7D3A                    jge .e_print
+   645 0000078B 4D31ED                  xor r13, r13
+   646                                 .bit_lp:
+   647 0000078E 4983FD08                cmp r13, 8
+   648 00000792 7D2C                    jge .e_bit
+   649 00000794 4C3B33                  cmp r14, [rbx+s_size]
+   650 00000797 7D2C                    jge .e_print
+   651 00000799 488B5308                mov rdx, [rbx+s_set]
+   652 0000079D 4A0FB61422              movzx rdx, byte [rdx+r12]
+   653 000007A2 4C0FA3EA                bt rdx, r13
+   654 000007A6 7310                    jnc .ct_bit
+   655 000007A8 488D3C25[00000000]      lea rdi, [printelem]
+   656 000007B0 4C89F6                  mov rsi, r14
+   657 000007B3 31C0                    xor eax, eax
+   658 000007B5 E8(F6FFFFFF)            call printf
+   659                                 .ct_bit:
+   660 000007BA 49FFC5                  inc r13
+   661 000007BD 49FFC6                  inc r14
+   662 000007C0 EBCA                    jmp .bit_lp
+   663                                 .e_bit:
+   664 000007C2 49FFC4                  inc r12
+   665 000007C5 EBBD                    jmp .pr_loop
+   666                                 .e_print:
+   667 000007C7 488D3C25[00000000]      lea rdi, [linefd]
+   668 000007CF 31C0                    xor eax, eax
+   669 000007D1 E8(F6FFFFFF)            call printf
+   670                                 
+   671                                 .end_print:
+   672 000007D6 415F                    pop r15
+   673 000007D8 415E                    pop r14
+   674 000007DA 415D                    pop r13
+   675 000007DC 415C                    pop r12
+   676 000007DE 5B                      pop rbx
+   677 000007DF C9                      leave
+   678 000007E0 C3                      ret
+   679                                 
+   680                                 
+   681                                 
+   682                                 main:
+   683 000007E1 55                      push rbp
+   684 000007E2 4889E5                  mov rbp, rsp
+   685 000007E5 53                      push rbx
+   686 000007E6 4154                    push r12
+   687 000007E8 4155                    push r13
+   688 000007EA 4156                    push r14
+   689                                 
+   690                                 
+   691                                 
+   692                                 
+   693 000007EC 4889F3                  mov rbx, rsi
+   694 000007EF 4883C308                add rbx, 8
+   695 000007F3 488B3B                  mov rdi, [rbx]
+   696 000007F6 E8(F6FFFFFF)            call atol
+   697 000007FB 4989C4                  mov r12, rax
+   698 000007FE 4883C308                add rbx, 8
+   699 00000802 488B3B                  mov rdi, [rbx]
+   700 00000805 E8(F6FFFFFF)            call atol
+   701 0000080A 4989C5                  mov r13, rax
+   702                                 
+   703 0000080D 48C7C710000000          mov rdi, Sets_size
+   704 00000814 E8(F6FFFFFF)            call malloc
+   705 00000819 48890425[00000000]      mov [_sets], rax
+   706                                 
+   707 00000821 488B1C25[00000000]      mov rbx, [_sets]
+   708 00000829 4C8923                  mov [rbx+sts_size], r12
+   709                                 
+   710 0000082C 4831D2                  xor rdx, rdx
+   711 0000082F 4C89E0                  mov rax, r12
+   712 00000832 48C7C110000000          mov rcx, Set_size
+   713 00000839 48F7E1                  mul rcx
+   714 0000083C 4889C7                  mov rdi, rax
+   715 0000083F E8(F6FFFFFF)            call malloc
+   716 00000844 48894308                mov [rbx+sts_sets], rax
+   717                                 
+   718 00000848 4D31F6                  xor r14, r14
+   719 0000084B 4C8B6308                mov r12, [rbx+sts_sets]
+   720                                 .loop:
+   721 0000084F 4C3B33                  cmp r14, qword [rbx+sts_size]
+   722 00000852 7D1F                    jge .again
+   723 00000854 4D892C24                mov [r12+s_size], r13
+   724 00000858 4C89EF                  mov rdi, r13
+   725 0000085B 48C1EF03                shr rdi, 3
+   726 0000085F 48FFC7                  inc rdi
+   727 00000862 E8(F6FFFFFF)            call malloc
+   728 00000867 4989442408              mov [r12+s_set], rax
+   729 0000086C 4983C410                add r12, Set_size
+   730 00000870 49FFC6                  inc r14
+   731 00000873 EBD8                    jmp .loop
+   732                                 
+   733                                 
+   734                                 
+   735                                 .again:
+   736 00000875 E881F7FFFF              call read_command
+   737                                 
+   738                                 
+   739 0000087A 4883F806                cmp rax, 6
+   740 0000087E 7446                    je .end
+   741                                 .nxt_ad:
+   742 00000880 4883F800                cmp rax, 0
+   743 00000884 7505                    jne .nxt_re
+   744 00000886 E8D2F8FFFF              call fun_add
+   745 0000088B EBE6                    jmp .again
+   746                                 .nxt_re:
+   747 0000088D 4883F801                cmp rax, 1
+   748 00000891 7505                    jne .nxt_te
+   749 00000893 E8D7F9FFFF              call fun_remove
+   750 00000898 EBD9                    jmp .again
+   751                                 .nxt_te:
+   752 0000089A 4883F802                cmp rax, 2
+   753 0000089E 7505                    jne .nxt_un
+   754 000008A0 E8DCFAFFFF              call fun_test
+   755 000008A5 EBCC                    jmp .again
+   756                                 .nxt_un:
+   757 000008A7 4883F803                cmp rax, 3
+   758 000008AB 7505                    jne .nxt_in
+   759 000008AD E8E6FBFFFF              call fun_union
+   760 000008B2 EBBF                    jmp .again
+   761                                 .nxt_in:
+   762 000008B4 4883F804                cmp rax, 4
+   763 000008B8 7505                    jne .nxt_pr
+   764 000008BA E807FDFFFF              call fun_intersection
+   765 000008BF EBB2                    jmp .again
+   766                                 .nxt_pr:
+   767 000008C1 E82EFEFFFF              call fun_print
+   768 000008C6 EBAB                    jmp .again
+   769                                 .end:
+   770                                 
+   771                                 
+   772                                 
+   773 000008C8 488B1C25[00000000]      mov rbx, [_sets]
+   774 000008D0 4C8B6308                mov r12, [rbx+sts_sets]
+   775 000008D4 4D31F6                  xor r14, r14
+   776                                 .loopf:
+   777 000008D7 4C3B33                  cmp r14, qword [rbx+sts_size]
+   778 000008DA 7D11                    jge .freeSets
+   779 000008DC 498B7C2408              mov rdi, [r12+s_set]
+   780 000008E1 E8(F6FFFFFF)            call free
+   781 000008E6 4983C410                add r12, Set_size
+   782 000008EA 49FFC6                  inc r14
+   783 000008ED EBE6                    jmp .loopf
+   784                                 
+   785                                 .freeSets:
+   786 000008EF 488B3C25[00000000]      mov rdi, [_sets]
+   787 000008F7 E8(F6FFFFFF)            call free
+   788                                 
+   789 000008FC 415E                    pop r14
+   790 000008FE 415D                    pop r13
+   791 00000900 415C                    pop r12
+   792 00000902 5B                      pop rbx
+   793 00000903 C9                      leave
+   794 00000904 C3                      ret
+   795                                 

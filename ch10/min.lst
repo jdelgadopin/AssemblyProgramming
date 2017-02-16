@@ -1,0 +1,511 @@
+     1                                 %line 389+1 ebe.inc
+     2                                 
+     3                                 %line 479+1 ebe.inc
+     4                                 
+     5                                 
+     6                                 
+     7                                 
+     8                                 %line 493+1 ebe.inc
+     9                                 
+    10                                 
+    11                                 
+    12                                 
+    13                                 
+    14                                 
+    15                                 
+    16                                 
+    17                                 
+    18                                 
+    19                                 %line 510+1 ebe.inc
+    20                                 local1 equ -8*1
+    21                                 %line 510+0 ebe.inc
+    22                                 local2 equ -8*2
+    23                                 local3 equ -8*3
+    24                                 local4 equ -8*4
+    25                                 local5 equ -8*5
+    26                                 local6 equ -8*6
+    27                                 local7 equ -8*7
+    28                                 local8 equ -8*8
+    29                                 local9 equ -8*9
+    30                                 local10 equ -8*10
+    31                                 local11 equ -8*11
+    32                                 local12 equ -8*12
+    33                                 local13 equ -8*13
+    34                                 local14 equ -8*14
+    35                                 local15 equ -8*15
+    36                                 local16 equ -8*16
+    37                                 local17 equ -8*17
+    38                                 local18 equ -8*18
+    39                                 local19 equ -8*19
+    40                                 local20 equ -8*20
+    41                                 local21 equ -8*21
+    42                                 local22 equ -8*22
+    43                                 local23 equ -8*23
+    44                                 local24 equ -8*24
+    45                                 local25 equ -8*25
+    46                                 local26 equ -8*26
+    47                                 local27 equ -8*27
+    48                                 local28 equ -8*28
+    49                                 local29 equ -8*29
+    50                                 local30 equ -8*30
+    51                                 local31 equ -8*31
+    52                                 local32 equ -8*32
+    53                                 local33 equ -8*33
+    54                                 local34 equ -8*34
+    55                                 local35 equ -8*35
+    56                                 local36 equ -8*36
+    57                                 local37 equ -8*37
+    58                                 local38 equ -8*38
+    59                                 local39 equ -8*39
+    60                                 local40 equ -8*40
+    61                                 local41 equ -8*41
+    62                                 local42 equ -8*42
+    63                                 local43 equ -8*43
+    64                                 local44 equ -8*44
+    65                                 local45 equ -8*45
+    66                                 local46 equ -8*46
+    67                                 local47 equ -8*47
+    68                                 local48 equ -8*48
+    69                                 local49 equ -8*49
+    70                                 local50 equ -8*50
+    71                                 local51 equ -8*51
+    72                                 local52 equ -8*52
+    73                                 local53 equ -8*53
+    74                                 local54 equ -8*54
+    75                                 local55 equ -8*55
+    76                                 local56 equ -8*56
+    77                                 local57 equ -8*57
+    78                                 local58 equ -8*58
+    79                                 local59 equ -8*59
+    80                                 local60 equ -8*60
+    81                                 local61 equ -8*61
+    82                                 local62 equ -8*62
+    83                                 local63 equ -8*63
+    84                                 local64 equ -8*64
+    85                                 local65 equ -8*65
+    86                                 local66 equ -8*66
+    87                                 local67 equ -8*67
+    88                                 local68 equ -8*68
+    89                                 local69 equ -8*69
+    90                                 local70 equ -8*70
+    91                                 local71 equ -8*71
+    92                                 local72 equ -8*72
+    93                                 local73 equ -8*73
+    94                                 local74 equ -8*74
+    95                                 local75 equ -8*75
+    96                                 local76 equ -8*76
+    97                                 local77 equ -8*77
+    98                                 local78 equ -8*78
+    99                                 local79 equ -8*79
+   100                                 local80 equ -8*80
+   101                                 local81 equ -8*81
+   102                                 local82 equ -8*82
+   103                                 local83 equ -8*83
+   104                                 local84 equ -8*84
+   105                                 local85 equ -8*85
+   106                                 local86 equ -8*86
+   107                                 local87 equ -8*87
+   108                                 local88 equ -8*88
+   109                                 local89 equ -8*89
+   110                                 local90 equ -8*90
+   111                                 local91 equ -8*91
+   112                                 local92 equ -8*92
+   113                                 local93 equ -8*93
+   114                                 local94 equ -8*94
+   115                                 local95 equ -8*95
+   116                                 local96 equ -8*96
+   117                                 local97 equ -8*97
+   118                                 local98 equ -8*98
+   119                                 local99 equ -8*99
+   120                                 local100 equ -8*100
+   121                                 %line 512+1 ebe.inc
+   122                                 
+   123                                 
+   124                                 
+   125                                 
+   126                                 
+   127                                 
+   128                                 
+   129                                 
+   130                                 
+   131                                 
+   132                                 
+   133                                 %line 530+1 ebe.inc
+   134                                 newPar7 equ 8*(7-7)
+   135                                 %line 530+0 ebe.inc
+   136                                 newPar8 equ 8*(8-7)
+   137                                 newPar9 equ 8*(9-7)
+   138                                 newPar10 equ 8*(10-7)
+   139                                 newPar11 equ 8*(11-7)
+   140                                 newPar12 equ 8*(12-7)
+   141                                 newPar13 equ 8*(13-7)
+   142                                 newPar14 equ 8*(14-7)
+   143                                 newPar15 equ 8*(15-7)
+   144                                 newPar16 equ 8*(16-7)
+   145                                 newPar17 equ 8*(17-7)
+   146                                 newPar18 equ 8*(18-7)
+   147                                 newPar19 equ 8*(19-7)
+   148                                 newPar20 equ 8*(20-7)
+   149                                 newPar21 equ 8*(21-7)
+   150                                 newPar22 equ 8*(22-7)
+   151                                 newPar23 equ 8*(23-7)
+   152                                 newPar24 equ 8*(24-7)
+   153                                 newPar25 equ 8*(25-7)
+   154                                 newPar26 equ 8*(26-7)
+   155                                 newPar27 equ 8*(27-7)
+   156                                 newPar28 equ 8*(28-7)
+   157                                 newPar29 equ 8*(29-7)
+   158                                 newPar30 equ 8*(30-7)
+   159                                 newPar31 equ 8*(31-7)
+   160                                 newPar32 equ 8*(32-7)
+   161                                 newPar33 equ 8*(33-7)
+   162                                 newPar34 equ 8*(34-7)
+   163                                 newPar35 equ 8*(35-7)
+   164                                 newPar36 equ 8*(36-7)
+   165                                 newPar37 equ 8*(37-7)
+   166                                 newPar38 equ 8*(38-7)
+   167                                 newPar39 equ 8*(39-7)
+   168                                 newPar40 equ 8*(40-7)
+   169                                 newPar41 equ 8*(41-7)
+   170                                 newPar42 equ 8*(42-7)
+   171                                 newPar43 equ 8*(43-7)
+   172                                 newPar44 equ 8*(44-7)
+   173                                 newPar45 equ 8*(45-7)
+   174                                 newPar46 equ 8*(46-7)
+   175                                 newPar47 equ 8*(47-7)
+   176                                 newPar48 equ 8*(48-7)
+   177                                 newPar49 equ 8*(49-7)
+   178                                 newPar50 equ 8*(50-7)
+   179                                 newPar51 equ 8*(51-7)
+   180                                 newPar52 equ 8*(52-7)
+   181                                 newPar53 equ 8*(53-7)
+   182                                 newPar54 equ 8*(54-7)
+   183                                 newPar55 equ 8*(55-7)
+   184                                 newPar56 equ 8*(56-7)
+   185                                 newPar57 equ 8*(57-7)
+   186                                 newPar58 equ 8*(58-7)
+   187                                 newPar59 equ 8*(59-7)
+   188                                 newPar60 equ 8*(60-7)
+   189                                 newPar61 equ 8*(61-7)
+   190                                 newPar62 equ 8*(62-7)
+   191                                 newPar63 equ 8*(63-7)
+   192                                 newPar64 equ 8*(64-7)
+   193                                 newPar65 equ 8*(65-7)
+   194                                 newPar66 equ 8*(66-7)
+   195                                 newPar67 equ 8*(67-7)
+   196                                 newPar68 equ 8*(68-7)
+   197                                 newPar69 equ 8*(69-7)
+   198                                 newPar70 equ 8*(70-7)
+   199                                 newPar71 equ 8*(71-7)
+   200                                 newPar72 equ 8*(72-7)
+   201                                 newPar73 equ 8*(73-7)
+   202                                 newPar74 equ 8*(74-7)
+   203                                 newPar75 equ 8*(75-7)
+   204                                 newPar76 equ 8*(76-7)
+   205                                 newPar77 equ 8*(77-7)
+   206                                 newPar78 equ 8*(78-7)
+   207                                 newPar79 equ 8*(79-7)
+   208                                 newPar80 equ 8*(80-7)
+   209                                 newPar81 equ 8*(81-7)
+   210                                 newPar82 equ 8*(82-7)
+   211                                 newPar83 equ 8*(83-7)
+   212                                 newPar84 equ 8*(84-7)
+   213                                 newPar85 equ 8*(85-7)
+   214                                 newPar86 equ 8*(86-7)
+   215                                 newPar87 equ 8*(87-7)
+   216                                 newPar88 equ 8*(88-7)
+   217                                 newPar89 equ 8*(89-7)
+   218                                 newPar90 equ 8*(90-7)
+   219                                 newPar91 equ 8*(91-7)
+   220                                 newPar92 equ 8*(92-7)
+   221                                 newPar93 equ 8*(93-7)
+   222                                 newPar94 equ 8*(94-7)
+   223                                 newPar95 equ 8*(95-7)
+   224                                 newPar96 equ 8*(96-7)
+   225                                 newPar97 equ 8*(97-7)
+   226                                 newPar98 equ 8*(98-7)
+   227                                 newPar99 equ 8*(99-7)
+   228                                 newPar100 equ 8*(100-7)
+   229                                 %line 532+1 ebe.inc
+   230                                 
+   231                                 
+   232                                 
+   233                                 
+   234                                 
+   235                                 
+   236                                 
+   237                                 
+   238                                 
+   239                                 
+   240                                 
+   241                                 %line 546+1 ebe.inc
+   242                                 
+   243                                 %line 551+1 ebe.inc
+   244                                 currPar7 equ 16+8*(7-7)
+   245                                 %line 551+0 ebe.inc
+   246                                 currPar8 equ 16+8*(8-7)
+   247                                 currPar9 equ 16+8*(9-7)
+   248                                 currPar10 equ 16+8*(10-7)
+   249                                 currPar11 equ 16+8*(11-7)
+   250                                 currPar12 equ 16+8*(12-7)
+   251                                 currPar13 equ 16+8*(13-7)
+   252                                 currPar14 equ 16+8*(14-7)
+   253                                 currPar15 equ 16+8*(15-7)
+   254                                 currPar16 equ 16+8*(16-7)
+   255                                 currPar17 equ 16+8*(17-7)
+   256                                 currPar18 equ 16+8*(18-7)
+   257                                 currPar19 equ 16+8*(19-7)
+   258                                 currPar20 equ 16+8*(20-7)
+   259                                 currPar21 equ 16+8*(21-7)
+   260                                 currPar22 equ 16+8*(22-7)
+   261                                 currPar23 equ 16+8*(23-7)
+   262                                 currPar24 equ 16+8*(24-7)
+   263                                 currPar25 equ 16+8*(25-7)
+   264                                 currPar26 equ 16+8*(26-7)
+   265                                 currPar27 equ 16+8*(27-7)
+   266                                 currPar28 equ 16+8*(28-7)
+   267                                 currPar29 equ 16+8*(29-7)
+   268                                 currPar30 equ 16+8*(30-7)
+   269                                 currPar31 equ 16+8*(31-7)
+   270                                 currPar32 equ 16+8*(32-7)
+   271                                 currPar33 equ 16+8*(33-7)
+   272                                 currPar34 equ 16+8*(34-7)
+   273                                 currPar35 equ 16+8*(35-7)
+   274                                 currPar36 equ 16+8*(36-7)
+   275                                 currPar37 equ 16+8*(37-7)
+   276                                 currPar38 equ 16+8*(38-7)
+   277                                 currPar39 equ 16+8*(39-7)
+   278                                 currPar40 equ 16+8*(40-7)
+   279                                 currPar41 equ 16+8*(41-7)
+   280                                 currPar42 equ 16+8*(42-7)
+   281                                 currPar43 equ 16+8*(43-7)
+   282                                 currPar44 equ 16+8*(44-7)
+   283                                 currPar45 equ 16+8*(45-7)
+   284                                 currPar46 equ 16+8*(46-7)
+   285                                 currPar47 equ 16+8*(47-7)
+   286                                 currPar48 equ 16+8*(48-7)
+   287                                 currPar49 equ 16+8*(49-7)
+   288                                 currPar50 equ 16+8*(50-7)
+   289                                 currPar51 equ 16+8*(51-7)
+   290                                 currPar52 equ 16+8*(52-7)
+   291                                 currPar53 equ 16+8*(53-7)
+   292                                 currPar54 equ 16+8*(54-7)
+   293                                 currPar55 equ 16+8*(55-7)
+   294                                 currPar56 equ 16+8*(56-7)
+   295                                 currPar57 equ 16+8*(57-7)
+   296                                 currPar58 equ 16+8*(58-7)
+   297                                 currPar59 equ 16+8*(59-7)
+   298                                 currPar60 equ 16+8*(60-7)
+   299                                 currPar61 equ 16+8*(61-7)
+   300                                 currPar62 equ 16+8*(62-7)
+   301                                 currPar63 equ 16+8*(63-7)
+   302                                 currPar64 equ 16+8*(64-7)
+   303                                 currPar65 equ 16+8*(65-7)
+   304                                 currPar66 equ 16+8*(66-7)
+   305                                 currPar67 equ 16+8*(67-7)
+   306                                 currPar68 equ 16+8*(68-7)
+   307                                 currPar69 equ 16+8*(69-7)
+   308                                 currPar70 equ 16+8*(70-7)
+   309                                 currPar71 equ 16+8*(71-7)
+   310                                 currPar72 equ 16+8*(72-7)
+   311                                 currPar73 equ 16+8*(73-7)
+   312                                 currPar74 equ 16+8*(74-7)
+   313                                 currPar75 equ 16+8*(75-7)
+   314                                 currPar76 equ 16+8*(76-7)
+   315                                 currPar77 equ 16+8*(77-7)
+   316                                 currPar78 equ 16+8*(78-7)
+   317                                 currPar79 equ 16+8*(79-7)
+   318                                 currPar80 equ 16+8*(80-7)
+   319                                 currPar81 equ 16+8*(81-7)
+   320                                 currPar82 equ 16+8*(82-7)
+   321                                 currPar83 equ 16+8*(83-7)
+   322                                 currPar84 equ 16+8*(84-7)
+   323                                 currPar85 equ 16+8*(85-7)
+   324                                 currPar86 equ 16+8*(86-7)
+   325                                 currPar87 equ 16+8*(87-7)
+   326                                 currPar88 equ 16+8*(88-7)
+   327                                 currPar89 equ 16+8*(89-7)
+   328                                 currPar90 equ 16+8*(90-7)
+   329                                 currPar91 equ 16+8*(91-7)
+   330                                 currPar92 equ 16+8*(92-7)
+   331                                 currPar93 equ 16+8*(93-7)
+   332                                 currPar94 equ 16+8*(94-7)
+   333                                 currPar95 equ 16+8*(95-7)
+   334                                 currPar96 equ 16+8*(96-7)
+   335                                 currPar97 equ 16+8*(97-7)
+   336                                 currPar98 equ 16+8*(98-7)
+   337                                 currPar99 equ 16+8*(99-7)
+   338                                 currPar100 equ 16+8*(100-7)
+   339                                 %line 553+1 ebe.inc
+   340                                 
+   341                                 %line 555+1 ebe.inc
+   342                                 
+   343                                 %line 562+1 ebe.inc
+   344                                 
+   345                                 %line 569+1 ebe.inc
+   346                                 
+   347                                 %line 574+1 ebe.inc
+   348                                 
+   349                                 %line 579+1 ebe.inc
+   350                                 
+   351                                 %line 584+1 ebe.inc
+   352                                 
+   353                                 %line 589+1 ebe.inc
+   354                                 
+   355                                 %line 593+1 ebe.inc
+   356                                 
+   357                                 %line 597+1 ebe.inc
+   358                                 
+   359                                 %line 600+1 ebe.inc
+   360                                 
+   361                                 %line 608+1 ebe.inc
+   362                                 
+   363                                 %line 619+1 ebe.inc
+   364                                 
+   365                                 %line 624+1 ebe.inc
+   366                                 
+   367                                 %line 1+1 min.asm
+   368                                 [segment .text]
+   369                                 [extern printf]
+   370                                 %line 2+0 min.asm
+   371                                 [extern random]
+   372                                 [extern malloc]
+   373                                 [extern atoi]
+   374                                 %line 3+1 min.asm
+   375                                 [global main]
+   376                                 %line 3+0 min.asm
+   377                                 [global create]
+   378                                 [global fill]
+   379                                 [global min]
+   380                                 %line 4+1 min.asm
+   381                                 
+   382                                 
+   383                                 create:
+   384 00000000 55                      push rbp
+   385 00000001 4889E5                  mov rbp, rsp
+   386 00000004 486BFF04                imul rdi, 4
+   387 00000008 E8(F6FFFFFF)            call malloc
+   388 0000000D C9                      leave
+   389 0000000E C3                      ret
+   390                                 
+   391                                 
+   392                                 fill:
+   393                                 .array equ local1
+   394                                 .size equ local2
+   395                                 .i equ local3
+   396 0000000F 55                      push rbp
+   397 00000010 4889E5                  mov rbp, rsp
+   398                                 
+   399 00000013 4883EC20                sub rsp, 32
+   400 00000017 48897DF8                mov [rbp+.array], rdi
+   401 0000001B 488975F0                mov [rbp+.size], rsi
+   402 0000001F 31C9                    xor ecx, ecx
+   403 00000021 48894DE8               .more mov [rbp+.i], rcx
+   404 00000025 E8(F6FFFFFF)            call random
+   405 0000002A 488B4DE8                mov rcx, [rbp+.i]
+   406 0000002E 488B7DF8                mov rdi, [rbp+.array]
+   407 00000032 89048F                  mov [rdi+rcx*4], eax
+   408 00000035 48FFC1                  inc rcx
+   409 00000038 483B4DF0                cmp rcx, [rbp+.size]
+   410 0000003C 7CE1                    jl .more
+   411 0000003E C9                      leave
+   412 0000003F C3                      ret
+   413                                 
+   414                                 
+   415                                 print:
+   416                                 .array equ local1
+   417                                 .size equ local2
+   418                                 .i equ local3
+   419 00000040 55                      push rbp
+   420 00000041 4889E5                  mov rbp, rsp
+   421                                 
+   422 00000044 4883EC20                sub rsp, 32
+   423 00000048 48897DF8                mov [rbp+.array], rdi
+   424 0000004C 488975F0                mov [rbp+.size], rsi
+   425 00000050 31C9                    xor ecx, ecx
+   426 00000052 48894DE8                mov [rbp+.i], rcx
+   427                                 [segment .data]
+   428                                 .format:
+   429 00000000 253130640A00            db "%10d",0x0a,0
+   430                                 [segment .text]
+   431 00000056 488D3C25[00000000]     .more lea rdi, [.format]
+   432 0000005E 488B55F8                mov rdx, [rbp+.array]
+   433 00000062 488B4DE8                mov rcx, [rbp+.i]
+   434 00000066 8B348A                  mov esi, [rdx+rcx*4]
+   435 00000069 48894DE8                mov [rbp+.i], rcx
+   436 0000006D 31C0                    xor eax, eax
+   437 0000006F E8(F6FFFFFF)            call printf
+   438 00000074 488B4C24E8              mov rcx, [rsp+.i]
+   439 00000079 48FFC1                  inc rcx
+   440 0000007C 48894DE8                mov [rbp+.i], rcx
+   441 00000080 483B4DF0                cmp rcx, [rbp+.size]
+   442 00000084 7CCE                    jl .more
+   443 00000086 C9                      leave
+   444 00000087 C3                      ret
+   445                                 
+   446                                 
+   447                                 min:
+   448 00000088 8B07                    mov eax, [rdi]
+   449 0000008A 48C7C101000000          mov rcx, 1
+   450 00000091 448B048F               .more mov r8d, [rdi+rcx*4]
+   451 00000095 4139C0                  cmp r8d, eax
+   452 00000098 410F4CC0                cmovl eax, r8d
+   453 0000009C 48FFC1                  inc rcx
+   454 0000009F 4839F1                  cmp rcx, rsi
+   455 000000A2 7CEB                    jl .more
+   456 000000A4 C3                      ret
+   457                                 
+   458                                 main:
+   459                                 .array equ local1
+   460                                 .size equ local2
+   461 000000A5 55                      push rbp
+   462 000000A6 4889E5                  mov rbp, rsp
+   463                                 
+   464 000000A9 4883EC10                sub rsp, 16
+   465                                 
+   466                                 
+   467 000000AD B90A000000              mov ecx, 10
+   468 000000B2 48894DF0                mov [rbp+.size], rcx
+   469                                 
+   470                                 
+   471 000000B6 83FF02                  cmp edi, 2
+   472 000000B9 7C0B                    jl .nosize
+   473 000000BB 488B7E08                mov rdi, [rsi+8]
+   474 000000BF E8(F6FFFFFF)            call atoi
+   475 000000C4 488945F0                mov [rbp+.size], rax
+   476                                 .nosize:
+   477                                 
+   478                                 
+   479 000000C8 488B7DF0                mov rdi, [rbp+.size]
+   480 000000CC E82AFFFFFF              call create
+   481 000000D1 488945F8                mov [rbp+.array], rax
+   482                                 
+   483                                 
+   484 000000D5 4889C7                  mov rdi, rax
+   485 000000D8 488B75F0                mov rsi, [rbp+.size]
+   486 000000DC E829FFFFFF              call fill
+   487                                 
+   488                                 
+   489 000000E1 488B75F0                mov rsi, [rbp+.size]
+   490 000000E5 4883FE14                cmp rsi, 20
+   491 000000E9 7F07                    jg .toobig
+   492 000000EB 488B7DF8                mov rdi, [rbp+.array]
+   493 000000EF E847FFFFFF              call print
+   494                                 .toobig:
+   495                                 
+   496                                 
+   497                                 [segment .data]
+   498                                 .format:
+   499 00000006 6D696E3A20256C640A-     db "min: %ld",0xa,0
+   500 00000006 00                 
+   501                                 [segment .text]
+   502 000000F4 488B7DF8                mov rdi, [rbp+.array]
+   503 000000F8 488B75F0                mov rsi, [rbp+.size]
+   504 000000FC E882FFFFFF              call min
+   505 00000101 488D3C25[00000000]      lea rdi, [.format]
+   506 00000109 4889C6                  mov rsi, rax
+   507 0000010C 31C0                    xor eax, eax
+   508 0000010E E8(F6FFFFFF)            call printf
+   509                                 
+   510 00000113 C9                      leave
+   511 00000114 C3                      ret

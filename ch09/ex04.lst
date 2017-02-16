@@ -1,0 +1,288 @@
+     1                                 %line 1+1 ex04.asm
+     2                                 [section .bss]
+     3 00000000 <gap>                  cjnts resq 156250
+     4 001312D0 <gap>                  cmmand resb 256
+     5                                 
+     6                                 
+     7 001313D0 <gap>                  param1 resq 1
+     8 001313D8 <gap>                  param2 resq 1
+     9                                 
+    10                                 [section .data]
+    11 00000000 257300                 cmndstr db "%s",0
+    12 00000003 256400                 inp db "%d",0
+    13 00000006 25642000               outp db "%d ",0
+    14 0000000A 456E74657220636F6D-    prompt1 db "Enter command (add, union, print, quit): ",0
+    15 0000000A 6D616E642028616464-
+    16 0000000A 2C20756E696F6E2C20-
+    17 0000000A 7072696E742C207175-
+    18 0000000A 6974293A2000       
+    19 00000034 456E74657220706172-    prompt2 db "Enter parameters: ",0
+    20 00000034 616D65746572733A20-
+    21 00000034 00                 
+    22 00000047 0A00                   linefd db 0xa,0
+    23                                 
+    24 00000049 756E696F6E00           union db "union",0
+    25 0000004F 7072696E7400           print db "print",0
+    26 00000055 7175697400             quit db "quit",0
+    27 0000005A 61646400               ad db "add",0
+    28                                 
+    29                                 [section .text]
+    30                                 [global _start]
+    31                                 
+    32                                 [extern printf]
+    33                                 [extern scanf]
+    34                                 
+    35                                 
+    36                                 
+    37                                 read_command:
+    38 00000000 55                      push rbp
+    39 00000001 4889E5                  mov rbp, rsp
+    40                                 beg_rc:
+    41 00000004 488D3C25[00000000]      lea rdi, [prompt1]
+    42 0000000C 31C0                    xor eax, eax
+    43 0000000E E8(F6FFFFFF)            call printf
+    44                                 
+    45 00000013 30C0                    xor al, al
+    46 00000015 B900010000              mov ecx, 256
+    47 0000001A 488D3C25[00000000]      lea rdi, [cmmand]
+    48 00000022 F3AB                    rep stosd
+    49                                 
+    50 00000024 488D3C25[00000000]      lea rdi, [cmndstr]
+    51 0000002C 488D3425[00000000]      lea rsi, [cmmand]
+    52 00000034 31C0                    xor eax, eax
+    53 00000036 E8(F6FFFFFF)            call scanf
+    54                                 
+    55                                 
+    56 0000003B 488D3425[00000000]      lea rsi, [cmmand]
+    57 00000043 488D3C25[00000000]      lea rdi, [ad]
+    58 0000004B 48C7C105000000          mov rcx, 5
+    59 00000052 F3A6                    repe cmpsb
+    60 00000054 4883F900                cmp rcx, 0
+    61 00000058 7507                    jne lb_un
+    62 0000005A 48C7C000000000          mov rax, 0
+    63 00000061 EB78                    jmp end_rc
+    64                                 lb_un:
+    65 00000063 488D3425[00000000]      lea rsi, [cmmand]
+    66 0000006B 488D3C25[00000000]      lea rdi, [union]
+    67 00000073 48C7C107000000          mov rcx, 7
+    68 0000007A F3A6                    repe cmpsb
+    69 0000007C 4883F900                cmp rcx, 0
+    70 00000080 7507                    jne lb_pr
+    71 00000082 48C7C001000000          mov rax, 1
+    72 00000089 EB50                    jmp end_rc
+    73                                 lb_pr:
+    74 0000008B 488D3425[00000000]      lea rsi, [cmmand]
+    75 00000093 488D3C25[00000000]      lea rdi, [print]
+    76 0000009B 48C7C107000000          mov rcx, 7
+    77 000000A2 F3A6                    repe cmpsb
+    78 000000A4 4883F900                cmp rcx, 0
+    79 000000A8 7507                    jne lb_qu
+    80 000000AA 48C7C002000000          mov rax, 2
+    81 000000B1 EB28                    jmp end_rc
+    82                                 lb_qu:
+    83 000000B3 488D3425[00000000]      lea rsi, [cmmand]
+    84 000000BB 488D3C25[00000000]      lea rdi, [quit]
+    85 000000C3 48C7C106000000          mov rcx, 6
+    86 000000CA F3A6                    repe cmpsb
+    87 000000CC 4883F900                cmp rcx, 0
+    88 000000D0 0F8528FFFFFF            jne beg_rc
+    89 000000D6 48C7C003000000          mov rax, 3
+    90                                 end_rc:
+    91 000000DD C9                      leave
+    92 000000DE C3                      ret
+    93                                 
+    94                                 
+    95                                 
+    96                                 _add:
+    97 000000DF 55                      push rbp
+    98 000000E0 4889E5                  mov rbp, rsp
+    99 000000E3 53                      push rbx
+   100                                 
+   101 000000E4 488D3C25[00000000]      lea rdi, [prompt2]
+   102 000000EC 31C0                    xor eax, eax
+   103 000000EE E8(F6FFFFFF)            call printf
+   104 000000F3 488D3C25[00000000]      lea rdi, [inp]
+   105 000000FB 488D3425[00000000]      lea rsi, [param1]
+   106 00000103 31C0                    xor eax, eax
+   107 00000105 E8(F6FFFFFF)            call scanf
+   108                                 
+   109                                 
+   110 0000010A 48833C25[00000000]-     cmp qword [param1], 0
+   111 0000010A 00                 
+   112 00000113 7C73                    jl e_add
+   113 00000115 48833C25[00000000]-     cmp qword [param1], 9
+   114 00000115 09                 
+   115 0000011E 7F68                    jg e_add
+   116                                 
+   117 00000120 488D3C25[00000000]      lea rdi, [inp]
+   118 00000128 488D3425[00000000]      lea rsi, [param2]
+   119 00000130 31C0                    xor eax, eax
+   120 00000132 E8(F6FFFFFF)            call scanf
+   121                                 
+   122                                 
+   123 00000137 48833C25[00000000]-     cmp qword [param2], 0
+   124 00000137 00                 
+   125 00000140 7C46                    jl e_add
+   126 00000142 48813C25[00000000]-     cmp qword [param2], 999999
+   127 00000142 3F420F00           
+   128 0000014E 7F38                    jg e_add
+   129                                 
+   130 00000150 488B0425[00000000]      mov rax, [param1]
+   131 00000158 48C7C3093D0000          mov rbx, 15625
+   132 0000015F 48F7E3                  mul rbx
+   133 00000162 488D1CC5[00000000]      lea rbx, [cjnts + 8*rax]
+   134 0000016A 4889D8                  mov rax, rbx
+   135 0000016D 488B1C25[00000000]      mov rbx, [param2]
+   136 00000175 48C1EB06                shr rbx, 6
+   137 00000179 488B0C25[00000000]      mov rcx, [param2]
+   138 00000181 4883E13F                and rcx, 0x3F
+   139 00000185 480FAB0CD8              bts [rax+8*rbx], rcx
+   140                                 e_add:
+   141 0000018A 5B                      pop rbx
+   142 0000018B C9                      leave
+   143 0000018C C3                      ret
+   144                                 
+   145                                 
+   146                                 
+   147                                 _union:
+   148 0000018D 55                      push rbp
+   149 0000018E 4889E5                  mov rbp, rsp
+   150 00000191 4154                    push r12
+   151 00000193 53                      push rbx
+   152                                 
+   153 00000194 488D3C25[00000000]      lea rdi, [prompt2]
+   154 0000019C 31C0                    xor eax, eax
+   155 0000019E E8(F6FFFFFF)            call printf
+   156 000001A3 488D3C25[00000000]      lea rdi, [inp]
+   157 000001AB 488D3425[00000000]      lea rsi, [param1]
+   158 000001B3 31C0                    xor eax, eax
+   159 000001B5 E8(F6FFFFFF)            call scanf
+   160                                 
+   161                                 
+   162 000001BA 48833C25[00000000]-     cmp qword [param1], 0
+   163 000001BA 00                 
+   164 000001C3 0F8C89000000            jl e_union
+   165 000001C9 48833C25[00000000]-     cmp qword [param1], 9
+   166 000001C9 09                 
+   167 000001D2 0F8F7A000000            jg e_union
+   168                                 
+   169 000001D8 488D3C25[00000000]      lea rdi, [inp]
+   170 000001E0 488D3425[00000000]      lea rsi, [param2]
+   171 000001E8 31C0                    xor eax, eax
+   172 000001EA E8(F6FFFFFF)            call scanf
+   173                                 
+   174                                 
+   175 000001EF 48833C25[00000000]-     cmp qword [param2], 0
+   176 000001EF 00                 
+   177 000001F8 7C5C                    jl e_union
+   178 000001FA 48833C25[00000000]-     cmp qword [param2], 9
+   179 000001FA 09                 
+   180 00000203 7F51                    jg e_union
+   181                                 
+   182 00000205 488B0425[00000000]      mov rax, [param1]
+   183 0000020D 48C7C3093D0000          mov rbx, 15625
+   184 00000214 48F7E3                  mul rbx
+   185 00000217 488D1CC5[00000000]      lea rbx, [cjnts + 8*rax]
+   186 0000021F 4989D8                  mov r8, rbx
+   187 00000222 488B0425[00000000]      mov rax, [param2]
+   188 0000022A 48C7C3093D0000          mov rbx, 15625
+   189 00000231 48F7E3                  mul rbx
+   190 00000234 488D1CC5[00000000]      lea rbx, [cjnts + 8*rax]
+   191 0000023C 4989D9                  mov r9, rbx
+   192 0000023F 4831C9                  xor rcx, rcx
+   193                                 un_loop:
+   194 00000242 4881F9093D0000          cmp rcx, 15625
+   195 00000249 740B                    je e_union
+   196 0000024B 4D8B24C9                mov r12, qword [r9+8*rcx]
+   197 0000024F 4D0924C8                or qword [r8+8*rcx], r12
+   198 00000253 48FFC1                  inc rcx
+   199 00000256 EBE8                    jmp un_loop
+   200                                 e_union:
+   201 00000258 5B                      pop rbx
+   202 00000259 415C                    pop r12
+   203 0000025B C9                      leave
+   204 0000025C C3                      ret
+   205                                 
+   206                                 
+   207                                 
+   208                                 _print:
+   209 0000025D 55                      push rbp
+   210 0000025E 4889E5                  mov rbp, rsp
+   211 00000261 4156                    push r14
+   212 00000263 4155                    push r13
+   213 00000265 4154                    push r12
+   214 00000267 53                      push rbx
+   215                                 
+   216 00000268 488D3C25[00000000]      lea rdi, [prompt2]
+   217 00000270 31C0                    xor eax, eax
+   218 00000272 E8(F6FFFFFF)            call printf
+   219 00000277 488D3C25[00000000]      lea rdi, [inp]
+   220 0000027F 488D3425[00000000]      lea rsi, [param1]
+   221 00000287 31C0                    xor eax, eax
+   222 00000289 E8(F6FFFFFF)            call scanf
+   223                                 
+   224                                 
+   225 0000028E 48833C25[00000000]-     cmp qword [param1], 0
+   226 0000028E 00                 
+   227 00000297 7C79                    jl again
+   228 00000299 48833C25[00000000]-     cmp qword [param1], 9
+   229 00000299 09                 
+   230 000002A2 7F6E                    jg again
+   231                                 
+   232 000002A4 488B0425[00000000]      mov rax, [param1]
+   233 000002AC 48C7C3093D0000          mov rbx, 15625
+   234 000002B3 48F7E3                  mul rbx
+   235 000002B6 488D1CC5[00000000]      lea rbx, [cjnts + 8*rax]
+   236 000002BE 4D31E4                  xor r12, r12
+   237 000002C1 4D31F6                  xor r14, r14
+   238                                 pr_loop:
+   239 000002C4 4981FC093D0000          cmp r12, 15625
+   240 000002CB 742D                    je e_print
+   241 000002CD 4D31ED                  xor r13, r13
+   242 000002D0 4983FD40               bit_lp: cmp r13, 64
+   243 000002D4 7D1F                    jge e_bit
+   244 000002D6 4E0FA32CE3              bt qword [rbx+8*r12], r13
+   245 000002DB 7310                    jnc ct_bit
+   246 000002DD 488D3C25[00000000]      lea rdi, [outp]
+   247 000002E5 4C89F6                  mov rsi, r14
+   248 000002E8 31C0                    xor eax, eax
+   249 000002EA E8(F6FFFFFF)            call printf
+   250 000002EF 49FFC5                 ct_bit: inc r13
+   251 000002F2 49FFC6                  inc r14
+   252 000002F5 EBD7                    jmp bit_lp
+   253 000002F7 49FFC4                 e_bit: inc r12
+   254 000002FA EBC6                    jmp pr_loop
+   255                                 e_print:
+   256 000002FC 488D3C25[00000000]      lea rdi, [linefd]
+   257 00000304 31C0                    xor eax, eax
+   258 00000306 E8(F6FFFFFF)            call printf
+   259 0000030B 5B                      pop rbx
+   260 0000030C 415C                    pop r12
+   261 0000030E 415D                    pop r13
+   262 00000310 415E                    pop r14
+   263 00000312 C9                      leave
+   264 00000313 C3                      ret
+   265                                 
+   266                                 
+   267                                 
+   268                                 _start:
+   269                                 
+   270 00000314 E8E2FCFFFF             again: call read_command
+   271                                 
+   272                                 
+   273 00000319 4883F803                cmp rax, 3
+   274 0000031D 741F                    je end
+   275 0000031F 4883F800               nxt_ad: cmp rax, 0
+   276 00000323 7505                    jne nxt_un
+   277 00000325 E8B0FDFFFF              call _add
+   278 0000032A EBE6                    jmp again
+   279 0000032C 4883F801               nxt_un: cmp rax, 1
+   280 00000330 7505                    jne nxt_pr
+   281 00000332 E851FEFFFF              call _union
+   282 00000337 EBD9                    jmp again
+   283                                 nxt_pr:
+   284 00000339 E81AFFFFFF              call _print
+   285 0000033E EBD2                    jmp again
+   286 00000340 B83C000000             end: mov eax, 60
+   287 00000345 31FF                    xor edi, edi
+   288 00000347 0F05                    syscall

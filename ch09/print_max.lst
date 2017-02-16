@@ -1,0 +1,51 @@
+     1                                 %line 1+1 print_max.asm
+     2                                 [section .data]
+     3 00000000 6D617828256C642C25-    fmt db 'max(%ld,%ld) = %ld',0xa,0
+     4 00000000 6C6429203D20256C64-
+     5 00000000 0A00               
+     6                                 
+     7                                 [section .text]
+     8                                 [global main]
+     9                                 [extern printf]
+    10                                 
+    11                                 
+    12                                 
+    13                                 a equ 0
+    14                                 b equ 8
+    15                                 print_max:
+    16 00000000 55                      push rbp
+    17 00000001 4889E5                  mov rbp, rsp
+    18 00000004 4883EC20                sub rsp, 32
+    19                                 
+    20                                 
+    21                                 max equ 16
+    22 00000008 48893C24                mov [rsp+a], rdi
+    23 0000000C 4889742408              mov [rsp+b], rsi
+    24                                 
+    25 00000011 48897C2410              mov [rsp+max], rdi
+    26                                 
+    27 00000016 4839FE                  cmp rsi, rdi
+    28 00000019 7E03                    jng skip
+    29 0000001B 4889742410              mov [rsp+max], rsi
+    30                                 skip:
+    31                                 
+    32 00000020 488D3C25[00000000]      lea rdi, [fmt]
+    33 00000028 488B3424                mov rsi, [rsp+a]
+    34 0000002C 488B542408              mov rdx, [rsp+b]
+    35 00000031 488B4C2410              mov rcx, [rsp+max]
+    36 00000036 31C0                    xor eax, eax
+    37 00000038 E8(F6FFFFFF)            call printf
+    38                                 
+    39 0000003D C9                      leave
+    40 0000003E C3                      ret
+    41                                 
+    42                                 main:
+    43 0000003F 55                      push rbp
+    44 00000040 4889E5                  mov rbp, rsp
+    45                                 
+    46 00000043 48C7C764000000          mov rdi, 100
+    47 0000004A 48C7C6C8000000          mov rsi, 200
+    48 00000051 E8A5FFFFFF              call print_max
+    49 00000056 31C0                    xor eax, eax
+    50 00000058 C9                      leave
+    51 00000059 C3                      ret

@@ -1,0 +1,247 @@
+     1                                 %line 1+1 ex03.asm
+     2                                 
+     3                                 
+     4                                 blocksize equ 512
+     5                                 
+     6                                 
+     7                                 
+     8                                 [section .bss]
+     9 00000000 <gap>                  fdinput resd 1
+    10 00000004 <gap>                  buffer resb blocksize
+    11 00000204 <gap>                  pattern resq 1
+    12 0000020C <gap>                  patternsize resq 1
+    13 00000214 <gap>                  linecounter resq 1
+    14                                 
+    15                                 
+    16                                 
+    17                                 [section .data]
+    18 00000000 72656164206661696C-    printerror db "read failure",0xa,0
+    19 00000000 7572650A00         
+    20 0000000E 6C696E65202564202D-    prnt_line db "line %d -- %s",0
+    21 0000000E 2D20257300         
+    22                                 
+    23                                 
+    24                                 
+    25                                 
+    26                                 
+    27                                 
+    28                                 [section .text]
+    29                                 [global main]
+    30                                 
+    31                                 [extern printf]
+    32                                 %line 28+0 ex03.asm
+    33                                 [extern open]
+    34                                 [extern read]
+    35                                 [extern lseek]
+    36                                 [extern close]
+    37                                 [extern malloc]
+    38                                 [extern free]
+    39                                 %line 29+1 ex03.asm
+    40                                 
+    41                                 
+    42                                 
+    43                                 search_pattern:
+    44                                 
+    45                                 
+    46 00000000 55                      push rbp
+    47 00000001 4889E5                  mov rbp, rsp
+    48 00000004 53                      push rbx
+    49 00000005 4154                    push r12
+    50 00000007 4155                    push r13
+    51 00000009 4883EC10                sub rsp, 16
+    52 0000000D 4889742408              mov [rsp+8], rsi
+    53 00000012 48893C24                mov [rsp], rdi
+    54                                 
+    55                                 [section .data]
+    56 0000001C 0000000000000000       .preproc: dq 0
+    57                                 
+    58                                 [section .text]
+    59                                 
+    60                                 
+    61 00000016 488B3C25[00000000]      mov rdi, [patternsize]
+    62 0000001E 4883C702                add rdi, 2
+    63 00000022 48C1E702                shl rdi, 2
+    64 00000026 E8(F6FFFFFF)            call malloc
+    65 0000002B 48890425[00000000]      mov qword [.preproc], rax
+    66                                 
+    67                                 
+    68 00000033 4D31C0                  xor r8, r8
+    69 00000036 49C7C1FFFFFFFF          mov r9, -1
+    70 0000003D 4C8B2425[00000000]      mov r12, qword [.preproc]
+    71 00000045 488B1C25[00000000]      mov rbx, qword [pattern]
+    72 0000004D 47890C84                mov dword [r12+4*r8], r9d
+    73                                 .wppext:
+    74 00000051 4C3B0425[00000000]      cmp r8, qword [patternsize]
+    75 00000059 7D22                    jge .ewppext
+    76                                 .wppint:
+    77 0000005B 4983F900                cmp r9, 0
+    78 0000005F 7D00                    jge .jgt0
+    79 00000061 EB0E                    jmp .ewppint
+    80                                 .jgt0:
+    81 00000063 428A1403                mov dl, byte [rbx+r8]
+    82 00000067 423A140B                cmp dl, byte [rbx+r9]
+    83 0000006B 7404                    je .ewppint
+    84                                 
+    85 0000006D 4F630C8C                movsxd r9, dword [r12+4*r9]
+    86 00000071 EBE6                    jmp .wppint
+    87                                 .ewppint:
+    88 00000073 49FFC0                  inc r8
+    89 00000076 49FFC1                  inc r9
+    90 00000079 47890C84                mov dword [r12+4*r8], r9d
+    91 0000007D EBD0                    jmp .wppext
+    92                                 .ewppext:
+    93                                 
+    94                                 
+    95 0000007F 4831C0                  xor rax, rax
+    96 00000082 4C8B2425[00000000]      mov r12, qword [.preproc]
+    97 0000008A 4C8B2C24                mov r13, qword [rsp]
+    98 0000008E 488B1C25[00000000]      mov rbx, qword [pattern]
+    99 00000096 4D31C0                  xor r8, r8
+   100 00000099 4D31C9                  xor r9, r9
+   101                                 .wsext:
+   102 0000009C 4C3B442408              cmp r8, qword [rsp+8]
+   103 000000A1 7D2E                    jge .endkmp
+   104                                 .wsint:
+   105 000000A3 4983F900                cmp r9, 0
+   106 000000A7 7D00                    jge .jsgt0
+   107 000000A9 EB0F                    jmp .ewsint
+   108                                 .jsgt0:
+   109 000000AB 438A540500              mov dl, byte [r13 + r8]
+   110 000000B0 423A140B                cmp dl, byte [rbx + r9]
+   111 000000B4 7404                    je .ewsint
+   112                                 
+   113 000000B6 4F630C8C                movsxd r9, dword [r12+4*r9]
+   114 000000BA EBE5                    jmp .wsint
+   115                                 .ewsint:
+   116 000000BC 49FFC0                  inc r8
+   117 000000BF 49FFC1                  inc r9
+   118 000000C2 4C3B0C25[00000000]      cmp r9, [patternsize]
+   119 000000CA 75CE                    jne .wsext
+   120 000000CC 48C7C001000000          mov rax, 1
+   121                                 
+   122                                 .endkmp:
+   123 000000D3 4883C410                add rsp, 16
+   124 000000D7 415D                    pop r13
+   125 000000D9 415C                    pop r12
+   126 000000DB 5B                      pop rbx
+   127 000000DC C9                      leave
+   128 000000DD C3                      ret
+   129                                 
+   130                                 
+   131                                 
+   132                                 main:
+   133 000000DE 55                      push rbp
+   134 000000DF 4889E5                  mov rbp, rsp
+   135 000000E2 53                      push rbx
+   136 000000E3 4154                    push r12
+   137                                 
+   138 000000E5 4889F3                  mov rbx, rsi
+   139 000000E8 4883C308                add rbx, 8
+   140 000000EC 488B33                  mov rsi, [rbx]
+   141 000000EF 48893425[00000000]      mov [pattern], rsi
+   142                                 
+   143 000000F7 4831C9                  xor rcx, rcx
+   144                                 .compute_size:
+   145 000000FA 803C0E00                cmp byte [rsi+rcx], 0x0
+   146 000000FE 7403                    je .size_computed
+   147 00000100 48FFC1                  inc rcx
+   148 00000103 EBF3                    jmp .compute_size
+   149                                 .size_computed:
+   150 00000105 48890C25[00000000]      mov [patternsize], rcx
+   151                                 
+   152                                 
+   153 0000010D 4883C308                add rbx, 8
+   154 00000111 488B3B                  mov rdi, [rbx]
+   155 00000114 BE00000000              mov esi, 0x0
+   156 00000119 E8(F6FFFFFF)            call open
+   157 0000011E 83F800                  cmp eax, 0
+   158 00000121 0F8CF7000000            jl .end
+   159 00000127 890425[00000000]        mov [fdinput], eax
+   160                                 
+   161 0000012E 48C70425[00000000]-     mov qword [linecounter], 0
+   162 0000012E 00000000           
+   163                                 .next_line:
+   164                                 
+   165                                 
+   166 0000013A 4831DB                  xor rbx, rbx
+   167 0000013D 48FF0425[00000000]      inc qword [linecounter]
+   168                                 .next_chunk:
+   169 00000145 4D31E4                  xor r12, r12
+   170 00000148 488B3C25[00000000]      mov rdi, [fdinput]
+   171 00000150 488D3425[00000000]      lea rsi, [buffer]
+   172 00000158 48C7C200020000          mov rdx, blocksize
+   173 0000015F E8(F6FFFFFF)            call read
+   174 00000164 4831C9                  xor rcx, rcx
+   175 00000167 83F800                  cmp eax, 0
+   176 0000016A 7E19                    jle .newline_found
+   177 0000016C 4989C4                  mov r12, rax
+   178                                 
+   179                                 .next_byte:
+   180 0000016F 4C39E1                  cmp rcx, r12
+   181 00000172 7D0C                    jge .end_chunk
+   182 00000174 80B9[00000000]0A        cmp byte [buffer+rcx], 0xa
+   183 0000017B 7408                    je .newline_found
+   184 0000017D 48FFC1                  inc rcx
+   185 00000180 EBEB                    jmp .next_byte
+   186                                 .end_chunk:
+   187 00000182 4801CB                  add rbx, rcx
+   188 00000185 EBBC                    jmp .next_chunk
+   189                                 .newline_found:
+   190 00000187 4889DA                  mov rdx, rbx
+   191 0000018A 4C01E2                  add rdx, r12
+   192 0000018D 4801CB                  add rbx, rcx
+   193 00000190 48FFC3                  inc rbx
+   194                                 
+   195                                 
+   196 00000193 48F7DA                  neg rdx
+   197 00000196 488B3C25[00000000]      mov rdi, [fdinput]
+   198 0000019E 4889D6                  mov rsi, rdx
+   199 000001A1 48C7C201000000          mov rdx, 1
+   200 000001A8 E8(F6FFFFFF)            call lseek
+   201                                 
+   202                                 
+   203 000001AD 4889DF                  mov rdi, rbx
+   204 000001B0 48FFC7                  inc rdi
+   205 000001B3 E8(F6FFFFFF)            call malloc
+   206 000001B8 4989C4                  mov r12, rax
+   207 000001BB 41C6041C00              mov byte [r12+rbx], 0x0
+   208                                 
+   209                                 
+   210 000001C0 488B3C25[00000000]      mov rdi, [fdinput]
+   211 000001C8 4C89E6                  mov rsi, r12
+   212 000001CB 4889DA                  mov rdx, rbx
+   213 000001CE E8(F6FFFFFF)            call read
+   214 000001D3 83F800                  cmp eax, 0
+   215 000001D6 7E36                    jle .close
+   216                                 
+   217                                 
+   218 000001D8 4C89E7                  mov rdi, r12
+   219 000001DB 4889DE                  mov rsi, rbx
+   220 000001DE E818FEFFFF              call search_pattern
+   221 000001E3 4883F800                cmp rax, 0
+   222 000001E7 7418                    je .not_found
+   223                                 
+   224                                 
+   225 000001E9 488D3C25[00000000]      lea rdi, [prnt_line]
+   226 000001F1 488B3425[00000000]      mov rsi, [linecounter]
+   227 000001F9 4C89E2                  mov rdx, r12
+   228 000001FC 31C0                    xor eax, eax
+   229 000001FE E8(F6FFFFFF)            call printf
+   230                                 
+   231                                 .not_found:
+   232                                 
+   233 00000203 4C89E7                  mov rdi, r12
+   234 00000206 E8(F6FFFFFF)            call free
+   235 0000020B E925FFFFFF              jmp .next_line
+   236                                 
+   237                                 .close:
+   238 00000210 4C89E7                  mov rdi, r12
+   239 00000213 E8(F6FFFFFF)            call free
+   240 00000218 8B3C25[00000000]        mov edi, [fdinput]
+   241 0000021F E8(F6FFFFFF)            call close
+   242                                 .end:
+   243 00000224 415C                    pop r12
+   244 00000226 5B                      pop rbx
+   245 00000227 C9                      leave
+   246 00000228 C3                      ret
+   247                                 

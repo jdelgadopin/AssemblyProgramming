@@ -1,0 +1,34 @@
+     1                                 %line 1+1 ex04.asm
+     2                                 [segment .data]
+     3                                 
+     4 00000000 588A07EEF533213D       dat dq 0x3D2133F5EE078A58
+     5                                 
+     6                                 [segment .text]
+     7                                 [global _start]
+     8                                 _start:
+     9 00000000 55                      push rbp
+    10 00000001 4889E5                  mov rbp, rsp
+    11                                 
+    12 00000004 488B0425[00000000]      mov rax, [dat]
+    13 0000000C 488B1C25[00000000]      mov rbx, [dat]
+    14                                 
+    15 00000014 48C1C808                ror rax, 8
+    16 00000018 4831C3                  xor rbx, rax
+    17 0000001B 48C1C808                ror rax, 8
+    18 0000001F 4831C3                  xor rbx, rax
+    19 00000022 48C1C808                ror rax, 8
+    20 00000026 4831C3                  xor rbx, rax
+    21 00000029 48C1C808                ror rax, 8
+    22 0000002D 4831C3                  xor rbx, rax
+    23 00000030 48C1C808                ror rax, 8
+    24 00000034 4831C3                  xor rbx, rax
+    25 00000037 48C1C808                ror rax, 8
+    26 0000003B 4831C3                  xor rbx, rax
+    27 0000003E 48C1C808                ror rax, 8
+    28 00000042 4831C3                  xor rbx, rax
+    29                                 
+    30 00000045 4881E3FF000000          and rbx, 0xFF
+    31                                 
+    32 0000004C 4831C0                  xor rax, rax
+    33 0000004F C9                      leave
+    34 00000050 C3                      ret

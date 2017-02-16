@@ -1,0 +1,22 @@
+     1                                 %line 1+1 pythagorean.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                 
+     6                                 [segment .data]
+     7 00000000 F600000000000000       a dq 246
+     8 00000008 4801000000000000       b dq 328
+     9 00000010 9A01000000000000       c dq 410
+    10                                 [segment .text]
+    11                                 [global _start]
+    12                                 _start:
+    13 00000000 488B0425[00000000]      mov rax, [a]
+    14 00000008 480FAFC0                imul rax, rax
+    15 0000000C 488B1C25[00000000]      mov rbx, [b]
+    16 00000014 480FAFDB                imul rbx, rbx
+    17 00000018 488B0C25[00000000]      mov rcx, [c]
+    18 00000020 480FAFC9                imul rcx, rcx
+    19 00000024 4801D8                  add rax, rbx
+    20 00000027 4829C8                  sub rax, rcx
+    21 0000002A 4831C0                  xor rax, rax
+    22 0000002D C3                      ret

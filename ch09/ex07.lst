@@ -1,0 +1,90 @@
+     1                                 %line 1+1 ex07.asm
+     2                                 [section .bss]
+     3 00000000 <gap>                  parens resb 80
+     4                                 
+     5                                 
+     6                                 [section .data]
+     7 00000000 456E74657220706172-    prompt db "Enter parentheses string (max 80): ",0
+     8 00000000 656E74686573657320-
+     9 00000000 737472696E6720286D-
+    10 00000000 6178203830293A2000 
+    11 00000024 257300                 strng db "%s",0
+    12 00000027 476F6F64210A00         blncd db "Good!",0xa,0
+    13 0000002E 426164204020636861-    nblncd db "Bad @ char %d",0xa,0
+    14 0000002E 722025640A00       
+    15                                 
+    16                                 
+    17                                 [section .text]
+    18                                 [global _start]
+    19                                 
+    20                                 [extern printf]
+    21                                 [extern scanf]
+    22                                 
+    23                                 
+    24                                 
+    25                                 read_parens:
+    26 00000000 55                      push rbp
+    27 00000001 4889E5                  mov rbp, rsp
+    28                                 
+    29 00000004 488D3C25[00000000]      lea rdi, [prompt]
+    30 0000000C 31C0                    xor eax, eax
+    31 0000000E E8(F6FFFFFF)            call printf
+    32                                 
+    33 00000013 488D3C25[00000000]      lea rdi, [strng]
+    34 0000001B 488D3425[00000000]      lea rsi, [parens]
+    35 00000023 31C0                    xor eax, eax
+    36 00000025 E8(F6FFFFFF)            call scanf
+    37 0000002A C9                      leave
+    38 0000002B C3                      ret
+    39                                 
+    40                                 
+    41                                 
+    42                                 balanced:
+    43 0000002C 55                      push rbp
+    44 0000002D 4889E5                  mov rbp, rsp
+    45 00000030 57                      push rdi
+    46 00000031 488B0C24                mov rcx, [rsp]
+    47 00000035 803900                  cmp byte [rcx], 0x0
+    48 00000038 7403                    je e_bc
+    49 0000003A 803929                  cmp byte [rcx], 0x29
+    50 0000003D 7504                    jne rec_case
+    51 0000003F 488B0424               e_bc: mov rax, [rsp]
+    52 00000043 C9                      leave
+    53 00000044 C3                      ret
+    54                                 rec_case:
+    55 00000045 48FFC1                  inc rcx
+    56 00000048 4889CF                  mov rdi, rcx
+    57 0000004B E8D7FFFFFF              call balanced
+    58 00000050 803829                  cmp byte [rax], 0x29
+    59 00000053 750B                    jne e_rc
+    60 00000055 48FFC0                  inc rax
+    61 00000058 4889C7                  mov rdi, rax
+    62 0000005B E8C7FFFFFF              call balanced
+    63 00000060 C9                      leave
+    64 00000061 C3                      ret
+    65 00000062 488B0424               e_rc: mov rax, [rsp]
+    66 00000066 C9                      leave
+    67 00000067 C3                      ret
+    68                                 
+    69                                 
+    70                                 
+    71                                 _start:
+    72 00000068 E88EFFFFFF              call read_parens
+    73                                 
+    74 0000006D 488D3C25[00000000]      lea rdi, [parens]
+    75 00000075 E8ADFFFFFF              call balanced
+    76 0000007A 803800                  cmp byte [rax], 0x0
+    77 0000007D 750F                    jne bad
+    78 0000007F 488D3C25[00000000]      lea rdi, [blncd]
+    79 00000087 31C0                    xor eax, eax
+    80 00000089 E8(F6FFFFFF)            call printf
+    81 0000008E EB1B                    jmp end
+    82 00000090 488D3C25[00000000]     bad: lea rdi, [nblncd]
+    83 00000098 488D0C25[FFFFFFFF]      lea rcx, [parens - 1]
+    84 000000A0 4829C8                  sub rax, rcx
+    85 000000A3 4889C6                  mov rsi, rax
+    86 000000A6 31C0                    xor eax, eax
+    87 000000A8 E8(F6FFFFFF)            call printf
+    88 000000AD B83C000000             end: mov eax, 60
+    89 000000B2 31FF                    xor edi, edi
+    90 000000B4 0F05                    syscall

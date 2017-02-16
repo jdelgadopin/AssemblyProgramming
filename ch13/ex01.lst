@@ -1,0 +1,323 @@
+     1                                  ;;; ---------------------------------------------------------------------
+     2                                  
+     3                                  	SECTION .bss
+     4 00000000 <res 00000100>          cmand		resb	256	; input string
+     5 00000100 <res 00000008>          element		resq	1	; input element
+     6 00000108 <res 00000008>          _set		resq	1	; address of the set instance
+     7                                  	
+     8                                  ;;; ---------------------------------------------------------------------
+     9                                  	
+    10                                          SECTION .data
+    11                                  	
+    12                                  	struc Set
+    13 00000000 <res 00000008>          s_size		resq	1 	; set size
+    14 00000008 <res 00000008>          s_set		resq	1	; address of the bit-array
+    15                                  	endstruc
+    16                                  	
+    17                                  	
+    18 00000000 257320256400            inp		db	"%s %d",0
+    19 00000006 456E74657220636F6D-     prompt 		db	"Enter command (add, remove, test, quit) and an element: ",0
+    20 0000000F 6D616E642028616464-
+    21 00000018 2C2072656D6F76652C-
+    22 00000021 20746573742C207175-
+    23 0000002A 69742920616E642061-
+    24 00000033 6E20656C656D656E74-
+    25 0000003C 3A2000             
+    26 0000003F 0A00                    linefd		db	0xa,0
+    27                                  
+    28                                  	
+    29 00000041 61646400                _add		db	"add",0
+    30 00000045 25642061646465640A-     _added		db	"%d added",0xa,0	
+    31 0000004E 00                 
+    32 0000004F 72656D6F766500          _remove		db	"remove",0
+    33 00000056 25642072656D6F7665-     _removed	db	"%d removed",0xa,0
+    34 0000005F 640A00             
+    35 00000062 7465737400              _test		db	"test",0
+    36 00000067 25642062656C6F6E67-     _belongs	db	"%d belongs to the set",0xa,0
+    37 00000070 7320746F2074686520-
+    38 00000079 7365740A00         
+    39 0000007E 2564206E6F74206265-     _notbelongs	db	"%d not belongs to the set",0xa,0
+    40 00000087 6C6F6E677320746F20-
+    41 00000090 746865207365740A00 
+    42 00000099 7175697400              _quit		db	"quit",0
+    43                                  
+    44                                  ;;; ---------------------------------------------------------------------
+    45                                  
+    46                                  	SECTION .text
+    47                                          global  main		; MUST be linked with gcc (not ld)
+    48                                  	
+    49                                          extern  scanf, printf, malloc, free, atol
+    50                                  
+    51                                  ;;; ---------------------------------------------------------------------
+    52                                  
+    53                                  read_command:
+    54 00000000 55                      	push 	rbp
+    55 00000001 4889E5                  	mov	rbp, rsp
+    56                                  .beg_rc: ;; print command prompt
+    57 00000004 488D3C25[06000000]      	lea	rdi, [prompt]
+    58 0000000C 31C0                    	xor	eax, eax
+    59 0000000E E8(00000000)            	call 	printf
+    60                                  	;; initialize the 256 bytes of command to 0
+    61 00000013 30C0                    	xor	al, al
+    62 00000015 B900010000              	mov	rcx, 256
+    63 0000001A 488D3C25[00000000]      	lea	rdi, [cmand]
+    64 00000022 F3AA                    	rep	stosb
+    65                                  	;; read command
+    66 00000024 488D3C25[00000000]      	lea	rdi, [inp]
+    67 0000002C 488D3425[00000000]      	lea	rsi, [cmand]
+    68 00000034 488D1425[00010000]      	lea	rdx, [element]
+    69 0000003C 31C0                    	xor	eax, eax
+    70 0000003E E8(00000000)            	call	scanf
+    71                                  	;; check what command has been given
+    72                                  	;; has it been 'add'?
+    73 00000043 488D3425[00000000]      	lea	rsi, [cmand]	; address of name
+    74 0000004B 488D3C25[41000000]      	lea	rdi, [_add]	; address of the constant string 'add\0'
+    75 00000053 B905000000              	mov	rcx, 5		; chars in 'add\0' + 1
+    76 00000058 F3A6                    	repe	cmpsb		; compare both strings
+    77 0000005A 4883F900                	cmp	rcx, 0
+    78 0000005E 7507                    	jne	.lb_rem		; if not equal check 'remove' 
+    79 00000060 B800000000              	mov	rax, 0
+    80 00000065 EB6E                    	jmp 	.end_rc
+    81                                  .lb_rem:;; has it been 'remove'?
+    82 00000067 488D3425[00000000]      	lea	rsi, [cmand]	; address of name
+    83 0000006F 488D3C25[4F000000]      	lea	rdi, [_remove]	; address of the constant string 'remove\0'
+    84 00000077 B908000000              	mov	rcx, 8		; chars in 'remove\0' + 1
+    85 0000007C F3A6                    	repe	cmpsb		; compare both strings
+    86 0000007E 4883F900                	cmp	rcx, 0
+    87 00000082 7507                    	jne	.lb_tst		; if not equal check 'test' 
+    88 00000084 B801000000              	mov	rax, 1
+    89 00000089 EB4A                    	jmp 	.end_rc
+    90                                  .lb_tst:;; has it been 'test'?
+    91 0000008B 488D3425[00000000]      	lea	rsi, [cmand]	; address of name
+    92 00000093 488D3C25[62000000]      	lea	rdi, [_test]	; address of the constant string 'test\0'
+    93 0000009B B906000000              	mov	rcx, 6		; chars in 'test\0' + 1
+    94 000000A0 F3A6                    	repe	cmpsb		; compare both strings
+    95 000000A2 4883F900                	cmp	rcx, 0
+    96 000000A6 7507                    	jne	.lb_qu		; if not equal check 'quit' 
+    97 000000A8 B802000000              	mov	rax, 2
+    98 000000AD EB26                    	jmp 	.end_rc
+    99                                  .lb_qu:	;; has it been 'quit'?
+   100 000000AF 488D3425[00000000]      	lea	rsi, [cmand]	; address of name
+   101 000000B7 488D3C25[99000000]      	lea	rdi, [_quit]	; address of the constant string 'quit\0'
+   102 000000BF B906000000              	mov	rcx, 6		; chars in 'quit\0' + 1
+   103 000000C4 F3A6                    	repe	cmpsb		; compare both strings
+   104 000000C6 4883F900                	cmp	rcx, 0
+   105 000000CA 0F8534FFFFFF            	jne	.beg_rc		; if not equal start again 
+   106 000000D0 B803000000              	mov	rax, 3
+   107                                  .end_rc:	
+   108 000000D5 C9                      	leave
+   109 000000D6 C3                      	ret
+   110                                  	
+   111                                  ;;; ---------------------------------------------------------------------
+   112                                  
+   113                                  fun_add:
+   114 000000D7 55                      	push 	rbp
+   115 000000D8 4889E5                  	mov	rbp, rsp
+   116 000000DB 53                      	push	rbx
+   117 000000DC 4154                    	push	r12
+   118 000000DE 4155                    	push	r13
+   119                                  
+   120 000000E0 488B1C25[08010000]      	mov	rbx, [_set]
+   121 000000E8 488B5308                	mov	rdx, [rbx + s_set]
+   122                                  	
+   123                                  	;; check if 0 <= [element] < s_size
+   124                                  	;; if not, quit
+   125 000000EC 48833C25[00010000]-     	cmp	qword [element], 0
+   126 000000F4 00                 
+   127 000000F5 7C3B                    	jl	.ret_wrong
+   128 000000F7 488B0B                  	mov	rcx, qword [rbx+s_size]
+   129 000000FA 483B0C25[00010000]      	cmp	rcx, qword [element]
+   130 00000102 7E2E                    	jle	.ret_wrong
+   131                                  
+   132                                  	;; now we know [element] is a set element	
+   133 00000104 488B0425[00010000]      	mov	rax, [element]
+   134 0000010C 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   135 00000110 4C8B2425[00010000]      	mov	r12, [element]
+   136 00000118 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   137 0000011C 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   138 00000120 4D0FA3E5                	bt	r13, r12
+   139 00000124 720C                    	jc	.ret_wrong		; the element was already there
+   140 00000126 4C0FAB24C2              	bts	qword [rdx+8*rax], r12	; the element is added
+   141 0000012B B801000000              	mov	rax, 0x1
+   142 00000130 EB03                    	jmp	.end_add
+   143                                  	
+   144                                  .ret_wrong:
+   145 00000132 4831C0                  	xor	rax, rax
+   146                                  	
+   147                                  .end_add:	
+   148 00000135 415D                    	pop	r13
+   149 00000137 415C                    	pop 	r12
+   150 00000139 5B                      	pop	rbx
+   151 0000013A C9                      	leave
+   152 0000013B C3                      	ret
+   153                                  	
+   154                                  ;;; ---------------------------------------------------------------------
+   155                                  
+   156                                  fun_remove:
+   157 0000013C 55                      	push 	rbp
+   158 0000013D 4889E5                  	mov	rbp, rsp
+   159 00000140 53                      	push	rbx
+   160 00000141 4154                    	push	r12
+   161 00000143 4155                    	push	r13
+   162                                  
+   163 00000145 488B1C25[08010000]      	mov	rbx, [_set]
+   164 0000014D 488B5308                	mov	rdx, [rbx + s_set]
+   165                                  	
+   166                                  	;; check if 0 <= [element] < s_size
+   167                                  	;; if not, quit
+   168 00000151 48833C25[00010000]-     	cmp	qword [element], 0
+   169 00000159 00                 
+   170 0000015A 7C3B                    	jl	.ret_wrong
+   171 0000015C 488B0B                  	mov	rcx, qword [rbx+s_size]
+   172 0000015F 483B0C25[00010000]      	cmp	rcx, qword [element]
+   173 00000167 7E2E                    	jle	.ret_wrong
+   174                                  
+   175                                  	;; now we know [element] is a set element	
+   176 00000169 488B0425[00010000]      	mov	rax, [element]
+   177 00000171 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   178 00000175 4C8B2425[00010000]      	mov	r12, [element]
+   179 0000017D 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   180 00000181 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   181 00000185 4D0FA3E5                	bt	r13, r12
+   182 00000189 730C                    	jnc	.ret_wrong		; the element wasn't there
+   183 0000018B 4C0FB324C2              	btr	qword [rdx+8*rax], r12	; the element is removed
+   184 00000190 B801000000              	mov	rax, 0x1
+   185 00000195 EB03                    	jmp	.end_remove
+   186                                  	
+   187                                  .ret_wrong:
+   188 00000197 4831C0                  	xor	rax, rax
+   189                                  
+   190                                  .end_remove:
+   191 0000019A 415D                    	pop	r13
+   192 0000019C 415C                    	pop 	r12
+   193 0000019E 5B                      	pop	rbx
+   194 0000019F C9                      	leave
+   195 000001A0 C3                      	ret
+   196                                  	
+   197                                  ;;; ---------------------------------------------------------------------
+   198                                  
+   199                                  fun_test:
+   200 000001A1 55                      	push 	rbp
+   201 000001A2 4889E5                  	mov	rbp, rsp
+   202 000001A5 53                      	push	rbx
+   203 000001A6 4154                    	push	r12
+   204 000001A8 4155                    	push	r13
+   205                                  
+   206 000001AA 488B1C25[08010000]      	mov	rbx, [_set]
+   207 000001B2 488B5308                	mov	rdx, [rbx + s_set]
+   208                                  	
+   209                                  	;; check if 0 <= [element] < s_size
+   210                                  	;; if not, quit
+   211 000001B6 48833C25[00010000]-     	cmp	qword [element], 0
+   212 000001BE 00                 
+   213 000001BF 7C36                    	jl	.ret_wrong
+   214 000001C1 488B0B                  	mov	rcx, qword [rbx+s_size]
+   215 000001C4 483B0C25[00010000]      	cmp	rcx, qword [element]
+   216 000001CC 7E29                    	jle	.ret_wrong
+   217                                  
+   218                                  	;; now we know [element] is a set element	
+   219 000001CE 488B0425[00010000]      	mov	rax, [element]
+   220 000001D6 48C1E806                	shr	rax, 6			; rax <-- [element]/64 
+   221 000001DA 4C8B2425[00010000]      	mov	r12, [element]
+   222 000001E2 4983E43F                	and	r12, 0x3F		; r12 <-- reminder of [element]/64	
+   223 000001E6 4C8B2CC2                	mov	r13, qword [rdx+8*rax]	
+   224 000001EA 4D0FA3E5                	bt	r13, r12
+   225 000001EE 7307                    	jnc	.ret_wrong		; the element wasn't there
+   226 000001F0 B801000000              	mov	rax, 0x1
+   227 000001F5 EB03                    	jmp	.end_test
+   228                                  	
+   229                                  .ret_wrong:
+   230 000001F7 4831C0                  	xor	rax, rax
+   231                                  
+   232                                  .end_test:
+   233 000001FA 415D                    	pop	r13
+   234 000001FC 415C                    	pop 	r12
+   235 000001FE 5B                      	pop	rbx
+   236 000001FF C9                      	leave
+   237 00000200 C3                      	ret
+   238                                  	
+   239                                  ;;; ---------------------------------------------------------------------
+   240                                  
+   241                                  main:
+   242 00000201 55                      	push	rbp
+   243 00000202 4889E5                  	mov	rbp, rsp
+   244 00000205 53                      	push	rbx		; save rbx
+   245 00000206 4154                    	push	r12		; save r12
+   246                                  
+   247                                  	;; create an instance of Set from the set size entered in the command line
+   248                                  	;; -----------------------------------------------------------------------
+   249                                  	;; read set size from command line
+   250 00000208 4889F1                  	mov	rcx, rsi
+   251 0000020B 4883C108                	add	rcx, 8		; assuming argc=2, rcx is the address of argv[1]
+   252 0000020F 488B39                  	mov	rdi, [rcx]	; rdi <- content of argv[1]
+   253 00000212 E8(00000000)            	call	atol
+   254 00000217 4989C4                  	mov	r12, rax	; save set size in r12
+   255                                  	;; create an instance of Set
+   256 0000021A BF10000000              	mov	rdi, Set_size
+   257 0000021F E8(00000000)            	call	malloc
+   258 00000224 48890425[08010000]      	mov	[_set], rax	; save set address
+   259                                  	;; save set size in the corresp. field
+   260 0000022C 488B1C25[08010000]      	mov	rbx, [_set]
+   261 00000234 4C8923                  	mov	[rbx+s_size], r12
+   262                                  	;; now I reserve memory for the bit-array
+   263 00000237 4C89E7                  	mov	rdi, r12       	; how many bytes do I need?
+   264 0000023A 48C1EF03                	shr	rdi, 3	       	; rdi <-- s_size/8
+   265 0000023E 48FFC7                  	inc	rdi		; rdi <-- s_size/8 + 1 (bytes I need)
+   266 00000241 E8(00000000)            	call	malloc
+   267 00000246 488B1C25[08010000]      	mov	rbx, [_set]
+   268 0000024E 48894308                	mov	[rbx+s_set], rax
+   269                                  	;; now, the instance of Set is complete
+   270                                  	;; ------------------------------------
+   271                                  
+   272                                  .again:
+   273 00000252 E8A9FDFFFF              	call 	read_command
+   274                                  	;; rax contains 0, 1, 2 or 3
+   275                                  	;; check for quit
+   276 00000257 4883F803                	cmp	rax, 3
+   277 0000025B 0F8485000000            	je	.end
+   278                                  .nxt_ad:
+   279 00000261 4883F800                	cmp	rax, 0
+   280 00000265 7524                    	jne	.nxt_re
+   281 00000267 E86BFEFFFF              	call	fun_add
+   282 0000026C 4883F801                	cmp	rax, 1
+   283 00000270 75E0                    	jne	.again
+   284 00000272 488D3C25[45000000]      	lea	rdi, [_added]	; the element has been successfully added
+   285 0000027A 488B3425[00010000]      	mov	rsi, [element]	; (silent if the element already belongs to the set)
+   286 00000282 31C0                    	xor	eax, eax
+   287 00000284 E8(00000000)            	call 	printf
+   288 00000289 EBC7                    	jmp  	.again	
+   289                                  .nxt_re:
+   290 0000028B 4883F801                	cmp 	rax, 1
+   291 0000028F 7524                    	jne 	.nxt_te
+   292 00000291 E8A6FEFFFF              	call	fun_remove
+   293 00000296 4883F801                	cmp	rax, 1		; the element has been successfully removed
+   294 0000029A 75B6                    	jne	.again		; (silent if the element did not belong to the set)
+   295 0000029C 488D3C25[56000000]      	lea	rdi, [_removed]
+   296 000002A4 488B3425[00010000]      	mov	rsi, [element]
+   297 000002AC 31C0                    	xor	eax, eax
+   298 000002AE E8(00000000)            	call 	printf
+   299 000002B3 EB9D                    	jmp 	.again
+   300                                  .nxt_te: ;; no need to check if rax = 2, sure it is
+   301 000002B5 E8E7FEFFFF              	call	fun_test
+   302 000002BA 4883F801                	cmp	rax, 1		
+   303 000002BE 750A                    	jne	.notbel
+   304 000002C0 488D3C25[67000000]      	lea	rdi, [_belongs]	   ; the element belongs to the set
+   305 000002C8 EB08                    	jmp	.decided
+   306                                  .notbel:
+   307 000002CA 488D3C25[7E000000]      	lea	rdi, [_notbelongs] ; the element does not belong to the set
+   308                                  .decided:
+   309 000002D2 488B3425[00010000]      	mov	rsi, [element]
+   310 000002DA 31C0                    	xor	eax, eax
+   311 000002DC E8(00000000)            	call 	printf
+   312                                  	
+   313 000002E1 E96CFFFFFF              	jmp	.again	
+   314                                  	
+   315                                  .end:
+   316 000002E6 488B3C25[08010000]      	mov	rdi, [_set]
+   317 000002EE E8(00000000)            	call	free
+   318                                  	
+   319 000002F3 415C                    	pop	r12		; restore r12
+   320 000002F5 5B                      	pop	rbx		; restore rbx
+   321 000002F6 C9                      	leave
+   322 000002F7 C3                      	ret
+   323                                  	

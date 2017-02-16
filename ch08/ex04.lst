@@ -1,0 +1,37 @@
+     1                                 %line 1+1 ex04.asm
+     2                                 [section .data]
+     3 00000000 71776572747975696F-     strng db "qwertyuiopoiuytrewq"
+     4 00000000 706F69757974726577-
+     5 00000000 71                 
+     6 00000013 1300000000000000        sz dq 19
+     7 0000001B 00                      pal db 0
+     8                                 
+     9                                 [section .text]
+    10                                 [global _start]
+    11                                 
+    12                                 _start:
+    13                                 
+    14 00000000 488D0425[00000000]      lea rax, [strng]
+    15 00000008 4889C3                  mov rbx, rax
+    16 0000000B 48031C25[00000000]      add rbx, [sz]
+    17 00000013 48FFCB                  dec rbx
+    18                                 
+    19 00000016 4839D8                 chck: cmp rax, rbx
+    20 00000019 7D0C                    jge pali
+    21                                 
+    22 0000001B 8A10                    mov dl, byte [rax]
+    23 0000001D 3A13                    cmp dl, byte [rbx]
+    24 0000001F 750D                    jne end
+    25                                 
+    26 00000021 48FFC0                  inc rax
+    27 00000024 48FFCB                  dec rbx
+    28                                 
+    29 00000027 EBEB                    jmp chck
+    30                                 
+    31 00000029 FE0425[00000000]       pali: inc byte [pal]
+    32                                 
+    33                                 end:
+    34 00000030 4831FF                  xor rdi,rdi
+    35 00000033 6A3C                    push 0x3c
+    36 00000035 58                      pop rax
+    37 00000036 0F05                    syscall

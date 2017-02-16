@@ -1,0 +1,108 @@
+     1                                 %line 1+1 proves.asm
+     2                                 
+     3                                 maxsize equ 10
+     4                                 
+     5                                 [section .bss]
+     6 00000000 <gap>                  arr resq maxsize
+     7 00000050 <gap>                  sze resq 1
+     8                                 
+     9                                 
+    10                                 
+    11                                 [section .data]
+    12 00000000 256400                 inp db "%d",0
+    13 00000003 456E74657220617272-    prompt db "Enter array (end it with any non-numerical character): ",0
+    14 00000003 61792028656E642069-
+    15 00000003 74207769746820616E-
+    16 00000003 79206E6F6E2D6E756D-
+    17 00000003 65726963616C206368-
+    18 00000003 61726163746572293A-
+    19 00000003 2000               
+    20 0000003B 25642000               pr_write db "%d ",0
+    21 0000003F 0A00                   linefd db 0xa,0
+    22                                 
+    23                                 [section .text]
+    24                                 [global _start]
+    25                                 
+    26                                 [extern printf]
+    27                                 [extern scanf]
+    28                                 [extern rand]
+    29                                 
+    30                                 
+    31                                 
+    32                                 read_data:
+    33                                 
+    34                                 
+    35 00000000 55                      push rbp
+    36 00000001 4889E5                  mov rbp, rsp
+    37 00000004 53                      push rbx
+    38 00000005 4154                    push r12
+    39 00000007 4989FC                  mov r12, rdi
+    40 0000000A 4831DB                  xor rbx, rbx
+    41                                 for_rd:
+    42 0000000D 488D3C25[00000000]      lea rdi, [inp]
+    43 00000015 498D34DC                lea rsi, [r12+rbx*8]
+    44 00000019 31C0                    xor eax, eax
+    45 0000001B E8(F6FFFFFF)            call scanf
+    46 00000020 4883F800                cmp rax, 0
+    47 00000024 7E09                    jle end_frd
+    48 00000026 48FFC3                  inc rbx
+    49 00000029 4883FB0A                cmp rbx, maxsize
+    50 0000002D 7D00                    jge end_frd
+    51 0000002F EBDA                    jmp for_rd
+    52                                 end_frd:
+    53 00000031 4889D8                  mov rax, rbx
+    54 00000034 415C                    pop r12
+    55 00000036 5B                      pop rbx
+    56 00000037 C9                      leave
+    57 00000038 C3                      ret
+    58                                 
+    59                                 
+    60                                 
+    61                                 print_data:
+    62                                 
+    63                                 
+    64 00000039 55                      push rbp
+    65 0000003A 4889E5                  mov rbp, rsp
+    66 0000003D 4154                    push r12
+    67 0000003F 53                      push rbx
+    68 00000040 56                      push rsi
+    69 00000041 4989FC                  mov r12, rdi
+    70 00000044 4831DB                  xor rbx, rbx
+    71 00000047 483B1C24               for_pd: cmp rbx, [rsp]
+    72 0000004B 7D16                    jge end_fpd
+    73 0000004D 488D3C25[00000000]      lea rdi, [pr_write]
+    74 00000055 498B34DC                mov rsi, [r12+rbx*8]
+    75 00000059 31C0                    xor eax, eax
+    76 0000005B E8(F6FFFFFF)            call printf
+    77 00000060 48FFC3                  inc rbx
+    78 00000063 EBE0                    jmp for_pd
+    79                                 end_fpd:
+    80 00000065 488D3C25[00000000]      lea rdi, [linefd]
+    81 0000006D 31C0                    xor eax, eax
+    82 0000006F E8(F6FFFFFF)            call printf
+    83 00000074 5E                      pop rsi
+    84                                 
+    85 00000075 5B                      pop rbx
+    86 00000076 415C                    pop r12
+    87 00000078 C9                      leave
+    88 00000079 C3                      ret
+    89                                 
+    90                                 
+    91                                 
+    92                                 _start:
+    93                                 
+    94 0000007A 488D3C25[00000000]      lea rdi, [prompt]
+    95 00000082 31C0                    xor eax, eax
+    96 00000084 E8(F6FFFFFF)            call printf
+    97                                 
+    98 00000089 488D3C25[00000000]      lea rdi, [arr]
+    99 00000091 E865FFFFFF              call read_data
+   100 00000096 48890425[00000000]      mov [sze], rax
+   101                                 
+   102 0000009E 488D3C25[00000000]      lea rdi, [arr]
+   103 000000A6 488B3425[00000000]      mov rsi, [sze]
+   104 000000AE E881FFFFFF              call print_data
+   105                                 
+   106 000000B3 B83C000000              mov eax, 60
+   107 000000B8 31FF                    xor edi, edi
+   108 000000BA 0F05                    syscall

@@ -1,0 +1,89 @@
+     1                                 %line 1+1 ex03.asm
+     2                                 
+     3                                 maxsize equ 80
+     4                                 prime equ 65521
+     5                                 
+     6                                 [section .bss]
+     7 00000000 <gap>                  strchar resb maxsize
+     8                                 
+     9                                 [section .data]
+    10 00000000 25640A00               prompt db "%d",0xa,0
+    11                                 
+    12                                 [section .text]
+    13                                 [global main]
+    14                                 
+    15                                 [extern printf]
+    16                                 %line 14+0 ex03.asm
+    17                                 [extern fgets]
+    18                                 [extern stdin]
+    19                                 %line 15+1 ex03.asm
+    20                                 
+    21                                 main:
+    22 00000000 55                      push rbp
+    23 00000001 4889E5                  mov rbp, rsp
+    24                                 
+    25 00000004 53                      push rbx
+    26 00000005 4154                    push r12
+    27 00000007 4155                    push r13
+    28                                 
+    29 00000009 488D1C25[00000000]      lea rbx, [strchar]
+    30                                 
+    31 00000011 4D31E4                  xor r12, r12
+    32 00000014 41FFC4                  inc r12d
+    33 00000017 4D31ED                  xor r13, r13
+    34                                 .again:
+    35                                 
+    36 0000001A 488D3C25[00000000]      lea rdi, [strchar]
+    37 00000022 48C7C650000000          mov rsi, maxsize
+    38 00000029 488B1425[00000000]      mov rdx, [stdin]
+    39 00000031 E8(F6FFFFFF)            call fgets
+    40 00000036 3C00                    cmp al, 0
+    41 00000038 743C                    jz .end
+    42                                 
+    43 0000003A 4831C9                  xor rcx, rcx
+    44                                 .loop:
+    45                                 
+    46 0000003D 803C0B00                cmp byte [rbx + rcx], 0
+    47 00000041 7431                    je .end_loop
+    48 00000043 4883F950                cmp rcx, maxsize
+    49 00000047 7D2B                    jge .end_loop
+    50                                 
+    51 00000049 4C0FB6040B              movzx r8, byte [rbx+rcx]
+    52 0000004E 4501C4                  add r12d, r8d
+    53 00000051 49C7C0F1FF0000          mov r8, prime
+    54 00000058 31D2                    xor edx, edx
+    55 0000005A 4489E0                  mov eax, r12d
+    56 0000005D 41F7F8                  idiv r8d
+    57 00000060 4189D4                  mov r12d, edx
+    58 00000063 4501E5                  add r13d, r12d
+    59 00000066 31D2                    xor edx, edx
+    60 00000068 4489E8                  mov eax, r13d
+    61 0000006B 41F7F8                  idiv r8d
+    62 0000006E 4189D5                  mov r13d, edx
+    63                                 
+    64 00000071 48FFC1                  inc rcx
+    65 00000074 EBC5                    jmp .loop
+    66                                 
+    67                                 .end_loop:
+    68                                 
+    69 00000076 EBA0                    jmp .again
+    70                                 
+    71                                 .end:
+    72                                 
+    73 00000078 4489E8                  mov eax, r13d
+    74 0000007B C1E010                  shl eax, 16
+    75 0000007E 4409E0                  or eax, r12d
+    76                                 
+    77 00000081 488D3C25[00000000]      lea rdi, [prompt]
+    78 00000089 4831F6                  xor rsi, rsi
+    79 0000008C 89C6                    mov esi, eax
+    80 0000008E 31C0                    xor eax, eax
+    81 00000090 E8(F6FFFFFF)            call printf
+    82                                 
+    83 00000095 415D                    pop r13
+    84 00000097 415C                    pop r12
+    85 00000099 5B                      pop rbx
+    86                                 
+    87 0000009A C9                      leave
+    88 0000009B C3                      ret
+    89                                 

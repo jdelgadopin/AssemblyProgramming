@@ -1,0 +1,151 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                  maxsize equ 100
+     6                                 
+     7                                 [section .bss]
+     8 00000000 <gap>                  arr resq maxsize
+     9 00000320 <gap>                  sze resq 1
+    10                                 
+    11                                 [section .data]
+    12 00000000 256400                 inp db "%d",0
+    13 00000003 456E74657220617272-    prompt db "Enter array size (0 to stop, max %d): ",0
+    14 00000003 61792073697A652028-
+    15 00000003 3020746F2073746F70-
+    16 00000003 2C206D617820256429-
+    17 00000003 3A2000             
+    18 0000002A 25642000               pr_write db "%d ",0
+    19 0000002E 0A00                   linefd db 0xa,0
+    20                                 
+    21                                 [section .text]
+    22                                 [global _start]
+    23                                 
+    24                                 [extern printf]
+    25                                 [extern scanf]
+    26                                 [extern rand]
+    27                                 
+    28                                 create_data:
+    29                                 
+    30                                 
+    31 00000000 55                      push rbp
+    32 00000001 4889E5                  mov rbp, rsp
+    33 00000004 4883EC18                sub rsp, 24
+    34 00000008 4C89642410              mov [rsp + 16], r12
+    35 0000000D 48893C24                mov [rsp], rdi
+    36 00000011 48C1E603                shl rsi, 3
+    37 00000015 4801FE                  add rsi, rdi
+    38 00000018 4889742408              mov [rsp + 8], rsi
+    39 0000001D 4C8B2424                mov r12, [rsp]
+    40 00000021 4C3B642408             for_rd: cmp r12, [rsp + 8]
+    41 00000026 7D1A                    jge end_frd
+    42 00000028 E8(F6FFFFFF)            call rand
+    43 0000002D 4831D2                  xor rdx, rdx
+    44 00000030 49C7C0E8030000          mov r8, 1000
+    45 00000037 49F7F8                  idiv r8
+    46 0000003A 49891424                mov [r12], rdx
+    47 0000003E 4983C408                add r12, 8
+    48 00000042 EBDB                    jmp for_rd
+    49                                 end_frd:
+    50 00000044 4C8B642410              mov r12, [rsp + 16]
+    51 00000049 C9                      leave
+    52 0000004A C3                      ret
+    53                                 
+    54                                 sort_data:
+    55                                 
+    56                                 
+    57                                 
+    58 0000004B 55                      push rbp
+    59 0000004C 4889E5                  mov rbp, rsp
+    60 0000004F 4883EC10                sub rsp, 16
+    61 00000053 4C89642408              mov [rsp + 8], r12
+    62 00000058 48893C24                mov [rsp], rdi
+    63 0000005C 48FFCE                  dec rsi
+    64 0000005F 48C1E603                shl rsi, 3
+    65 00000063 4801F7                  add rdi, rsi
+    66 00000066 6631C0                 s_do: xor ax, ax
+    67 00000069 488B0C24                mov rcx, [rsp]
+    68 0000006D 4839F9                 s_for: cmp rcx, rdi
+    69 00000070 7D1E                    jge e_do
+    70 00000072 4C8B6108                mov r12, [rcx + 8]
+    71 00000076 4C3921                  cmp [rcx], r12
+    72 00000079 7E0F                    jle e_for
+    73 0000007B 4C3321                  xor r12, [rcx]
+    74 0000007E 4C3121                  xor [rcx], r12
+    75 00000081 4C3321                  xor r12, [rcx]
+    76 00000084 4C896108                mov [rcx + 8], r12
+    77 00000088 6683C801                or ax, 0x1
+    78 0000008C 4883C108               e_for: add rcx, 8
+    79 00000090 EBD9                    jmp s_for
+    80 00000092 660FBAE000             e_do: bt ax, 0
+    81 00000097 72CB                    jc s_do
+    82 00000099 4C8B642408              mov r12, [rsp + 8]
+    83 0000009E C9                      leave
+    84 0000009F C3                      ret
+    85                                 
+    86                                 print_data:
+    87                                 
+    88                                 
+    89 000000A0 55                      push rbp
+    90 000000A1 4889E5                  mov rbp, rsp
+    91 000000A4 4883EC18                sub rsp, 24
+    92 000000A8 4C89642410              mov [rsp + 16], r12
+    93 000000AD 48893C24                mov [rsp], rdi
+    94 000000B1 48C1E603                shl rsi, 3
+    95 000000B5 4801FE                  add rsi, rdi
+    96 000000B8 4889742408              mov [rsp + 8], rsi
+    97 000000BD 4C8B2424                mov r12, [rsp]
+    98 000000C1 4C3B642408             for_pd: cmp r12, [rsp + 8]
+    99 000000C6 7D17                    jge end_fpd
+   100 000000C8 488D3C25[00000000]      lea rdi, [pr_write]
+   101 000000D0 498B3424                mov rsi, [r12]
+   102 000000D4 31C0                    xor eax, eax
+   103 000000D6 E8(F6FFFFFF)            call printf
+   104 000000DB 4983C408                add r12, 8
+   105 000000DF EBDE                    jmp for_pd
+   106                                 end_fpd:
+   107 000000E1 488D3C25[00000000]      lea rdi, [linefd]
+   108 000000E9 31C0                    xor eax, eax
+   109 000000EB E8(F6FFFFFF)            call printf
+   110 000000F0 4C8B642410              mov r12, [rsp + 16]
+   111 000000F5 C9                      leave
+   112 000000F6 C3                      ret
+   113                                 
+   114                                 _start:
+   115                                 
+   116                                 again:
+   117 000000F7 488D3C25[00000000]      lea rdi, [prompt]
+   118 000000FF 48C7C664000000          mov rsi, maxsize
+   119 00000106 31C0                    xor eax, eax
+   120 00000108 E8(F6FFFFFF)            call printf
+   121 0000010D 488D3C25[00000000]      lea rdi, [inp]
+   122 00000115 488D3425[00000000]      lea rsi, [sze]
+   123 0000011D 31C0                    xor eax, eax
+   124 0000011F E8(F6FFFFFF)            call scanf
+   125 00000124 4C8B0425[00000000]      mov r8, [sze]
+   126 0000012C 4983F800                cmp r8, 0
+   127 00000130 745D                    je end
+   128 00000132 4983F864                cmp r8, maxsize
+   129 00000136 7FBD                    jg again
+   130                                 
+   131 00000138 488D3C25[00000000]      lea rdi, [arr]
+   132 00000140 488B3425[00000000]      mov rsi, [sze]
+   133 00000148 E8AEFEFFFF              call create_data
+   134                                 
+   135 0000014D 488D3C25[00000000]      lea rdi, [arr]
+   136 00000155 488B3425[00000000]      mov rsi, [sze]
+   137 0000015D E839FFFFFF              call print_data
+   138                                 
+   139 00000162 488D3C25[00000000]      lea rdi, [arr]
+   140 0000016A 488B3425[00000000]      mov rsi, [sze]
+   141 00000172 E8CFFEFFFF              call sort_data
+   142                                 
+   143 00000177 488D3C25[00000000]      lea rdi, [arr]
+   144 0000017F 488B3425[00000000]      mov rsi, [sze]
+   145 00000187 E80FFFFFFF              call print_data
+   146                                 
+   147 0000018C E961FFFFFF              jmp again
+   148                                 
+   149 00000191 B83C000000             end: mov eax, 60
+   150 00000196 31FF                    xor edi, edi
+   151 00000198 0F05                    syscall

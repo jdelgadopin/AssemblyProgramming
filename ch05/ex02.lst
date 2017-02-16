@@ -1,0 +1,21 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 [segment .data]
+     3 00000000 12                     n1 db 0x12
+     4 00000001 AB12                   n2 dw 0x12AB
+     5 00000003 CD34AB12               n4 dd 0x12AB34CD
+     6 00000007 EF78CD56CD34AB12       n8 dq 0x12AB34CD56CD78EF
+     7 0000000F 0000000000000000       r dq 0
+     8                                 
+     9                                 [segment .text]
+    10                                 [global _start]
+    11                                 _start:
+    12 00000000 480FBE0425[00000000]      movsx rax, byte [n1]
+    13 00000009 480FBF1C25[00000000]      movsx rbx, word [n2]
+    14 00000012 48630C25[00000000]      movsxd rcx, dword [n4]
+    15 0000001A 488B1425[00000000]      mov rdx, [n8]
+    16 00000022 48010425[00000000]      add [r], rax
+    17 0000002A 48011C25[00000000]      add [r], rbx
+    18 00000032 48010C25[00000000]      add [r], rcx
+    19 0000003A 48011425[00000000]      add [r], rdx
+    20 00000042 4831C0                  xor rax, rax
+    21 00000045 C3                      ret

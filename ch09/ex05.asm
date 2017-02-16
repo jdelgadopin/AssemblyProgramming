@@ -1,0 +1,199 @@
+
+maxsize equ 	100			; max array size
+
+
+	
+	SECTION .bss
+arr	resq	maxsize
+sze	resq	1
+
+
+
+	SECTION .data
+inp		db	"%d",0
+prompt		db	"Enter array (end it with any non-numerical character): ",0
+pr_write	db	"%d ",0
+linefd		db	0xa,0
+result_true	db	"The sequence is bitonic",0xa,0
+result_false	db	"The sequence is not bitonic",0xa,0
+
+
+
+	SECTION .text
+        global  _start
+	
+        extern  printf
+	extern  scanf
+	extern	rand
+
+;;; ---------------------------------------------------------------------	
+	
+read_data:
+	;; Parameter: array address (rdi)
+	;; Return: size (rax)
+	push 	rbp		; normal stack frame
+	mov	rbp, rsp
+	sub	rsp, 24		; space for address, r12 and rbx
+	mov	[rsp + 16], rbx ; save rbx
+	mov	[rsp + 8], r12	; save r12
+	mov	[rsp], rdi	; save address
+	xor	rbx, rbx	; rbx <- 0
+	mov	r12, [rsp]	; r12 <- array address
+for_rd:
+	lea	rdi, [inp]	; set arg 1 for scanf
+	mov	rsi, r12
+	xor	eax, eax	; 0 float parameters
+	call	scanf
+	cmp	rax, 1		; is scanf ok?
+	jne	end_frd		; if not, jump to the end
+	inc 	rbx		; rbx++    increment size counter
+	add	r12, 8		; r12 += 8 increment address in a quad-word
+	jmp	for_rd
+end_frd:
+	mov	rax, rbx	; return value: size of array
+	mov	r12, [rsp + 8]	; restore r12
+	mov	rbx, [rsp + 16]	; restore rbx
+	leave
+	ret
+
+;;; ---------------------------------------------------------------------
+	
+bitonic:	
+	;; Parameter: array address (rdi), size (rsi)
+	;; Return: boolean (true -> al = -1 / false -> al = 0)
+	push 	rbp			; normal stack frame
+	mov	rbp, rsp
+	sub	rsp, 24			; space for the address, size and r12
+	mov	[rsp + 16], r12		; save r12
+	mov	[rsp + 8], rsi		; save size
+	mov	[rsp], rdi		; save array address
+	xor 	al, al			; bitonic <- false
+	cmp	rsi, 0
+	je	end_bt			; if (arr==null) ret false 
+	cmp	rsi, 4			; if (size >= 4) continue
+	jge	cnt_bt			; if not...
+	mov	al, -1 			; bitonic <- true
+	jmp	end_bt			; ...return true
+cnt_bt:
+	;; initializations: We will use r8, r9, r10, al and rdx
+	xor	al, al			; dir = false
+	mov	r9, [rsp + 8]		; r9 <- size
+	dec	r9			; r9 <- size - 1
+	shl	r9, 3			; r9 <- (size - 1) x 8
+	add	r9, [rsp]		; r9 <- array address + (size - 1) x 8
+	mov	r10, r9
+	add	r10, 8			; size, r10 <- array address + size x 8
+	mov 	r8, [rsp]		; pos,  r8  <- array address
+	
+bquwh:	cmp	r8, r10			; is (pos < size)?
+	jge	equwh
+	mov	rcx, [r9]
+	cmp	rcx, [r8]		; if (array[pos] != array[size - 1])
+	jne	equwh			; break
+	add	r8, 8	
+	jmp	bquwh
+equwh:
+	cmp	r8, r10			; if pos == size
+	jne	mn_bt
+	mov	al, -1			; bitonic <- true
+	jmp	end_bt
+mn_bt:	
+	;; r8 now contains the address of the first element that
+	;; differs from the last
+	xor	rdx, rdx		; switches = 0
+	xor 	al, al    		; dir = false
+	mov	rcx, [r8]		; rcx = [r8] = array[pos]
+	cmp	rcx, [r9]		; array[pos] > array[size - 1] ?
+	jle	ct_bt			; if not, continue
+	mov	al, -1			; else dir = true
+ct_bt:					; thus, dir = array[pos] > array[size - 1]
+	cmp	r8, r9			; while (pos < size -1 ...
+	jge	et_bt
+	cmp	rdx, 2			; ... && switches <= 2)
+	jg	et_bt
+	mov	r11, r8
+	add	r11, 8
+	mov	rcx, [r11]     		; rcx = [r8+8] = array[pos+1]
+	cmp	rcx, [r8]		; if ((array[pos + 1] != array[pos])...
+	je	eif_bt
+	xor	r12b, r12b
+	cmp	rcx, [r8]		
+	jg	bexp
+	mov	r12b, -1
+bexp:	cmp	al, r12b		; && (array[pos + 1] <= array[pos]) == dir
+	jne	eif_bt
+	inc	rdx			; switches++
+	xor	al, -1			; dir <- !dir
+eif_bt:	add	r8, 8
+	jmp	ct_bt
+et_bt:
+	xor	al, al			; return switches <= 2
+	cmp 	rdx, 2
+	jg	end_bt
+	mov	al, -1	
+end_bt: 
+	mov	r12, [rsp + 16]	; restore r12
+	leave
+	ret
+
+;;; ---------------------------------------------------------------------
+	
+print_data:
+	;; Parameter: array address (rdi), size (rsi)
+	;; Return: void
+	push 	rbp		; normal stack frame
+	mov	rbp, rsp
+	sub	rsp, 24		; space for address, size and r12
+	mov	[rsp + 16], r12
+	mov	[rsp], rdi	; save address
+	shl	rsi, 3		; every element array is a quad-word
+	add	rsi, rdi  	; rsi <- array address + 8 x size
+	mov	[rsp + 8], rsi	; [rsp+8] <- array address + 8 x size
+	mov	r12, [rsp]	; r12 <- array address
+for_pd:	cmp 	r12, [rsp + 8]
+	jge	end_fpd
+	lea	rdi, [pr_write]	; address of pr_write
+	mov	rsi, [r12]	; next data
+        xor     eax, eax	; 0 float parameters
+        call    printf
+	add	r12, 8
+	jmp	for_pd
+end_fpd:	
+	lea	rdi, [linefd]	; address of pr_read
+        xor     eax, eax	; 0 float parameters
+        call    printf
+	mov	r12, [rsp + 16] ; restore r12
+	leave
+	ret
+
+;;; ---------------------------------------------------------------------
+	
+_start:
+	
+	lea	rdi, [prompt]	; address of prompt
+        xor     eax, eax	; 0 float parameters
+        call    printf
+	
+	lea	rdi, [arr]
+	call 	read_data
+	mov 	[sze], rax
+
+	lea	rdi, [arr]
+	mov	rsi, [sze]
+	call 	print_data
+	
+	lea	rdi, [arr]
+	mov	rsi, [sze]
+	call	bitonic
+
+	cmp 	al, 0
+	je	false
+	lea	rdi, [result_true]
+	jmp	print
+false:	lea	rdi, [result_false]
+print:	xor	eax, eax
+	call	printf
+		
+end:	mov	eax, 60	     	; exit
+	xor	edi, edi
+	syscall

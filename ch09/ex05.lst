@@ -1,0 +1,211 @@
+     1                                 %line 1+1 ex05.asm
+     2                                 
+     3                                 maxsize equ 100
+     4                                 
+     5                                 
+     6                                 
+     7                                 [section .bss]
+     8 00000000 <gap>                  arr resq maxsize
+     9 00000320 <gap>                  sze resq 1
+    10                                 
+    11                                 
+    12                                 
+    13                                 [section .data]
+    14 00000000 256400                 inp db "%d",0
+    15 00000003 456E74657220617272-    prompt db "Enter array (end it with any non-numerical character): ",0
+    16 00000003 61792028656E642069-
+    17 00000003 74207769746820616E-
+    18 00000003 79206E6F6E2D6E756D-
+    19 00000003 65726963616C206368-
+    20 00000003 61726163746572293A-
+    21 00000003 2000               
+    22 0000003B 25642000               pr_write db "%d ",0
+    23 0000003F 0A00                   linefd db 0xa,0
+    24 00000041 546865207365717565-    result_true db "The sequence is bitonic",0xa,0
+    25 00000041 6E6365206973206269-
+    26 00000041 746F6E69630A00     
+    27 0000005A 546865207365717565-    result_false db "The sequence is not bitonic",0xa,0
+    28 0000005A 6E6365206973206E6F-
+    29 0000005A 74206269746F6E6963-
+    30 0000005A 0A00               
+    31                                 
+    32                                 
+    33                                 
+    34                                 [section .text]
+    35                                 [global _start]
+    36                                 
+    37                                 [extern printf]
+    38                                 [extern scanf]
+    39                                 [extern rand]
+    40                                 
+    41                                 
+    42                                 
+    43                                 read_data:
+    44                                 
+    45                                 
+    46 00000000 55                      push rbp
+    47 00000001 4889E5                  mov rbp, rsp
+    48 00000004 4883EC18                sub rsp, 24
+    49 00000008 48895C2410              mov [rsp + 16], rbx
+    50 0000000D 4C89642408              mov [rsp + 8], r12
+    51 00000012 48893C24                mov [rsp], rdi
+    52 00000016 4831DB                  xor rbx, rbx
+    53 00000019 4C8B2424                mov r12, [rsp]
+    54                                 for_rd:
+    55 0000001D 488D3C25[00000000]      lea rdi, [inp]
+    56 00000025 4C89E6                  mov rsi, r12
+    57 00000028 31C0                    xor eax, eax
+    58 0000002A E8(F6FFFFFF)            call scanf
+    59 0000002F 4883F801                cmp rax, 1
+    60 00000033 7507                    jne end_frd
+    61 00000035 48FFC3                  inc rbx
+    62 00000038 4983C408                add r12, 8
+    63 0000003C EBDD                    jmp for_rd
+    64                                 end_frd:
+    65 0000003E 4889D8                  mov rax, rbx
+    66 00000041 4C8B642408              mov r12, [rsp + 8]
+    67 00000046 488B5C2410              mov rbx, [rsp + 16]
+    68 0000004B C9                      leave
+    69 0000004C C3                      ret
+    70                                 
+    71                                 
+    72                                 
+    73                                 bitonic:
+    74                                 
+    75                                 
+    76 0000004D 55                      push rbp
+    77 0000004E 4889E5                  mov rbp, rsp
+    78 00000051 4883EC18                sub rsp, 24
+    79 00000055 4C89642410              mov [rsp + 16], r12
+    80 0000005A 4889742408              mov [rsp + 8], rsi
+    81 0000005F 48893C24                mov [rsp], rdi
+    82 00000063 30C0                    xor al, al
+    83 00000065 4883FE00                cmp rsi, 0
+    84 00000069 0F848E000000            je end_bt
+    85 0000006F 4883FE04                cmp rsi, 4
+    86 00000073 7D05                    jge cnt_bt
+    87 00000075 B0FF                    mov al, -1
+    88 00000077 E982000000              jmp end_bt
+    89                                 cnt_bt:
+    90                                 
+    91 0000007C 30C0                    xor al, al
+    92 0000007E 4C8B4C2408              mov r9, [rsp + 8]
+    93 00000083 49FFC9                  dec r9
+    94 00000086 49C1E103                shl r9, 3
+    95 0000008A 4C030C24                add r9, [rsp]
+    96 0000008E 4D89CA                  mov r10, r9
+    97 00000091 4983C208                add r10, 8
+    98 00000095 4C8B0424                mov r8, [rsp]
+    99                                 
+   100 00000099 4D39D0                 bquwh: cmp r8, r10
+   101 0000009C 7D0C                    jge equwh
+   102 0000009E 498B09                  mov rcx, [r9]
+   103 000000A1 493B08                  cmp rcx, [r8]
+   104 000000A4 7504                    jne equwh
+   105 000000A6 4983C008                add r8, 8
+   106 000000AA EBEB                    jmp bquwh
+   107                                 equwh:
+   108 000000AC 4D39D0                  cmp r8, r10
+   109 000000AF 7502                    jne mn_bt
+   110 000000B1 B0FF                    mov al, -1
+   111 000000B3 EB4C                    jmp end_bt
+   112                                 mn_bt:
+   113                                 
+   114                                 
+   115 000000B5 4831D2                  xor rdx, rdx
+   116 000000B8 30C0                    xor al, al
+   117 000000BA 498B08                  mov rcx, [r8]
+   118 000000BD 493B09                  cmp rcx, [r9]
+   119 000000C0 7E00                    jle ct_bt
+   120 000000C2 B0FF                    mov al, -1
+   121                                 ct_bt:
+   122 000000C4 4D39C8                  cmp r8, r9
+   123 000000C7 7D2E                    jge et_bt
+   124 000000C9 4883FA02                cmp rdx, 2
+   125 000000CD 7F28                    jg et_bt
+   126 000000CF 4D89C3                  mov r11, r8
+   127 000000D2 4983C308                add r11, 8
+   128 000000D6 498B0B                  mov rcx, [r11]
+   129 000000D9 493B08                  cmp rcx, [r8]
+   130 000000DC 7413                    je eif_bt
+   131 000000DE 4530E4                  xor r12b, r12b
+   132 000000E1 493B08                  cmp rcx, [r8]
+   133 000000E4 7F01                    jg bexp
+   134 000000E6 41B4FF                  mov r12b, -1
+   135 000000E9 4438E0                 bexp: cmp al, r12b
+   136 000000EC 7503                    jne eif_bt
+   137 000000EE 48FFC2                  inc rdx
+   138 000000F1 34FF                    xor al, -1
+   139 000000F3 4983C008               eif_bt: add r8, 8
+   140 000000F7 EBC9                    jmp ct_bt
+   141                                 et_bt:
+   142 000000F9 30C0                    xor al, al
+   143 000000FB 4883FA02                cmp rdx, 2
+   144 000000FF 7F00                    jg end_bt
+   145 00000101 B0FF                    mov al, -1
+   146                                 end_bt:
+   147 00000103 4C8B642410              mov r12, [rsp + 16]
+   148 00000108 C9                      leave
+   149 00000109 C3                      ret
+   150                                 
+   151                                 
+   152                                 
+   153                                 print_data:
+   154                                 
+   155                                 
+   156 0000010A 55                      push rbp
+   157 0000010B 4889E5                  mov rbp, rsp
+   158 0000010E 4883EC18                sub rsp, 24
+   159 00000112 4C89642410              mov [rsp + 16], r12
+   160 00000117 48893C24                mov [rsp], rdi
+   161 0000011B 48C1E603                shl rsi, 3
+   162 0000011F 4801FE                  add rsi, rdi
+   163 00000122 4889742408              mov [rsp + 8], rsi
+   164 00000127 4C8B2424                mov r12, [rsp]
+   165 0000012B 4C3B642408             for_pd: cmp r12, [rsp + 8]
+   166 00000130 7D17                    jge end_fpd
+   167 00000132 488D3C25[00000000]      lea rdi, [pr_write]
+   168 0000013A 498B3424                mov rsi, [r12]
+   169 0000013E 31C0                    xor eax, eax
+   170 00000140 E8(F6FFFFFF)            call printf
+   171 00000145 4983C408                add r12, 8
+   172 00000149 EBDE                    jmp for_pd
+   173                                 end_fpd:
+   174 0000014B 488D3C25[00000000]      lea rdi, [linefd]
+   175 00000153 31C0                    xor eax, eax
+   176 00000155 E8(F6FFFFFF)            call printf
+   177 0000015A 4C8B642410              mov r12, [rsp + 16]
+   178 0000015F C9                      leave
+   179 00000160 C3                      ret
+   180                                 
+   181                                 
+   182                                 
+   183                                 _start:
+   184                                 
+   185 00000161 488D3C25[00000000]      lea rdi, [prompt]
+   186 00000169 31C0                    xor eax, eax
+   187 0000016B E8(F6FFFFFF)            call printf
+   188                                 
+   189 00000170 488D3C25[00000000]      lea rdi, [arr]
+   190 00000178 E87EFEFFFF              call read_data
+   191 0000017D 48890425[00000000]      mov [sze], rax
+   192                                 
+   193 00000185 488D3C25[00000000]      lea rdi, [arr]
+   194 0000018D 488B3425[00000000]      mov rsi, [sze]
+   195 00000195 E86BFFFFFF              call print_data
+   196                                 
+   197 0000019A 488D3C25[00000000]      lea rdi, [arr]
+   198 000001A2 488B3425[00000000]      mov rsi, [sze]
+   199 000001AA E899FEFFFF              call bitonic
+   200                                 
+   201 000001AF 3C00                    cmp al, 0
+   202 000001B1 7408                    je false
+   203 000001B3 488D3C25[00000000]      lea rdi, [result_true]
+   204 000001BB EB06                    jmp print
+   205 000001BD 488D3C25[00000000]     false: lea rdi, [result_false]
+   206 000001C5 31C0                   print: xor eax, eax
+   207 000001C7 E8(F6FFFFFF)            call printf
+   208                                 
+   209 000001CC B83C000000             end: mov eax, 60
+   210 000001D1 31FF                    xor edi, edi
+   211 000001D3 0F05                    syscall

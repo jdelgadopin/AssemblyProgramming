@@ -1,0 +1,38 @@
+     1                                 %line 1+1 ex02.asm
+     2                                 [section .bss]
+     3 00000000 <gap>                   fibs resq 100
+     4                                 
+     5                                 
+     6                                 [section .data]
+     7 00000000 0000000000000000        numfibs dq 0
+     8 00000008 0000000000000000        lastfib dq 0
+     9                                 
+    10                                 
+    11                                 [section .text]
+    12                                 [global _start]
+    13                                 
+    14                                 _start:
+    15 00000000 4D31C0                  xor r8, r8
+    16 00000003 49C7C101000000          mov r9, 1
+    17 0000000A 4C890C25[08000000]      mov [fibs+8], r9
+    18                                 
+    19 00000012 48C7C110000000          mov rcx, 16
+    20                                 iter:
+    21 00000019 4C89C8                  mov rax, r9
+    22 0000001C 4C01C0                  add rax, r8
+    23 0000001F 7011                    jo end
+    24 00000021 488981[00000000]        mov [fibs+rcx], rax
+    25 00000028 4D89C8                  mov r8, r9
+    26 0000002B 4989C1                  mov r9, rax
+    27 0000002E 4883C108                add rcx, 8
+    28 00000032 EBE3                    jmp iter
+    29                                 end:
+    30 00000034 48C1E903                shr rcx, 3
+    31 00000038 48FFC9                  dec rcx
+    32 0000003B 48890C25[00000000]      mov [numfibs], rcx
+    33 00000043 4C890C25[00000000]      mov [lastfib], r9
+    34                                 
+    35 0000004B 4831FF                  xor rdi,rdi
+    36 0000004E 6A3C                    push 0x3c
+    37 00000050 58                      pop rax
+    38 00000051 0F05                    syscall

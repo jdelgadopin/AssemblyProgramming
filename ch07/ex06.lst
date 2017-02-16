@@ -1,0 +1,85 @@
+     1                                 %line 1+1 ex06.asm
+     2                                 [segment .data]
+     3                                 
+     4 00000000 7CA7BB41               f1 dd 23.45678
+     5 00000004 C7411345               f2 dd 2356.1111
+     6 00000008 00000000               rs dd 0
+     7                                 
+     8 0000000C 00                     sgnf1 db 0
+     9 0000000D 00                     expf1 db 0
+    10 0000000E 00000000               mntf1 dd 0
+    11                                 
+    12 00000012 00                     sgnf2 db 0
+    13 00000013 00                     expf2 db 0
+    14 00000014 00000000               mntf2 dd 0
+    15                                 
+    16 00000018 00                     sgnr db 0
+    17 00000019 00                     expr db 0
+    18 0000001A 00000000               mntr dd 0
+    19                                 
+    20                                 [segment .text]
+    21                                 [global _start]
+    22                                 _start:
+    23                                 
+    24 00000000 8B0425[00000000]        mov eax, [f1]
+    25 00000007 890425[00000000]        mov [mntf1], eax
+    26 0000000E C1E817                  shr eax, 23
+    27 00000011 880425[00000000]        mov [expf1], al
+    28 00000018 802C25[00000000]7F      sub byte [expf1], 0x7F
+    29 00000020 C1E808                  shr eax, 8
+    30 00000023 880425[00000000]        mov [sgnf1], al
+    31 0000002A 812425[00000000]FF-     and dword [mntf1], 0x7FFFFF
+    32 0000002A FF7F00             
+    33 00000035 0FBA2C25[00000000]-     bts dword [mntf1], 23
+    34 00000035 17                 
+    35                                 
+    36                                 
+    37 0000003E 8B0425[00000000]        mov eax, [f2]
+    38 00000045 890425[00000000]        mov [mntf2], eax
+    39 0000004C C1E817                  shr eax, 23
+    40 0000004F 880425[00000000]        mov [expf2], al
+    41 00000056 802C25[00000000]7F      sub byte [expf2], 0x7F
+    42 0000005E C1E808                  shr eax, 8
+    43 00000061 880425[00000000]        mov [sgnf2], al
+    44 00000068 812425[00000000]FF-     and dword [mntf2], 0x7FFFFF
+    45 00000068 FF7F00             
+    46 00000073 0FBA2C25[00000000]-     bts dword [mntf2], 23
+    47 00000073 17                 
+    48                                 
+    49                                 
+    50 0000007C 8A0425[00000000]        mov al, [sgnf1]
+    51 00000083 020425[00000000]        add al, byte [sgnf2]
+    52 0000008A 2401                    and al, 0x1
+    53 0000008C 880425[00000000]        mov byte [sgnr], al
+    54 00000093 8A0425[00000000]        mov al, [expf1]
+    55 0000009A 020425[00000000]        add al, [expf2]
+    56 000000A1 880425[00000000]        mov byte [expr], al
+    57 000000A8 8B0425[00000000]        mov eax, [mntf1]
+    58 000000AF F72425[00000000]        mul dword [mntf2]
+    59 000000B6 48C1E220                shl rdx, 32
+    60 000000BA 4809D0                  or rax, rdx
+    61 000000BD 4831C9                  xor rcx, rcx
+    62 000000C0 4889C1                  mov rcx, rax
+    63 000000C3 48C1E92F                shr rcx, 47
+    64 000000C7 000C25[00000000]        add byte [expr], cl
+    65 000000CE 48C1E817                shr rax, 23
+    66 000000D2 48D3E8                  shr rax, cl
+    67 000000D5 890425[00000000]        mov dword [mntr], eax
+    68 000000DC 480FBAF017              btr rax, 23
+    69                                 
+    70                                 
+    71 000000E1 31DB                    xor ebx, ebx
+    72 000000E3 8A1C25[00000000]        mov bl, [sgnr]
+    73 000000EA C1E31F                  shl ebx, 31
+    74 000000ED 31C9                    xor ecx, ecx
+    75 000000EF 8A0C25[00000000]        mov cl, [expr]
+    76 000000F6 80C17F                  add cl, 0x7F
+    77 000000F9 C1E117                  shl ecx, 23
+    78 000000FC 09D8                    or eax, ebx
+    79 000000FE 09C8                    or eax, ecx
+    80 00000100 890425[00000000]        mov dword [rs], eax
+    81                                 
+    82 00000107 4831FF                  xor rdi,rdi
+    83 0000010A 6A3C                    push 0x3c
+    84 0000010C 58                      pop rax
+    85 0000010D 0F05                    syscall

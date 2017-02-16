@@ -1,0 +1,15 @@
+     1                                 %line 1+1 rotate.asm
+     2                                 [segment .text]
+     3                                 [global main]
+     4                                 main:
+     5 00000000 55                      push rbp
+     6 00000001 4889E5                  mov rbp, rsp
+     7 00000004 48C7C078563412          mov rax, 0x12345678
+     8 0000000B 48C1C808                ror rax, 8
+     9 0000000F 48C1E804                shr rax, 4
+    10 00000013 48C1E004                shl rax, 4
+    11 00000017 4883C80A                or rax, 1010
+    12 0000001B 48C1C008                rol rax, 8
+    13 0000001F 4831C0                  xor rax, rax
+    14 00000022 C9                      leave
+    15 00000023 C3                      ret

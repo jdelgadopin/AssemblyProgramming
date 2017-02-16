@@ -1,0 +1,74 @@
+     1                                 %line 1+1 ex06.asm
+     2                                 [segment .data]
+     3 00000000 00                     a db 0
+     4 00000001 00                     b db 0
+     5 00000002 456E74657220612C20-    prompt: db "Enter a, b (0 <= a,b <= 255): ",0
+     6 00000002 62202830203C3D2061-
+     7 00000002 2C62203C3D20323535-
+     8 00000002 293A2000           
+     9 00000021 256420256400           scanf_format db "%d %d",0
+    10 00000027 6763642825642C2564-    printf_format db "gcd(%d,%d) = %d",0x0a,0
+    11 00000027 29203D2025640A00   
+    12                                 
+    13                                 [segment .text]
+    14                                 [global _start]
+    15                                 [extern scanf]
+    16                                 [extern printf]
+    17                                 
+    18                                 gcd:
+    19 00000000 55                      push rbp
+    20 00000001 4889E5                  mov rbp, rsp
+    21 00000004 57                      push rdi
+    22 00000005 56                      push rsi
+    23 00000006 803C2400                cmp byte [rsp], 0
+    24 0000000A 7506                    jne rec_case
+    25 0000000C 480FB6442408            movzx rax, byte [rsp+8]
+    26 00000012 C9                      leave
+    27 00000013 C3                      ret
+    28                                 rec_case:
+    29 00000014 8A0C24                  mov cl, byte [rsp]
+    30 00000017 668B442408              mov ax, word [rsp+8]
+    31 0000001C F6F1                    div cl
+    32 0000001E 66C1E808                shr ax, 8
+    33 00000022 480FB63C24              movzx rdi, byte [rsp]
+    34 00000027 480FB6F0                movzx rsi, al
+    35 0000002B E8CBFFFFFF              call gcd
+    36 00000030 C9                      leave
+    37 00000031 C3                      ret
+    38                                 
+    39                                 _start
+    40                                 
+    41                                 
+    42                                 
+    43 00000032 488D3C25[00000000]      lea rdi, [prompt]
+    44 0000003A 31C0                    xor eax, eax
+    45 0000003C E8(F6FFFFFF)            call printf
+    46                                 
+    47                                 
+    48                                 
+    49 00000041 488D3C25[00000000]      lea rdi, [scanf_format]
+    50 00000049 488D3425[00000000]      lea rsi, [a]
+    51 00000051 488D1425[00000000]      lea rdx, [b]
+    52 00000059 31C0                    xor eax, eax
+    53 0000005B E8(F6FFFFFF)            call scanf
+    54                                 
+    55                                 
+    56                                 
+    57 00000060 480FB63C25[00000000]      movzx rdi, byte [a]
+    58 00000069 480FB63425[00000000]      movzx rsi, byte [b]
+    59 00000072 E884FFFFFF              call gcd
+    60                                 
+    61                                 
+    62                                 
+    63 00000077 488D3C25[00000000]      lea rdi, [printf_format]
+    64 0000007F 480FB63425[00000000]      movzx rsi, byte [a]
+    65 00000088 480FB61425[00000000]      movzx rdx, byte [b]
+    66 00000091 480FB6C8                movzx rcx, al
+    67 00000095 31C0                    xor eax, eax
+    68 00000097 E8(F6FFFFFF)            call printf
+    69                                 
+    70                                 
+    71                                 
+    72 0000009C B83C000000             end: mov eax, 60
+    73 000000A1 31FF                    xor edi, edi
+    74 000000A3 0F05                    syscall

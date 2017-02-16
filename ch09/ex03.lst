@@ -1,0 +1,100 @@
+     1                                 %line 1+1 ex03.asm
+     2                                 
+     3                                 [section .data]
+     4 00000000 5079746861676F7265-    prompt db "Pythagorean triples (a,b,c) up to c = 500",0xa,0
+     5 00000000 616E20747269706C65-
+     6 00000000 732028612C622C6329-
+     7 00000000 20757020746F206320-
+     8 00000000 3D203530300A00     
+     9 0000002B 202825642C25642C25-    triple db " (%d,%d,%d) ",0
+    10 0000002B 64292000           
+    11 00000038 0A00                   linefd db 0xa,0
+    12                                 
+    13                                 [section .text]
+    14                                 [global _start]
+    15                                 
+    16                                 [extern printf]
+    17                                 
+    18                                 
+    19                                 
+    20                                 test_pythagorean:
+    21 00000000 55                      push rbp
+    22 00000001 4889E5                  mov rbp, rsp
+    23 00000004 30C0                    xor al, al
+    24 00000006 4989F8                  mov r8, rdi
+    25 00000009 4C0FAFC7                imul r8, rdi
+    26 0000000D 4989F1                  mov r9, rsi
+    27 00000010 4C0FAFCE                imul r9, rsi
+    28 00000014 4D01C8                  add r8, r9
+    29 00000017 4989D2                  mov r10, rdx
+    30 0000001A 4C0FAFD2                imul r10, rdx
+    31 0000001E 4D39D0                  cmp r8, r10
+    32 00000021 7400                    je true
+    33 00000023 C9                      leave
+    34 00000024 C3                      ret
+    35 00000025 0C01                   true: or al, 0x1
+    36 00000027 C9                      leave
+    37 00000028 C3                      ret
+    38                                 
+    39                                 
+    40                                 
+    41                                 pythagorean:
+    42 00000029 55                      push rbp
+    43 0000002A 4889E5                  mov rbp, rsp
+    44 0000002D 4154                    push r12
+    45 0000002F 53                      push rbx
+    46 00000030 57                      push rdi
+    47                                 
+    48 00000031 49C7C401000000          mov r12, 1
+    49 00000038 4C3B2424               stra: cmp r12, [rsp]
+    50 0000003C 7D3D                    jge enda
+    51                                 
+    52 0000003E 4C89E3                  mov rbx, r12
+    53 00000041 483B1C24               strb: cmp rbx, [rsp]
+    54 00000045 7D2F                    jge endb
+    55 00000047 4C89E7                  mov rdi, r12
+    56 0000004A 4889DE                  mov rsi, rbx
+    57 0000004D 488B1424                mov rdx, [rsp]
+    58 00000051 E8A5FFFFFF              call test_pythagorean
+    59 00000056 3C00                    cmp al, 0
+    60 00000058 7417                    je notpy
+    61 0000005A 488D3C25[00000000]      lea rdi, [triple]
+    62 00000062 4C89E6                  mov rsi, r12
+    63 00000065 4889DA                  mov rdx, rbx
+    64 00000068 488B0C24                mov rcx, [rsp]
+    65 0000006C 31C0                    xor eax, eax
+    66 0000006E E8(F6FFFFFF)            call printf
+    67                                 notpy:
+    68 00000073 48FFC3                  inc rbx
+    69 00000076 EBC7                    jmp strb
+    70                                 endb:
+    71 00000078 49FFC4                  inc r12
+    72 0000007B EBB9                    jmp stra
+    73                                 enda:
+    74 0000007D 5F                      pop rdi
+    75 0000007E 5B                      pop rbx
+    76 0000007F 415C                    pop r12
+    77 00000081 C9                      leave
+    78 00000082 C3                      ret
+    79                                 
+    80                                 
+    81                                 
+    82                                 _start:
+    83                                 
+    84 00000083 488D3C25[00000000]      lea rdi, [prompt]
+    85 0000008B 31C0                    xor eax, eax
+    86 0000008D E8(F6FFFFFF)            call printf
+    87 00000092 48C7C301000000          mov rbx, 1
+    88 00000099 4881FBF4010000         loop_c: cmp rbx, 500
+    89 000000A0 7F0B                    jg end
+    90 000000A2 4889DF                  mov rdi, rbx
+    91 000000A5 E87AFFFFFF              call pythagorean
+    92 000000AA 48FFC3                  inc rbx
+    93 000000AD EBE8                    jmp loop_c
+    94                                 end:
+    95 000000AF 488D3C25[00000000]      lea rdi, [linefd]
+    96 000000B7 31C0                    xor eax, eax
+    97 000000B9 E8(F6FFFFFF)            call printf
+    98 000000BE B83C000000              mov eax, 60
+    99 000000C3 31FF                    xor edi, edi
+   100 000000C5 0F05                    syscall

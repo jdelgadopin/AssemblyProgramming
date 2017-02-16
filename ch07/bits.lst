@@ -1,0 +1,20 @@
+     1                                 %line 1+1 bits.asm
+     2                                 [segment .text]
+     3                                 [global main]
+     4                                 main:
+     5 00000000 55                      push rbp
+     6 00000001 4889E5                  mov rbp, rsp
+     7 00000004 48C7C078563412          mov rax, 0x12345678
+     8 0000000B 48C1E808                shr rax, 8
+     9 0000000F 4825FF000000            and rax, 0xff
+    10 00000015 48C7C078563412          mov rax, 0x12345678
+    11 0000001C 48C7C2AA000000          mov rdx, 0xaa
+    12 00000023 48C7C3FF000000          mov rbx, 0xff
+    13 0000002A 48C1E308                shl rbx, 8
+    14 0000002E 48F7D3                  not rbx
+    15 00000031 4821D8                  and rax, rbx
+    16 00000034 48C1E208                shl rdx, 8
+    17 00000038 4809D0                  or rax, rdx
+    18 0000003B 4831C0                  xor rax, rax
+    19 0000003E C9                      leave
+    20 0000003F C3                      ret

@@ -1,0 +1,16 @@
+     1                                 %line 1+1 bits3.asm
+     2                                 [segment .data]
+     3 00000000 EFCDAB8967452301       sample dq 0x0123456789abcdef
+     4 00000008 0000000000000000       field dq 0
+     5                                 [segment .text]
+     6                                 [global main]
+     7                                 main:
+     8 00000000 55                      push rbp
+     9 00000001 4889E5                  mov rbp, rsp
+    10 00000004 488B0425[00000000]      mov rax, [sample]
+    11 0000000C 48C1E817                shr rax, 23
+    12 00000010 4825FFFFFF1F            and rax, 0x1fffffff
+    13 00000016 48890425[00000000]      mov [field], rax
+    14 0000001E 4831C0                  xor rax, rax
+    15 00000021 C9                      leave
+    16 00000022 C3                      ret

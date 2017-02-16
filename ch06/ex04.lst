@@ -1,0 +1,39 @@
+     1                                 %line 1+1 ex04.asm
+     2                                 
+     3                                 [segment .data]
+     4 00000000 1F06000000000000       costkwh dq 1567
+     5 00000008 4A07000000000000       kwhused dq 1866
+     6 00000010 F401000000000000       ctfee dq 500
+     7 00000018 0000000000000000       dollars dq 0
+     8 00000020 0000000000000000       pennies dq 0
+     9 00000028 6400000000000000       ct100 dq 100
+    10 00000030 0000000000000000       zero dq 0
+    11                                 
+    12                                 [segment .text]
+    13                                 [global _start]
+    14                                 _start:
+    15 00000000 55                      push rbp
+    16 00000001 4889E5                  mov rbp, rsp
+    17 00000004 4883EC10                sub rsp, 16
+    18                                 
+    19                                 
+    20 00000008 488B1C25[00000000]      mov rbx, qword [kwhused]
+    21 00000010 4881EBE8030000          sub rbx, 1000
+    22 00000017 480F4C1C25[00000000]      cmovl rbx, [zero]
+    23 00000020 48891C25[00000000]      mov qword [kwhused], rbx
+    24 00000028 488B0425[00000000]      mov rax, [costkwh]
+    25 00000030 48F72C25[00000000]      imul qword [kwhused]
+    26 00000038 48030425[00000000]      add rax, [ctfee]
+    27                                 
+    28                                 
+    29 00000040 48F73C25[00000000]      idiv qword [ct100]
+    30 00000048 48890425[00000000]      mov [dollars], rax
+    31 00000050 48891425[00000000]      mov [pennies], rdx
+    32                                 
+    33                                 
+    34                                 
+    35                                 
+    36                                 
+    37 00000058 4831C0                  xor rax, rax
+    38 0000005B C9                      leave
+    39 0000005C C3                      ret

@@ -1,0 +1,93 @@
+     1                                 %line 1+1 ex01_wrap.asm
+     2                                 [section .bss]
+     3 00000000 <gap>                  fileinput resq 1
+     4 00000008 <gap>                  fdinput resd 1
+     5 0000000C <gap>                  fileoutput resq 1
+     6 00000014 <gap>                  fdoutput resd 1
+     7 00000018 <gap>                  buffsize resq 1
+     8                                 
+     9                                 [section .data]
+    10 00000000 636F7079206661696C-    printerror db "copy failure",0xa,0
+    11 00000000 7572650A00         
+    12                                 
+    13                                 [section .text]
+    14                                 [global main]
+    15                                 
+    16                                 [extern printf]
+    17                                 %line 14+0 ex01_wrap.asm
+    18                                 [extern malloc]
+    19                                 [extern atol]
+    20                                 [extern open]
+    21                                 [extern read]
+    22                                 [extern write]
+    23                                 [extern close]
+    24                                 %line 15+1 ex01_wrap.asm
+    25                                 
+    26                                 
+    27                                 
+    28                                 main:
+    29 00000000 55                      push rbp
+    30 00000001 4889E5                  mov rbp, rsp
+    31 00000004 53                      push rbx
+    32 00000005 4154                    push r12
+    33                                 
+    34 00000007 488D4E08                lea rcx, [rsi+8]
+    35 0000000B 488B09                  mov rcx, [rcx]
+    36 0000000E 48890C25[00000000]      mov [fileinput], rcx
+    37 00000016 488D4E10                lea rcx, [rsi+16]
+    38 0000001A 488B09                  mov rcx, [rcx]
+    39 0000001D 48890C25[00000000]      mov [fileoutput], rcx
+    40 00000025 488D4E18                lea rcx, [rsi+24]
+    41 00000029 488B39                  mov rdi, [rcx]
+    42 0000002C E8(F6FFFFFF)            call atol
+    43 00000031 48890425[00000000]      mov [buffsize], rax
+    44                                 
+    45                                 
+    46 00000039 488B3C25[00000000]      mov rdi, [buffsize]
+    47 00000041 E8(F6FFFFFF)            call malloc
+    48 00000046 4889C3                  mov rbx, rax
+    49                                 
+    50 00000049 488B3C25[00000000]      mov rdi, [fileinput]
+    51 00000051 BE00000000              mov esi, 0x0
+    52 00000056 E8(F6FFFFFF)            call open
+    53 0000005B 83F800                  cmp eax, 0
+    54 0000005E 7C7A                    jl .error
+    55 00000060 890425[00000000]        mov [fdinput], eax
+    56 00000067 488B3C25[00000000]      mov rdi, [fileoutput]
+    57 0000006F BE42000000              mov esi, 0x42
+    58 00000074 48C7C280010000          mov rdx, 600
+    59 0000007B E8(F6FFFFFF)            call open
+    60 00000080 83F800                  cmp eax, 0
+    61 00000083 7C55                    jl .error
+    62 00000085 890425[00000000]        mov [fdoutput], eax
+    63                                 
+    64                                 .loop:
+    65 0000008C 488B3C25[00000000]      mov rdi, [fdinput]
+    66 00000094 4889DE                  mov rsi, rbx
+    67 00000097 488B1425[00000000]      mov rdx, [buffsize]
+    68 0000009F E8(F6FFFFFF)            call read
+    69 000000A4 4883F800                cmp rax, 0
+    70 000000A8 7E16                    jle .close
+    71 000000AA 4989C4                  mov r12, rax
+    72 000000AD 488B3C25[00000000]      mov rdi, [fdoutput]
+    73 000000B5 4889DE                  mov rsi, rbx
+    74 000000B8 4C89E2                  mov rdx, r12
+    75 000000BB E8(F6FFFFFF)            call write
+    76 000000C0 EBC8                    jmp .loop
+    77                                 .close:
+    78                                 
+    79 000000C2 8B3C25[00000000]        mov edi, [fdinput]
+    80 000000C9 E8(F6FFFFFF)            call close
+    81 000000CE 8B3C25[00000000]        mov edi, [fdoutput]
+    82 000000D5 E8(F6FFFFFF)            call close
+    83 000000DA EB0D                    jmp .end
+    84                                 .error:
+    85 000000DC 488D3C25[00000000]      lea rdi, [printerror]
+    86 000000E4 31C0                    xor eax, eax
+    87 000000E6 E8(F6FFFFFF)            call printf
+    88                                 .end:
+    89 000000EB 415C                    pop r12
+    90 000000ED 5B                      pop rbx
+    91 000000EE C9                      leave
+    92 000000EF C3                      ret
+    93                                 

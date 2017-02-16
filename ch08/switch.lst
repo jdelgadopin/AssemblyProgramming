@@ -1,0 +1,39 @@
+     1                                 %line 1+1 switch.asm
+     2                                 [segment .data]
+     3 00000000 [0000000000000000]     switch: dq case0
+     4 00000008 [0000000000000000]      dq case1
+     5 00000010 [0000000000000000]      dq case2
+     6 00000018 [0000000000000000]      dq case3
+     7                                 
+     8 00000020 0200000000000000       i: dq 2
+     9                                 
+    10                                 [segment .text]
+    11                                 [global _start]
+    12                                 [extern scanf]
+    13                                 %line 11+0 switch.asm
+    14                                 [extern scanf]
+    15                                 %line 12+1 switch.asm
+    16                                 [extern printf]
+    17                                 _start:
+    18 00000000 55                      push rbp
+    19 00000001 4889E5                  mov rbp, rsp
+    20 00000004 4883EC10                sub rsp, 16
+    21 00000008 488B0425[00000000]      mov rax, [i]
+    22 00000010 488D1425[00000000]      lea rdx, [switch]
+    23 00000018 FF24C2                  jmp [rdx+rax*8]
+    24                                 case0:
+    25 0000001B 48C7C364000000          mov rbx, 100
+    26 00000022 EB19                    jmp end
+    27                                 case1:
+    28 00000024 48C7C365000000          mov rbx, 101
+    29 0000002B EB10                    jmp end
+    30                                 case2:
+    31 0000002D 48C7C366000000          mov rbx, 102
+    32 00000034 EB07                    jmp end
+    33                                 case3:
+    34 00000036 48C7C367000000          mov rbx, 103
+    35 0000003D EBFE                    jmp end
+    36                                 end:
+    37 0000003F 31C0                    xor eax, eax
+    38 00000041 C9                      leave
+    39 00000042 C3                      ret

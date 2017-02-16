@@ -1,0 +1,95 @@
+     1                                 %line 1+1 ex01_qsort_noprint.asm
+     2                                 [section .data]
+     3                                 
+     4                                 [section .text]
+     5                                 [global main]
+     6                                 
+     7                                 [extern rand]
+     8                                 %line 6+0 ex01_qsort_noprint.asm
+     9                                 [extern malloc]
+    10                                 [extern atol]
+    11                                 [extern qsort]
+    12                                 %line 7+1 ex01_qsort_noprint.asm
+    13                                 
+    14                                 
+    15                                 
+    16                                 create_data:
+    17                                 
+    18                                 
+    19                                 .array equ 0
+    20                                 .size equ 8
+    21                                 .r12 equ 16
+    22                                 .rbx equ 24
+    23 00000000 55                      push rbp
+    24 00000001 4889E5                  mov rbp, rsp
+    25 00000004 4883EC20                sub rsp, 32
+    26 00000008 48895C2418              mov [rsp+.rbx], rbx
+    27 0000000D 4C89642410              mov [rsp+.r12], r12
+    28 00000012 48897C2408              mov [rsp+.size], rdi
+    29 00000017 48C1E702                shl rdi, 2
+    30 0000001B E8(F6FFFFFF)            call malloc
+    31 00000020 48890424                mov [rsp+.array], rax
+    32 00000024 488B1C24                mov rbx, [rsp+.array]
+    33 00000028 4D31E4                  xor r12, r12
+    34                                 .for:
+    35 0000002B 4C3B642408              cmp r12, [rsp+.size]
+    36 00000030 7D19                    jge .end
+    37 00000032 E8(F6FFFFFF)            call rand
+    38 00000037 4831D2                  xor rdx, rdx
+    39 0000003A 49C7C010270000          mov r8, 10000
+    40 00000041 49F7F8                  idiv r8
+    41 00000044 428914A3                mov dword [rbx+4*r12], edx
+    42 00000048 49FFC4                  inc r12
+    43 0000004B EBDC                    jmp .for
+    44                                 .end:
+    45 0000004D 488B0424                mov rax, [rsp+.array]
+    46 00000051 4C8B642410              mov r12, [rsp+.r12]
+    47 00000056 488B5C2418              mov rbx, [rsp+.rbx]
+    48 0000005B C9                      leave
+    49 0000005C C3                      ret
+    50                                 
+    51                                 
+    52                                 
+    53                                 compare:
+    54                                 
+    55 0000005D 55                      push rbp
+    56 0000005E 4889E5                  mov rbp, rsp
+    57 00000061 8B07                    mov eax, dword [rdi]
+    58 00000063 2B06                    sub eax, dword [rsi]
+    59 00000065 C9                      leave
+    60 00000066 C3                      ret
+    61                                 
+    62                                 sort_data:
+    63                                 
+    64                                 
+    65                                 
+    66 00000067 55                      push rbp
+    67 00000068 4889E5                  mov rbp, rsp
+    68                                 
+    69 0000006B 48C7C204000000          mov rdx, 4
+    70 00000072 488D0C25[00000000]      lea rcx, [compare]
+    71 0000007A E8(F6FFFFFF)            call qsort
+    72 0000007F C9                      leave
+    73 00000080 C3                      ret
+    74                                 
+    75                                 
+    76                                 
+    77                                 main:
+    78 00000081 55                      push rbp
+    79 00000082 4889E5                  mov rbp, rsp
+    80 00000085 4883EC10                sub rsp, 16
+    81 00000089 4889F1                  mov rcx, rsi
+    82 0000008C 4883C108                add rcx, 8
+    83 00000090 488B39                  mov rdi, [rcx]
+    84 00000093 E8(F6FFFFFF)            call atol
+    85 00000098 50                      push rax
+    86 00000099 4889C7                  mov rdi, rax
+    87 0000009C E85AFFFFFF              call create_data
+    88 000000A1 50                      push rax
+    89                                 
+    90 000000A2 488B3C24                mov rdi, [rsp]
+    91 000000A6 488B742408              mov rsi, [rsp+8]
+    92 000000AB E8B2FFFFFF              call sort_data
+    93 000000B0 C9                      leave
+    94 000000B1 C3                      ret
+    95                                 

@@ -1,0 +1,48 @@
+     1                                 %line 1+1 print_max_ld.asm
+     2                                 [section .data]
+     3 00000000 6D617828256C642C25-    fmt db 'max(%ld,%ld) = %ld',0xa,0
+     4 00000000 6C6429203D20256C64-
+     5 00000000 0A00               
+     6                                 
+     7                                 [section .text]
+     8                                 [global _start]
+     9                                 [extern printf]
+    10                                 
+    11                                 
+    12                                 
+    13                                 a equ 0
+    14                                 b equ 8
+    15                                 print_max:
+    16 00000000 55                      push rbp
+    17 00000001 4889E5                  mov rbp, rsp
+    18 00000004 4883EC20                sub rsp, 32
+    19                                 
+    20                                 max equ 16
+    21 00000008 48893C24                mov [rsp+a], rdi
+    22 0000000C 4889742408              mov [rsp+b], rsi
+    23                                 
+    24 00000011 48897C2410              mov [rsp+max], rdi
+    25                                 
+    26 00000016 4839FE                  cmp rsi, rdi
+    27 00000019 7E03                    jng skip
+    28 0000001B 4889742410              mov [rsp+max], rsi
+    29                                 skip:
+    30                                 
+    31 00000020 488D3C25[00000000]      lea rdi, [fmt]
+    32 00000028 488B3424                mov rsi, [rsp+a]
+    33 0000002C 488B542408              mov rdx, [rsp+b]
+    34 00000031 488B4C2410              mov rcx, [rsp+max]
+    35 00000036 31C0                    xor eax, eax
+    36 00000038 E8(F6FFFFFF)            call printf
+    37                                 
+    38 0000003D C9                      leave
+    39 0000003E C3                      ret
+    40                                 
+    41                                 _start:
+    42                                 
+    43 0000003F 48C7C764000000          mov rdi, 100
+    44 00000046 48C7C6C8000000          mov rsi, 200
+    45 0000004D E8A9FFFFFF              call print_max
+    46 00000052 B83C000000              mov eax, 60
+    47 00000057 31FF                    xor edi, edi
+    48 00000059 0F05                    syscall

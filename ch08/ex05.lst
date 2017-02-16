@@ -1,0 +1,139 @@
+     1                                 %line 1+1 ex05.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                 
+     6                                 [section .bss]
+     7                                 
+     8 00000000 <gap>                   preproc resb 7
+     9                                 
+    10 00000007 <gap>                   rplcdi resb 100
+    11                                 
+    12                                 
+    13 0000006B <gap>                   rplcdtx resb 250
+    14                                 
+    15                                 [section .data]
+    16                                 
+    17 00000000 313233343536373839-     text db "123456789012345678901234567890123456789012345678901234567890"
+    18 00000000 303132333435363738-
+    19 00000000 393031323334353637-
+    20 00000000 383930313233343536-
+    21 00000000 373839303132333435-
+    22 00000000 363738393031323334-
+    23 00000000 353637383930       
+    24 0000003C 3C                      sizet db 60
+    25                                 
+    26 0000003D 3637383930              patt db "67890"
+    27 00000042 05                      sizep db 5
+    28                                 
+    29 00000043 61                      repl db "a"
+    30 00000044 01                      sizer db 1
+    31                                 
+    32                                 [section .text]
+    33                                 [global _start]
+    34                                 
+    35                                 _start:
+    36                                 
+    37                                 
+    38                                 
+    39 00000000 4D31C0                  xor r8, r8
+    40 00000003 49C7C1FFFFFFFF          mov r9, -1
+    41 0000000A 458888[00000000]        mov byte [preproc + r8], r9b
+    42                                 wppext:
+    43 00000011 443A0425[00000000]      cmp r8b, byte [sizep]
+    44 00000019 7D2F                    jge ewppext
+    45                                 wppint:
+    46 0000001B 4983F900                cmp r9, 0
+    47 0000001F 7D00                    jge jgt0
+    48 00000021 EB18                    jmp ewppint
+    49 00000023 418A90[00000000]       jgt0: mov dl, byte [patt + r8]
+    50 0000002A 413A91[00000000]        cmp dl, byte [patt + r9]
+    51 00000031 7408                    je ewppint
+    52                                 
+    53 00000033 4D0FBE89[00000000]      movsx r9, byte [preproc + r9]
+    54 0000003B EBDC                    jmp wppint
+    55                                 ewppint:
+    56 0000003D 49FFC0                  inc r8
+    57 00000040 49FFC1                  inc r9
+    58 00000043 458888[00000000]        mov byte [preproc + r8], r9b
+    59 0000004A EBC3                    jmp wppext
+    60                                 ewppext:
+    61                                 
+    62                                 
+    63                                 
+    64                                 
+    65 0000004C 4831DB                  xor rbx, rbx
+    66 0000004F C60425[00000000]FF      mov byte [rplcdi], -1
+    67 00000057 4D31C0                  xor r8, r8
+    68 0000005A 4D31C9                  xor r9, r9
+    69                                 wsext:
+    70 0000005D 443A0425[00000000]      cmp r8b, byte [sizet]
+    71 00000065 7D4B                    jge ewsext
+    72                                 wsint:
+    73 00000067 4983F900                cmp r9, 0
+    74 0000006B 7D00                    jge jsgt0
+    75 0000006D EB18                    jmp ewsint
+    76 0000006F 418A90[00000000]       jsgt0: mov dl, byte [text + r8]
+    77 00000076 413A91[00000000]        cmp dl, byte [patt + r9]
+    78 0000007D 7408                    je ewsint
+    79                                 
+    80 0000007F 4D0FBE89[00000000]      movsx r9, byte [preproc + r9]
+    81 00000087 EBDC                    jmp wsint
+    82                                 ewsint:
+    83 00000089 49FFC0                  inc r8
+    84 0000008C 49FFC1                  inc r9
+    85 0000008F 443A0C25[00000000]      cmp r9b, byte [sizep]
+    86 00000097 75C2                    jne wsext
+    87 00000099 448883[00000000]        mov byte [rplcdi + rbx], r8b
+    88 000000A0 44288B[00000000]        sub byte [rplcdi + rbx], r9b
+    89 000000A7 48FFC3                  inc rbx
+    90 000000AA 4D0FBE89[00000000]      movsx r9, byte [preproc + r9]
+    91 000000B2 EBA7                    jmp wsext
+    92                                 ewsext:
+    93 000000B4 4C0FB61425[00000000]      movzx r10, byte[sizet]
+    94 000000BD 49FFC2                  inc r10
+    95 000000C0 448893[00000000]        mov byte [rplcdi + rbx], r10b
+    96                                 
+    97                                 
+    98                                 
+    99                                 
+   100 000000C7 EB21                    jmp start
+   101                                 
+   102                                 
+   103                                 
+   104 000000C9 4D31D2                 cpypt: xor r10, r10
+   105 000000CC 443A1425[00000000]     wpt: cmp r10b, byte [sizer]
+   106 000000D4 7D40                    jge ecpypt
+   107 000000D6 458A9A[00000000]        mov r11b, byte [repl + r10]
+   108 000000DD 458899[00000000]        mov byte [rplcdtx + r9], r11b
+   109 000000E4 49FFC2                  inc r10
+   110 000000E7 49FFC1                  inc r9
+   111 000000EA EBDE                    jmp wpt
+   112                                 
+   113                                 
+   114 000000EC 4D31C0                 start: xor r8, r8
+   115 000000EF 4D31C9                  xor r9, r9
+   116 000000F2 4831C9                  xor rcx, rcx
+   117 000000F5 443A0425[00000000]     cpyng: cmp r8b, byte [sizet]
+   118 000000FD 7D3A                    jge end
+   119 000000FF 443A81[00000000]       wlt: cmp r8b, byte [rplcdi + rcx]
+   120 00000106 7E03                    jle rightk
+   121 00000108 48FFC1                  inc rcx
+   122 0000010B EBF0                    jmp wlt
+   123 0000010D 443A81[00000000]       rightk: cmp r8b, byte [rplcdi + rcx]
+   124 00000114 750D                    jne kcpy
+   125 00000116 EBAF                    jmp cpypt
+   126 00000118 44020425[00000000]     ecpypt: add r8b, byte [sizep]
+   127 00000120 48FFC1                  inc rcx
+   128 00000123 EBCE                    jmp cpyng
+   129 00000125 458A98[00000000]       kcpy: mov r11b, byte [text + r8]
+   130 0000012C 458899[00000000]        mov byte [rplcdtx + r9], r11b
+   131 00000133 49FFC0                  inc r8
+   132 00000136 49FFC1                  inc r9
+   133 00000139 EBB8                    jmp cpyng
+   134                                 
+   135                                 end:
+   136 0000013B 4831FF                  xor rdi,rdi
+   137 0000013E 6A3C                    push 0x3c
+   138 00000140 58                      pop rax
+   139 00000141 0F05                    syscall

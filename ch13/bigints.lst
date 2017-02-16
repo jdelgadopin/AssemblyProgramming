@@ -1,0 +1,732 @@
+     1                                 %line 1+1 bigints.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                 
+     6                                 
+     7                                 
+     8                                 
+     9                                 
+    10                                 [section .bss]
+    11 00000000 <gap>                  string_read: resb 1024
+    12 00000400 <gap>                  zero: resq 1
+    13 00000408 <gap>                  one: resq 1
+    14                                 
+    15                                 [absolute 0]
+    16                                 %line 14+0 bigints.asm
+    17                                 BigInt:
+    18                                 %line 15+1 bigints.asm
+    19                                 b_size: resq 1
+    20                                 b_num: resq 1
+    21                                 BigInt_size EQU $ - BigInt
+    22                                 %line 17+0 bigints.asm
+    23                                 [section .bss]
+    24                                 %line 18+1 bigints.asm
+    25                                 
+    26                                 
+    27                                 
+    28                                 [section .data]
+    29                                 
+    30 00000000 00070E151C232A3138     boundaries db 0,7,14,21,28,35,42,49,56
+    31                                 
+    32 00000009 257300                 _inp db "%s",0
+    33 0000000C 2530327500             _out db "%02u",0
+    34 00000011 0A00                   _ret db 0xa,0
+    35 00000013 456E7465722061206E-    _pro db "Enter a number: ",0
+    36 00000013 756D6265723A2000   
+    37 00000024 3D3D3D3E2000           _prn db "===> ",0
+    38 0000002A 2077697468206F7665-    _ove db " with overflow",0
+    39 0000002A 72666C6F7700       
+    40 00000039 73756D3A2000           _sum db "sum: ",0
+    41                                 
+    42                                 
+    43                                 
+    44                                 
+    45                                 [section .text]
+    46                                 [global print_BigInt]
+    47                                 %line 37+0 bigints.asm
+    48                                 [global add_BigInt]
+    49                                 [global prod_BigInt]
+    50                                 [global convert_string_to_num]
+    51                                 [global free_BigInt]
+    52                                 [global equal]
+    53                                 [global init_BigInt]
+    54                                 %line 38+1 bigints.asm
+    55                                 [extern printf]
+    56                                 %line 38+0 bigints.asm
+    57                                 [extern malloc]
+    58                                 [extern free]
+    59                                 [extern atol]
+    60                                 %line 39+1 bigints.asm
+    61                                 
+    62                                 
+    63                                 
+    64                                 convert_string_to_num:
+    65                                 
+    66                                 
+    67                                 
+    68 00000000 55                      push rbp
+    69 00000001 4889E5                  mov rbp, rsp
+    70 00000004 53                      push rbx
+    71 00000005 4154                    push r12
+    72 00000007 4155                    push r13
+    73 00000009 4156                    push r14
+    74                                 
+    75 0000000B 4889FB                  mov rbx, rdi
+    76                                 
+    77 0000000E 48C7C710000000          mov rdi, BigInt_size
+    78 00000015 E8(F6FFFFFF)            call malloc
+    79 0000001A 4989C4                  mov r12, rax
+    80                                 
+    81 0000001D 4831C0                  xor rax, rax
+    82                                 .next_zero:
+    83 00000020 803C0300                cmp byte [rbx+rax], 0
+    84 00000024 7409                    je .compute_size
+    85 00000026 803C0330                cmp byte [rbx+rax], 0x30
+    86 0000002A 7503                    jne .compute_size
+    87 0000002C 48FFC0                  inc rax
+    88 0000002F EBED                    jmp .next_zero
+    89                                 
+    90                                 .compute_size:
+    91 00000031 4801C3                  add rbx, rax
+    92 00000034 4831C0                  xor rax, rax
+    93                                 .next_char:
+    94 00000037 803C0300                cmp byte [rbx+rax], 0
+    95 0000003B 7403                    je .size
+    96 0000003D 48FFC0                  inc rax
+    97 00000040 EBF3                    jmp .next_char
+    98                                 .size:
+    99 00000042 4989C6                  mov r14, rax
+   100 00000045 48C7C112000000          mov rcx, 18
+   101 0000004C 4831D2                  xor rdx, rdx
+   102 0000004F 48F7F1                  div rcx
+   103 00000052 4883FA00                cmp rdx, 0
+   104 00000056 7401                    je .save
+   105 00000058 48FFC0                  inc rax
+   106                                 .save:
+   107 0000005B 4883F800                cmp rax, 0
+   108 0000005F 750B                    jne .not_zero
+   109 00000061 4C8B2425[00000000]      mov r12, [zero]
+   110 00000069 E9AC000000              jmp .end_conversion
+   111                                 .not_zero:
+   112 0000006E 4989D5                  mov r13, rdx
+   113 00000071 49890424                mov qword [r12+b_size], rax
+   114 00000075 48C1E003                shl rax, 3
+   115 00000079 4889C7                  mov rdi, rax
+   116 0000007C E8(F6FFFFFF)            call malloc
+   117 00000081 4989442408              mov qword [r12+b_num], rax
+   118                                 
+   119                                 
+   120                                 
+   121                                 
+   122                                 
+   123                                 
+   124                                 
+   125                                 
+   126                                 [section .bss]
+   127 00000410 <gap>                  .temp: resb 19
+   128                                 
+   129                                 [section .text]
+   130                                 
+   131 00000086 4D31C0                  xor r8, r8
+   132 00000089 4983EE12                sub r14, 18
+   133                                 .next_qword:
+   134 0000008D 4983FE00                cmp r14, 0
+   135 00000091 7C4A                    jl .done
+   136                                 
+   137 00000093 4150                    push r8
+   138 00000095 4A8D3433                lea rsi, [rbx+r14]
+   139 00000099 488D3C25[00000000]      lea rdi, [.temp]
+   140 000000A1 48C7C112000000          mov rcx, 18
+   141 000000A8 F3A4                    rep movsb
+   142 000000AA 4158                    pop r8
+   143 000000AC C60425[12000000]00      mov byte [.temp+18], 0
+   144                                 
+   145 000000B4 4150                    push r8
+   146 000000B6 488D3C25[00000000]      lea rdi, [.temp]
+   147 000000BE E8(F6FFFFFF)            call atol
+   148 000000C3 4889C7                  mov rdi, rax
+   149 000000C6 E85B000000              call convert_num_to_num
+   150 000000CB 4158                    pop r8
+   151 000000CD 4D8B4C2408              mov r9, [r12+b_num]
+   152 000000D2 4B8904C1                mov qword [r9+8*r8], rax
+   153                                 
+   154 000000D6 49FFC0                  inc r8
+   155 000000D9 4983EE12                sub r14, 18
+   156 000000DD EBAC                    jmp .next_qword
+   157                                 .done:
+   158                                 
+   159 000000DF 4983FD00                cmp r13, 0
+   160 000000E3 7438                    je .end_conversion
+   161 000000E5 4150                    push r8
+   162 000000E7 488D33                  lea rsi, [rbx]
+   163 000000EA 488D3C25[00000000]      lea rdi, [.temp]
+   164 000000F2 4C89E9                  mov rcx, r13
+   165 000000F5 F3A4                    rep movsb
+   166 000000F7 41C685[00000000]00      mov byte [.temp+r13], 0
+   167 000000FF 488D3C25[00000000]      lea rdi, [.temp]
+   168 00000107 E8(F6FFFFFF)            call atol
+   169 0000010C 4889C7                  mov rdi, rax
+   170 0000010F E812000000              call convert_num_to_num
+   171 00000114 4158                    pop r8
+   172 00000116 4D8B4C2408              mov r9, [r12+b_num]
+   173 0000011B 4B8904C1                mov qword [r9+8*r8], rax
+   174                                 .end_conversion:
+   175 0000011F 4C89E0                  mov rax, r12
+   176 00000122 415E                    pop r14
+   177 00000124 415D                    pop r13
+   178 00000126 415C                    pop r12
+   179 00000128 5B                      pop rbx
+   180 00000129 C9                      leave
+   181 0000012A C3                      ret
+   182                                 
+   183                                 
+   184                                 
+   185                                 convert_num_to_num:
+   186                                 
+   187                                 
+   188                                 
+   189                                 
+   190 0000012B 55                      push rbp
+   191 0000012C 4889E5                  mov rbp, rsp
+   192 0000012F 53                      push rbx
+   193 00000130 4154                    push r12
+   194                                 
+   195 00000132 4889F8                  mov rax, rdi
+   196 00000135 4D31E4                  xor r12, r12
+   197 00000138 4831DB                  xor rbx, rbx
+   198                                 .next:
+   199 0000013B 4883F800                cmp rax, 0
+   200 0000013F 7427                    je .done
+   201 00000141 4883FB09                cmp rbx, 9
+   202 00000145 7D21                    jge .done
+   203 00000147 48C7C164000000          mov rcx, 100
+   204 0000014E 4831D2                  xor rdx, rdx
+   205 00000151 48F7F1                  div rcx
+   206                                 
+   207                                 
+   208 00000154 480FB68B[00000000]      movzx rcx, byte [boundaries+rbx]
+   209 0000015C 49D3CC                  ror r12, cl
+   210 0000015F 4108D4                  or r12b,dl
+   211 00000162 49D3C4                  rol r12, cl
+   212 00000165 48FFC3                  inc rbx
+   213 00000168 EBCF                    jmp .next
+   214                                 .done:
+   215 0000016A 4C89E0                  mov rax, r12
+   216                                 .end:
+   217 0000016D 415C                    pop r12
+   218 0000016F 5B                      pop rbx
+   219 00000170 C9                      leave
+   220 00000171 C3                      ret
+   221                                 
+   222                                 
+   223                                 
+   224                                 print_num:
+   225                                 
+   226 00000172 55                      push rbp
+   227 00000173 4889E5                  mov rbp, rsp
+   228 00000176 53                      push rbx
+   229 00000177 4154                    push r12
+   230 00000179 4155                    push r13
+   231                                 
+   232 0000017B 4989FC                  mov r12, rdi
+   233 0000017E 4989F5                  mov r13, rsi
+   234 00000181 48C7C308000000          mov rbx, 8
+   235                                 .next:
+   236 00000188 4883FB00                cmp rbx, 0
+   237 0000018C 7C41                    jl .done
+   238 0000018E 480FB68B[00000000]      movzx rcx, byte [boundaries+rbx]
+   239 00000196 49D3CC                  ror r12, cl
+   240 00000199 490FB6F4                movzx rsi, r12b
+   241 0000019D 480FBAF607              btr rsi, 7
+   242 000001A2 4883FE00                cmp rsi, 0
+   243 000001A6 7504                    jne .go_pr
+   244 000001A8 4983FD00                cmp r13, 0
+   245 000001AC 7411                    je .go_no
+   246                                 .go_pr:
+   247 000001AE 4983CD01                or r13, 0x1
+   248 000001B2 488D3C25[00000000]      lea rdi, [_out]
+   249 000001BA 31C0                    xor eax, eax
+   250 000001BC E8(F6FFFFFF)            call printf
+   251                                 .go_no:
+   252 000001C1 480FB68B[00000000]      movzx rcx, byte [boundaries+rbx]
+   253 000001C9 49D3C4                  rol r12, cl
+   254 000001CC 48FFCB                  dec rbx
+   255 000001CF EBB5                    jmp .next
+   256                                 .done:
+   257 000001D1 4C89E8                  mov rax, r13
+   258 000001D4 415D                    pop r13
+   259 000001D6 415C                    pop r12
+   260 000001D8 5B                      pop rbx
+   261 000001D9 C9                      leave
+   262 000001DA C3                      ret
+   263                                 
+   264                                 
+   265                                 
+   266                                 print_BigInt:
+   267                                 
+   268                                 
+   269 000001DB 55                      push rbp
+   270 000001DC 4889E5                  mov rbp, rsp
+   271 000001DF 53                      push rbx
+   272 000001E0 4154                    push r12
+   273 000001E2 4155                    push r13
+   274 000001E4 57                      push rdi
+   275                                 
+   276 000001E5 4C8B27                  mov r12, [rdi+b_size]
+   277 000001E8 4C8B6F08                mov r13, [rdi+b_num]
+   278                                 
+   279                                 [section .data]
+   280 0000003F 303000                 ._zero: db "00",0
+   281 00000042 2564202D2D2000         ._size: db "%d -- ",0
+   282                                 [section .text]
+   283 000001EC 488D3C25[00000000]      lea rdi, [._size]
+   284 000001F4 4C89E6                  mov rsi, r12
+   285 000001F7 31C0                    xor eax, eax
+   286 000001F9 E8(F6FFFFFF)            call printf
+   287                                 
+   288 000001FE 4831DB                  xor rbx, rbx
+   289                                 
+   290 00000201 49FFCC                  dec r12
+   291                                 .next_qword:
+   292 00000204 4983FC00                cmp r12, 0
+   293 00000208 7C13                    jl .end_qword
+   294 0000020A 4B8B7CE500              mov rdi, qword [r13+8*r12]
+   295 0000020F 4889DE                  mov rsi, rbx
+   296 00000212 E856FFFFFF              call print_num
+   297 00000217 4889C3                  mov rbx, rax
+   298 0000021A 49FFCC                  dec r12
+   299 0000021D EBE3                    jmp .next_qword
+   300                                 .end_qword:
+   301 0000021F 4883FB00                cmp rbx, 0
+   302 00000223 750D                    jne .end
+   303 00000225 488D3C25[00000000]      lea rdi, [._zero]
+   304 0000022D 31C0                    xor eax, eax
+   305 0000022F E8(F6FFFFFF)            call printf
+   306                                 .end:
+   307 00000234 58                      pop rax
+   308 00000235 415D                    pop r13
+   309 00000237 415C                    pop r12
+   310 00000239 5B                      pop rbx
+   311 0000023A C9                      leave
+   312 0000023B C3                      ret
+   313                                 
+   314                                 
+   315                                 
+   316                                 equal:
+   317                                 
+   318                                 
+   319 0000023C 55                      push rbp
+   320 0000023D 4889E5                  mov rbp, rsp
+   321 00000240 53                      push rbx
+   322 00000241 4154                    push r12
+   323 00000243 4155                    push r13
+   324 00000245 4156                    push r14
+   325 00000247 4157                    push r15
+   326 00000249 4831C0                  xor rax, rax
+   327 0000024C 4C8B27                  mov r12, [rdi+b_size]
+   328 0000024F 4C8B6F08                mov r13, [rdi+b_num]
+   329 00000253 4C8B36                  mov r14, [rsi+b_size]
+   330 00000256 4C8B7E08                mov r15, [rsi+b_num]
+   331 0000025A 4D39F4                  cmp r12, r14
+   332 0000025D 751D                    jne .end
+   333 0000025F 4831DB                  xor rbx, rbx
+   334                                 .next_qword:
+   335 00000262 4C39E3                  cmp rbx, r12
+   336 00000265 7D0E                    jge .end_qword
+   337 00000267 4D8B44DD00              mov r8, qword [r13+8*rbx]
+   338 0000026C 4D3B04DF                cmp r8, qword [r15+8*rbx]
+   339 00000270 750A                    jne .end
+   340 00000272 48FFC3                  inc rbx
+   341 00000275 EBE9                    jmp .next_qword
+   342                                 .end_qword:
+   343 00000277 48C7C001000000          mov rax, 0x1
+   344                                 .end:
+   345 0000027E 415F                    pop r15
+   346 00000280 415E                    pop r14
+   347 00000282 415D                    pop r13
+   348 00000284 415C                    pop r12
+   349 00000286 5B                      pop rbx
+   350 00000287 C9                      leave
+   351 00000288 C3                      ret
+   352                                 
+   353                                 
+   354                                 
+   355                                 prod_BigInt:
+   356                                 
+   357                                 
+   358 00000289 55                      push rbp
+   359 0000028A 4889E5                  mov rbp, rsp
+   360 0000028D 53                      push rbx
+   361 0000028E 4154                    push r12
+   362 00000290 4155                    push r13
+   363 00000292 4156                    push r14
+   364 00000294 4157                    push r15
+   365                                 
+   366                                 
+   367 00000296 E8A1020000              call order
+   368                                 
+   369 0000029B 4989C5                  mov r13, rax
+   370 0000029E 4C8B20                  mov r12, [rax+b_size]
+   371 000002A1 4989D7                  mov r15, rdx
+   372 000002A4 4C8B32                  mov r14, [rdx+b_size]
+   373                                 .go_on:
+   374                                 
+   375                                 
+   376                                 
+   377                                 [section .data]
+   378 00000049 0100000000000000       .result: dq 1
+   379                                 
+   380                                 [section .text]
+   381                                 
+   382 000002A7 48C7C710000000          mov rdi, BigInt_size
+   383 000002AE E8(F6FFFFFF)            call malloc
+   384 000002B3 48890425[00000000]      mov [.result], rax
+   385 000002BB 4C8B0425[00000000]      mov r8, [.result]
+   386 000002C3 49C70001000000          mov qword [r8+b_size], 0x1
+   387 000002CA 48C7C708000000          mov rdi, 8
+   388 000002D1 E8(F6FFFFFF)            call malloc
+   389 000002D6 4C8B0425[00000000]      mov r8, [.result]
+   390 000002DE 49894008                mov qword [r8+b_num], rax
+   391 000002E2 48C70000000000          mov qword [rax], 0x0
+   392                                 
+   393 000002E9 48C7C710000000          mov rdi, BigInt_size
+   394 000002F0 E8(F6FFFFFF)            call malloc
+   395 000002F5 4889C3                  mov rbx, rax
+   396 000002F8 48C70301000000          mov qword [rbx+b_size], 0x1
+   397 000002FF 48C7C708000000          mov rdi, 8
+   398 00000306 E8(F6FFFFFF)            call malloc
+   399 0000030B 48894308                mov qword [rbx+b_num], rax
+   400 0000030F 48C70000000000          mov qword [rax], 0x0
+   401                                 
+   402                                 .next:
+   403                                 
+   404 00000316 4889DF                  mov rdi, rbx
+   405 00000319 4C89EE                  mov rsi, r13
+   406 0000031C E816FFFFFF              call equal
+   407 00000321 4883F801                cmp rax, 1
+   408 00000325 7444                    je .stop
+   409                                 
+   410                                 
+   411 00000327 488B3C25[00000000]      mov rdi, qword [.result]
+   412 0000032F 4C89FE                  mov rsi, r15
+   413 00000332 E84C000000              call add_BigInt
+   414                                 
+   415 00000337 50                      push rax
+   416 00000338 488B3C25[00000000]      mov rdi, qword [.result]
+   417 00000340 E857020000              call free_BigInt
+   418 00000345 58                      pop rax
+   419 00000346 48890425[00000000]      mov qword [.result], rax
+   420                                 
+   421                                 
+   422 0000034E 4889DF                  mov rdi, rbx
+   423 00000351 488B3425[00000000]      mov rsi, [one]
+   424 00000359 E825000000              call add_BigInt
+   425                                 
+   426 0000035E 50                      push rax
+   427 0000035F 4889DF                  mov rdi, rbx
+   428 00000362 E835020000              call free_BigInt
+   429 00000367 58                      pop rax
+   430 00000368 4889C3                  mov rbx, rax
+   431                                 
+   432 0000036B EBA7                    jmp .next
+   433                                 .stop:
+   434                                 
+   435 0000036D 4889DF                  mov rdi, rbx
+   436 00000370 E827020000              call free_BigInt
+   437                                 
+   438 00000375 488B0425[00000000]      mov rax, [.result]
+   439 0000037D 415F                    pop r15
+   440 0000037F 415E                    pop r14
+   441 00000381 415D                    pop r13
+   442 00000383 415C                    pop r12
+   443 00000385 5B                      pop rbx
+   444 00000386 C9                      leave
+   445 00000387 C3                      ret
+   446                                 
+   447                                 
+   448                                 
+   449                                 add_BigInt:
+   450                                 
+   451                                 
+   452 00000388 55                      push rbp
+   453 00000389 4889E5                  mov rbp, rsp
+   454 0000038C 53                      push rbx
+   455 0000038D 4154                    push r12
+   456 0000038F 4155                    push r13
+   457 00000391 4156                    push r14
+   458 00000393 4157                    push r15
+   459                                 
+   460 00000395 4C8B27                  mov r12, [rdi+b_size]
+   461 00000398 4C8B6F08                mov r13, [rdi+b_num]
+   462 0000039C 4C8B36                  mov r14, [rsi+b_size]
+   463 0000039F 4C8B7E08                mov r15, [rsi+b_num]
+   464 000003A3 4D39E6                  cmp r14, r12
+   465 000003A6 7D0C                    jge .go_on
+   466 000003A8 4C8B26                  mov r12, [rsi+b_size]
+   467 000003AB 4C8B6E08                mov r13, [rsi+b_num]
+   468 000003AF 4C8B37                  mov r14, [rdi+b_size]
+   469 000003B2 4C8B7F08                mov r15, [rdi+b_num]
+   470                                 .go_on:
+   471                                 
+   472                                 
+   473                                 
+   474                                 [section .data]
+   475 00000051 0100000000000000       .result: dq 1
+   476                                 
+   477                                 [section .text]
+   478                                 
+   479                                 
+   480 000003B6 48C7C710000000          mov rdi, BigInt_size
+   481 000003BD E8(F6FFFFFF)            call malloc
+   482 000003C2 48890425[00000000]      mov [.result], rax
+   483 000003CA 4889C3                  mov rbx, rax
+   484 000003CD 4C89F7                  mov rdi, r14
+   485 000003D0 48893B                  mov qword [rbx+b_size], rdi
+   486 000003D3 48C1E703                shl rdi, 3
+   487 000003D7 E8(F6FFFFFF)            call malloc
+   488 000003DC 48894308                mov qword [rbx+b_num], rax
+   489                                 
+   490                                 
+   491 000003E0 4831D2                  xor rdx, rdx
+   492 000003E3 4831DB                  xor rbx, rbx
+   493                                 .next_qword_1stpass:
+   494 000003E6 4C39E3                  cmp rbx, r12
+   495 000003E9 7D21                    jge .end_qword_1stpass
+   496 000003EB 498B7CDD00              mov rdi, qword [r13+8*rbx]
+   497 000003F0 498B34DF                mov rsi, qword [r15+8*rbx]
+   498                                 
+   499 000003F4 E8A1000000              call add_num
+   500 000003F9 488B0C25[00000000]      mov rcx, [.result]
+   501 00000401 488B4908                mov rcx, [rcx+b_num]
+   502 00000405 488904D9                mov qword [rcx+8*rbx], rax
+   503 00000409 48FFC3                  inc rbx
+   504 0000040C EBD6                    jmp .next_qword_1stpass
+   505                                 .end_qword_1stpass:
+   506                                 
+   507                                 .next_qword_2ndpass:
+   508 0000040E 4C39F3                  cmp rbx, r14
+   509 00000411 7D23                    jge .end_qword_2ndpass
+   510 00000413 48C7C700000000          mov rdi, 0x0
+   511 0000041A 498B34DF                mov rsi, qword [r15+8*rbx]
+   512                                 
+   513 0000041E E877000000              call add_num
+   514 00000423 488B0C25[00000000]      mov rcx, [.result]
+   515 0000042B 488B4908                mov rcx, [rcx+b_num]
+   516 0000042F 488904D9                mov qword [rcx+8*rbx], rax
+   517 00000433 48FFC3                  inc rbx
+   518 00000436 EBD4                    jmp .next_qword_2ndpass
+   519                                 .end_qword_2ndpass:
+   520                                 
+   521 00000438 4883FA00                cmp rdx, 0
+   522 0000043C 744C                    je .end
+   523 0000043E 4C8B2425[00000000]      mov r12, [.result]
+   524 00000446 4D8B6C2408              mov r13, [r12+b_num]
+   525 0000044B 4C89F1                  mov rcx, r14
+   526 0000044E 48FFC1                  inc rcx
+   527 00000451 49890C24                mov qword [r12+b_size], rcx
+   528 00000455 48C1E103                shl rcx, 3
+   529 00000459 4889CF                  mov rdi, rcx
+   530 0000045C E8(F6FFFFFF)            call malloc
+   531 00000461 4989442408              mov qword [r12+b_num], rax
+   532 00000466 4831DB                  xor rbx, rbx
+   533                                 .next_qword:
+   534 00000469 4C39F3                  cmp rbx, r14
+   535 0000046C 7D0C                    jge .end_qword
+   536 0000046E 498B7CDD00              mov rdi, qword [r13+8*rbx]
+   537 00000473 48893CD8                mov qword [rax+8*rbx], rdi
+   538 00000477 48FFC3                  inc rbx
+   539 0000047A EBEB                    jmp .next_qword
+   540                                 .end_qword:
+   541 0000047C 4AC704F001000000        mov qword [rax+8*r14], 0x1
+   542 00000484 4C89EF                  mov rdi, r13
+   543 00000487 E8(F6FFFFFF)            call free
+   544                                 .end:
+   545 0000048C 488B0425[00000000]      mov rax, [.result]
+   546 00000494 415F                    pop r15
+   547 00000496 415E                    pop r14
+   548 00000498 415D                    pop r13
+   549 0000049A 415C                    pop r12
+   550 0000049C 5B                      pop rbx
+   551 0000049D C9                      leave
+   552 0000049E C3                      ret
+   553                                 
+   554                                 
+   555                                 
+   556                                 add_num:
+   557                                 
+   558                                 
+   559 0000049F 55                      push rbp
+   560 000004A0 4889E5                  mov rbp, rsp
+   561 000004A3 53                      push rbx
+   562 000004A4 4154                    push r12
+   563 000004A6 4155                    push r13
+   564 000004A8 4156                    push r14
+   565 000004AA 4157                    push r15
+   566                                 
+   567                                 
+   568                                 
+   569                                 
+   570                                 
+   571                                 
+   572                                 [section .data]
+   573 00000059 00                     .carry: db 0
+   574                                 
+   575                                 [section .text]
+   576                                 
+   577 000004AC 4D31C0                  xor r8, r8
+   578 000004AF 4989FC                  mov r12, rdi
+   579 000004B2 4989F5                  mov r13, rsi
+   580 000004B5 881425[00000000]        mov byte [.carry], dl
+   581                                 
+   582 000004BC 4831DB                  xor rbx, rbx
+   583                                 .next:
+   584 000004BF 4883FB09                cmp rbx, 9
+   585 000004C3 7D63                    jge .done
+   586 000004C5 480FB68B[00000000]      movzx rcx, byte [boundaries+rbx]
+   587 000004CD 49D3CC                  ror r12, cl
+   588 000004D0 4D0FB6F4                movzx r14, r12b
+   589 000004D4 490FBAF607              btr r14, 7
+   590 000004D9 49D3C4                  rol r12, cl
+   591 000004DC 49D3CD                  ror r13, cl
+   592 000004DF 4D0FB6FD                movzx r15, r13b
+   593 000004E3 490FBAF707              btr r15, 7
+   594 000004E8 49D3C5                  rol r13, cl
+   595 000004EB 4500FE                  add r14b, r15b
+   596 000004EE 480FB61425[00000000]      movzx rdx, byte [.carry]
+   597 000004F7 4100D6                  add r14b, dl
+   598 000004FA 49C7C164000000          mov r9, 100
+   599 00000501 4C89F0                  mov rax, r14
+   600 00000504 4831D2                  xor rdx, rdx
+   601 00000507 49F7F1                  div r9
+   602 0000050A 880425[00000000]        mov byte [.carry], al
+   603 00000511 4989D6                  mov r14, rdx
+   604 00000514 49D3C8                  ror r8, cl
+   605 00000517 49C1E807                shr r8, 7
+   606 0000051B 49C1E007                shl r8, 7
+   607 0000051F 4508F0                  or r8b, r14b
+   608 00000522 49D3C0                  rol r8, cl
+   609 00000525 48FFC3                  inc rbx
+   610 00000528 EB93                    jmp .next
+   611                                 .done:
+   612 0000052A 4C89C0                  mov rax, r8
+   613 0000052D 480FB61425[00000000]      movzx rdx, byte [.carry]
+   614                                 .end:
+   615 00000536 415F                    pop r15
+   616 00000538 415E                    pop r14
+   617 0000053A 415D                    pop r13
+   618 0000053C 415C                    pop r12
+   619 0000053E 5B                      pop rbx
+   620 0000053F C9                      leave
+   621 00000540 C3                      ret
+   622                                 
+   623                                 
+   624                                 
+   625                                 order:
+   626                                 
+   627                                 
+   628 00000541 55                      push rbp
+   629 00000542 4889E5                  mov rbp, rsp
+   630 00000545 53                      push rbx
+   631 00000546 4154                    push r12
+   632 00000548 4155                    push r13
+   633 0000054A 4156                    push r14
+   634 0000054C 4157                    push r15
+   635                                 
+   636 0000054E 4889F8                  mov rax, rdi
+   637 00000551 4C8B27                  mov r12, [rdi+b_size]
+   638 00000554 4C8B6F08                mov r13, [rdi+b_num]
+   639 00000558 4889F2                  mov rdx, rsi
+   640 0000055B 4C8B36                  mov r14, [rsi+b_size]
+   641 0000055E 4C8B7E08                mov r15, [rsi+b_num]
+   642 00000562 4D39F4                  cmp r12, r14
+   643 00000565 7C2D                    jl .end
+   644 00000567 4D39F4                  cmp r12, r14
+   645 0000056A 7F22                    jg .switch
+   646                                 
+   647 0000056C 4C89E3                  mov rbx, r12
+   648 0000056F 48FFCB                  dec rbx
+   649                                 .next_qword:
+   650 00000572 4883FB00                cmp rbx, 0
+   651 00000576 7C16                    jl .end_qword
+   652 00000578 4D8B44DD00              mov r8, qword [r13+8*rbx]
+   653 0000057D 4D8B0CDF                mov r9, qword [r15+8*rbx]
+   654 00000581 4D39C8                  cmp r8, r9
+   655 00000584 720E                    jb .end
+   656 00000586 4D39C8                  cmp r8, r9
+   657 00000589 7703                    ja .switch
+   658 0000058B 48FFCB                  dec rbx
+   659 0000058E EBE0                    jmp .next_qword
+   660                                 .end_qword:
+   661                                 
+   662                                 .switch:
+   663 00000590 4889F0                  mov rax, rsi
+   664 00000593 4889FA                  mov rdx, rdi
+   665                                 .end:
+   666 00000596 415F                    pop r15
+   667 00000598 415E                    pop r14
+   668 0000059A 415D                    pop r13
+   669 0000059C 415C                    pop r12
+   670 0000059E 5B                      pop rbx
+   671 0000059F C9                      leave
+   672 000005A0 C3                      ret
+   673                                 
+   674                                 
+   675                                 
+   676                                 free_BigInt:
+   677                                 
+   678                                 
+   679 000005A1 55                      push rbp
+   680 000005A2 4889E5                  mov rbp, rsp
+   681 000005A5 53                      push rbx
+   682 000005A6 50                      push rax
+   683                                 
+   684 000005A7 4889FB                  mov rbx, rdi
+   685 000005AA 488B7B08                mov rdi, [rbx+b_num]
+   686 000005AE E8(F6FFFFFF)            call free
+   687 000005B3 4889DF                  mov rdi, rbx
+   688 000005B6 E8(F6FFFFFF)            call free
+   689                                 
+   690 000005BB 58                      pop rax
+   691 000005BC 5B                      pop rbx
+   692 000005BD C9                      leave
+   693 000005BE C3                      ret
+   694                                 
+   695                                 
+   696                                 
+   697                                 init_BigInt:
+   698 000005BF 55                      push rbp
+   699 000005C0 4889E5                  mov rbp, rsp
+   700 000005C3 53                      push rbx
+   701 000005C4 4154                    push r12
+   702 000005C6 4155                    push r13
+   703 000005C8 4156                    push r14
+   704 000005CA 4157                    push r15
+   705                                 
+   706 000005CC 48C7C710000000          mov rdi, BigInt_size
+   707 000005D3 E8(F6FFFFFF)            call malloc
+   708 000005D8 48890425[00000000]      mov qword [zero], rax
+   709 000005E0 4C8B2425[00000000]      mov r12, qword [zero]
+   710 000005E8 49C7042401000000        mov qword [r12+b_size], 0x1
+   711 000005F0 48C7C708000000          mov rdi, 8
+   712 000005F7 E8(F6FFFFFF)            call malloc
+   713 000005FC 4989442408              mov qword [r12+b_num], rax
+   714 00000601 48C70000000000          mov qword [rax], 0x0
+   715                                 
+   716 00000608 48C7C710000000          mov rdi, BigInt_size
+   717 0000060F E8(F6FFFFFF)            call malloc
+   718 00000614 48890425[00000000]      mov qword [one], rax
+   719 0000061C 4C8B2425[00000000]      mov r12, qword [one]
+   720 00000624 49C7042401000000        mov qword [r12+b_size], 0x1
+   721 0000062C 48C7C708000000          mov rdi, 8
+   722 00000633 E8(F6FFFFFF)            call malloc
+   723 00000638 4989442408              mov qword [r12+b_num], rax
+   724 0000063D 48C70001000000          mov qword [rax], 0x1
+   725                                 
+   726 00000644 415F                    pop r15
+   727 00000646 415E                    pop r14
+   728 00000648 415D                    pop r13
+   729 0000064A 415C                    pop r12
+   730 0000064C 5B                      pop rbx
+   731 0000064D C9                      leave
+   732 0000064E C3                      ret

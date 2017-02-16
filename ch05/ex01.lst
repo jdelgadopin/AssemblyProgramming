@@ -1,0 +1,19 @@
+     1                                 %line 1+1 ex01.asm
+     2                                 [segment .data]
+     3 00000000 0A00000000000000       a dq 0xA
+     4 00000008 1400000000000000       b dq 20
+     5 00000010 F6FFFFFFFFFFFFFF       na dq -10
+     6 00000018 EBFFFFFFFFFFFFFF       nb dq -21
+     7                                 
+     8                                 [segment .text]
+     9                                 [global _start]
+    10                                 _start:
+    11 00000000 488B0425[00000000]      mov rax, [a]
+    12 00000008 488B1C25[00000000]      mov rbx, [b]
+    13 00000010 488B0C25[00000000]      mov rcx, [na]
+    14 00000018 488B1425[00000000]      mov rdx, [nb]
+    15 00000020 4801D8                  add rax, rbx
+    16 00000023 4801C8                  add rax, rcx
+    17 00000026 4801D0                  add rax, rdx
+    18 00000029 4831C0                  xor rax, rax
+    19 0000002C C3                      ret

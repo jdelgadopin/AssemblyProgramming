@@ -1,0 +1,54 @@
+     1                                 %line 1+1 provesscanf.asm
+     2                                 
+     3                                 [section .bss]
+     4 00000000 <gap>                  strng1 resb 30
+     5 0000001E <gap>                  strng2 resb 10
+     6                                 
+     7                                 [section .data]
+     8 00000000 2533307300             inp1 db "%30s",0
+     9 00000005 2531307300             inp2 db "%10s",0
+    10 0000000A 456E74657220737472-    prompt1 db "Enter string (30 max): ",0
+    11 0000000A 696E6720283330206D-
+    12 0000000A 6178293A2000       
+    13 00000022 456E74657220737472-    prompt2 db "Enter string (10 max): ",0
+    14 00000022 696E6720283130206D-
+    15 00000022 6178293A2000       
+    16 0000003A 3D3D3D3E202573202D-    pr_write db "===> %s -- %s",0xa,0
+    17 0000003A 2D2025730A00       
+    18                                 
+    19                                 [section .text]
+    20                                 [global _start]
+    21                                 
+    22                                 [extern printf]
+    23                                 [extern scanf]
+    24                                 
+    25                                 _start:
+    26                                 
+    27                                 .again:
+    28 00000000 488D3C25[00000000]      lea rdi, [prompt1]
+    29 00000008 31C0                    xor eax, eax
+    30 0000000A E8(F6FFFFFF)            call printf
+    31 0000000F 488D3C25[00000000]      lea rdi, [inp1]
+    32 00000017 488D3425[00000000]      lea rsi, [strng1]
+    33 0000001F 31C0                    xor eax, eax
+    34 00000021 E8(F6FFFFFF)            call scanf
+    35                                 
+    36 00000026 488D3C25[00000000]      lea rdi, [prompt2]
+    37 0000002E 31C0                    xor eax, eax
+    38 00000030 E8(F6FFFFFF)            call printf
+    39 00000035 488D3C25[00000000]      lea rdi, [inp2]
+    40 0000003D 488D3425[00000000]      lea rsi, [strng2]
+    41 00000045 31C0                    xor eax, eax
+    42 00000047 E8(F6FFFFFF)            call scanf
+    43                                 
+    44 0000004C 488D3C25[00000000]      lea rdi, [pr_write]
+    45 00000054 488D3425[00000000]      lea rsi, [strng1]
+    46 0000005C 488D1425[00000000]      lea rdx, [strng2]
+    47 00000064 31C0                    xor eax, eax
+    48 00000066 E8(F6FFFFFF)            call printf
+    49                                 
+    50 0000006B EB91                    jmp .again
+    51                                 
+    52 0000006D B83C000000              mov eax, 60
+    53 00000072 31FF                    xor edi, edi
+    54 00000074 0F05                    syscall

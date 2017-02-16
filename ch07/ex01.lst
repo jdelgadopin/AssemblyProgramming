@@ -1,0 +1,58 @@
+     1                                 %line 1+1 ex01.asm
+     2                                 [segment .data]
+     3                                 
+     4 00000000 FF                     strd db 11111111
+     5 00000001 00000000               rslt dd 0
+     6                                 
+     7                                 [segment .text]
+     8                                 [global _start]
+     9                                 _start:
+    10 00000000 55                      push rbp
+    11 00000001 4889E5                  mov rbp, rsp
+    12                                 
+    13 00000004 4831C0                  xor rax, rax
+    14                                 
+    15 00000007 48C7C001000000          mov rax, 0x1
+    16 0000000E 480FB61C25[00000000]      movzx rbx, byte [strd]
+    17 00000017 4821D8                  and rax, rbx
+    18 0000001A 48010425[00000000]      add [rslt], rax
+    19 00000022 D02C25[00000000]        shr byte [strd], 1
+    20 00000029 48C7C001000000          mov rax, 0x1
+    21 00000030 480FB61C25[00000000]      movzx rbx, byte [strd]
+    22 00000039 4821D8                  and rax, rbx
+    23 0000003C 48010425[00000000]      add [rslt], rax
+    24 00000044 D02C25[00000000]        shr byte [strd], 1
+    25 0000004B 48C7C001000000          mov rax, 0x1
+    26 00000052 480FB61C25[00000000]      movzx rbx, byte [strd]
+    27 0000005B 4821D8                  and rax, rbx
+    28 0000005E 48010425[00000000]      add [rslt], rax
+    29 00000066 D02C25[00000000]        shr byte [strd], 1
+    30 0000006D 48C7C001000000          mov rax, 0x1
+    31 00000074 480FB61C25[00000000]      movzx rbx, byte [strd]
+    32 0000007D 4821D8                  and rax, rbx
+    33 00000080 48010425[00000000]      add [rslt], rax
+    34 00000088 D02C25[00000000]        shr byte [strd], 1
+    35 0000008F 48C7C001000000          mov rax, 0x1
+    36 00000096 480FB61C25[00000000]      movzx rbx, byte [strd]
+    37 0000009F 4821D8                  and rax, rbx
+    38 000000A2 48010425[00000000]      add [rslt], rax
+    39 000000AA D02C25[00000000]        shr byte [strd], 1
+    40 000000B1 48C7C001000000          mov rax, 0x1
+    41 000000B8 480FB61C25[00000000]      movzx rbx, byte [strd]
+    42 000000C1 4821D8                  and rax, rbx
+    43 000000C4 48010425[00000000]      add [rslt], rax
+    44 000000CC D02C25[00000000]        shr byte [strd], 1
+    45 000000D3 48C7C001000000          mov rax, 0x1
+    46 000000DA 480FB61C25[00000000]      movzx rbx, byte [strd]
+    47 000000E3 4821D8                  and rax, rbx
+    48 000000E6 48010425[00000000]      add [rslt], rax
+    49 000000EE D02C25[00000000]        shr byte [strd], 1
+    50 000000F5 48C7C001000000          mov rax, 0x1
+    51 000000FC 480FB61C25[00000000]      movzx rbx, byte [strd]
+    52 00000105 4821D8                  and rax, rbx
+    53 00000108 48010425[00000000]      add [rslt], rax
+    54 00000110 D02C25[00000000]        shr byte [strd], 1
+    55                                 
+    56 00000117 4831C0                  xor rax, rax
+    57 0000011A C9                      leave
+    58 0000011B C3                      ret

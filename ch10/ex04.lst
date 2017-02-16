@@ -1,0 +1,124 @@
+     1                                 %line 1+1 ex04.asm
+     2                                 [section .bss]
+     3 00000000 <gap>                  strchar resb 80
+     4 00000050 <gap>                  collisions resd 99991
+     5 00061AAC <gap>                  results resd 1000
+     6                                 
+     7                                 [section .data]
+     8 00000000 15CD5B07D338FB0D40-    multipliers dd 123456789, 234567891, 345678912, 456789123, 567891234, 678912345, 789123456, 891234567
+     9 00000000 A49A14830C3A1B2255-
+    10 00000000 D92159617728801109-
+    11 00000000 2F07291F35         
+    12                                 
+    13 00000020 25640A00               prompt db "%d",0xa,0
+    14 00000024 2537397300             inp db "%79s",0
+    15 00000029 256420686173686573-    indexvalue db "%d hashes with %d collisions",0xa,0
+    16 00000029 207769746820256420-
+    17 00000029 636F6C6C6973696F6E-
+    18 00000029 730A00             
+    19                                 
+    20                                 [section .text]
+    21                                 [global main]
+    22                                 
+    23                                 [extern printf]
+    24                                 %line 16+0 ex04.asm
+    25                                 [extern scanf]
+    26                                 %line 17+1 ex04.asm
+    27                                 
+    28                                 
+    29                                 
+    30                                 hash:
+    31                                 
+    32 00000000 55                      push rbp
+    33 00000001 4889E5                  mov rbp, rsp
+    34 00000004 53                      push rbx
+    35 00000005 4154                    push r12
+    36 00000007 4989FC                  mov r12, rdi
+    37 0000000A 4831DB                  xor rbx, rbx
+    38 0000000D 4831C9                  xor rcx, rcx
+    39                                 .loop_hash:
+    40 00000010 41803C0C00              cmp byte [r12+rcx], 0
+    41 00000015 7423                    je .end_hash
+    42 00000017 4989C9                  mov r9, rcx
+    43 0000001A 4983E107                and r9, 0x7
+    44 0000001E 4E8D148D[00000000]      lea r10, [multipliers+4*r9]
+    45 00000026 458B0A                  mov r9d, [r10]
+    46 00000029 4831D2                  xor rdx, rdx
+    47 0000002C 490FB6040C              movzx rax, byte [r12+rcx]
+    48 00000031 49F7E1                  mul r9
+    49 00000034 4801C3                  add rbx, rax
+    50 00000037 48FFC1                  inc rcx
+    51 0000003A EBD2                    jmp .loop_hash
+    52                                 .end_hash:
+    53 0000003C 4831D2                  xor rdx, rdx
+    54 0000003F 4889D8                  mov rax, rbx
+    55 00000042 48C7C197860100          mov rcx, 99991
+    56 00000049 48F7F1                  div rcx
+    57 0000004C 4889D0                  mov rax, rdx
+    58 0000004F 415C                    pop r12
+    59 00000051 5B                      pop rbx
+    60 00000052 C9                      leave
+    61 00000053 C3                      ret
+    62                                 
+    63                                 
+    64                                 
+    65                                 main:
+    66 00000054 55                      push rbp
+    67 00000055 4889E5                  mov rbp, rsp
+    68                                 
+    69 00000058 53                      push rbx
+    70 00000059 4154                    push r12
+    71 0000005B 4155                    push r13
+    72                                 
+    73 0000005D 488D1C25[00000000]      lea rbx, [collisions]
+    74                                 .loop_reading:
+    75                                 
+    76 00000065 488D3C25[00000000]      lea rdi, [inp]
+    77 0000006D 488D3425[00000000]      lea rsi, [strchar]
+    78 00000075 31C0                    xor eax, eax
+    79 00000077 E8(F6FFFFFF)            call scanf
+    80 0000007C 4883F801                cmp rax, 1
+    81 00000080 7510                    jne .end_reading
+    82                                 
+    83 00000082 488D3C25[00000000]      lea rdi, [strchar]
+    84 0000008A E86CFFFFFF              call hash
+    85                                 
+    86 0000008F FF0483                  inc dword [rbx+4*rax]
+    87 00000092 EBCF                    jmp .loop_reading
+    88                                 .end_reading:
+    89 00000094 49C7C0E7030000          mov r8, 999
+    90 0000009B 4C8D2425[00000000]      lea r12, [results]
+    91 000000A3 4831C9                  xor rcx, rcx
+    92                                 .loop_counting:
+    93 000000A6 4881F997860100          cmp rcx, 99991
+    94 000000AD 7415                    je .end_counting
+    95 000000AF 8B148B                  mov edx, [rbx+4*rcx]
+    96 000000B2 4881FAE8030000          cmp rdx, 1000
+    97 000000B9 490F4DD0                cmovge rdx, r8
+    98 000000BD 41FF0494                inc dword [r12+4*rdx]
+    99 000000C1 48FFC1                  inc rcx
+   100 000000C4 EBDE                    jmp .loop_counting
+   101                                 .end_counting:
+   102 000000C6 4831DB                  xor rbx, rbx
+   103                                 .loop_results:
+   104 000000C9 4881FBE8030000          cmp rbx, 1000
+   105 000000D0 7420                    je .end
+   106 000000D2 41833C9C00              cmp dword [r12+4*rbx], 0
+   107 000000D7 7414                    je .cont
+   108 000000D9 488D3C25[00000000]      lea rdi, [indexvalue]
+   109 000000E1 418B349C                mov esi, dword [r12+4*rbx]
+   110 000000E5 4889DA                  mov rdx, rbx
+   111 000000E8 31C0                    xor eax, eax
+   112 000000EA E8(F6FFFFFF)            call printf
+   113                                 .cont:
+   114 000000EF 48FFC3                  inc rbx
+   115 000000F2 EBD3                    jmp .loop_results
+   116                                 .end:
+   117                                 
+   118 000000F4 415D                    pop r13
+   119 000000F6 415C                    pop r12
+   120 000000F8 5B                      pop rbx
+   121                                 
+   122 000000F9 C9                      leave
+   123 000000FA C3                      ret
+   124                                 

@@ -1,0 +1,757 @@
+Abbreviation Code 1 Tag DW_TAG_compile_unit [no children]
+Offset 0x0
+    DW_AT_stmt_list DW_FORM_data4
+    DW_AT_low_pc DW_FORM_addr
+    DW_AT_high_pc DW_FORM_addr
+    DW_AT_name DW_FORM_string
+    DW_AT_comp_dir DW_FORM_string
+    DW_AT_producer DW_FORM_string
+    DW_AT_language DW_FORM_data2
+parse_aranges
+length 0x2c
+Version 2
+Debug info offset 0
+address size 8
+segment size 0
+length 0x10f address 0x4000b0
+DWARF LINE HEADER
+  total_length: 106
+  version: 2
+  header_length: : 31
+  mininstlen: 1
+  is_stmt: 1
+  line_base: -5
+  line_range: 14
+  opcode_base: 13
+ op 1 0
+ op 2 1
+ op 3 1
+ op 4 1
+ op 5 1
+ op 6 0
+ op 7 0
+ op 8 0
+ op 9 1
+ op 10 0
+ op 11 0
+ op 12 1
+FILE (ex06.asm)
+| dir idx 0
+| lastmod 0
+| filelen 0
+Extended opcode 2: set Address to 0x4000b0
+Advance line by 22, to 23
+Copy
+Special opcode 104: advance Address by 7 to 4000b7 and Line by 1 to 24
+Special opcode 104: advance Address by 7 to 4000be and Line by 1 to 25
+Special opcode 48: advance Address by 3 to 4000c1 and Line by 1 to 26
+Special opcode 104: advance Address by 7 to 4000c8 and Line by 1 to 27
+Special opcode 118: advance Address by 8 to 4000d0 and Line by 1 to 28
+Special opcode 48: advance Address by 3 to 4000d3 and Line by 1 to 29
+Special opcode 104: advance Address by 7 to 4000da and Line by 1 to 30
+Special opcode 160: advance Address by 11 to 4000e5 and Line by 1 to 31
+Special opcode 134: advance Address by 9 to 4000ee and Line by 3 to 34
+Special opcode 104: advance Address by 7 to 4000f5 and Line by 1 to 35
+Special opcode 104: advance Address by 7 to 4000fc and Line by 1 to 36
+Special opcode 48: advance Address by 3 to 4000ff and Line by 1 to 37
+Special opcode 104: advance Address by 7 to 400106 and Line by 1 to 38
+Special opcode 118: advance Address by 8 to 40010e and Line by 1 to 39
+Special opcode 48: advance Address by 3 to 400111 and Line by 1 to 40
+Special opcode 104: advance Address by 7 to 400118 and Line by 1 to 41
+Special opcode 160: advance Address by 11 to 400123 and Line by 1 to 42
+Special opcode 134: advance Address by 9 to 40012c and Line by 3 to 45
+Special opcode 104: advance Address by 7 to 400133 and Line by 1 to 46
+Special opcode 104: advance Address by 7 to 40013a and Line by 1 to 47
+Special opcode 34: advance Address by 2 to 40013c and Line by 1 to 48
+Special opcode 104: advance Address by 7 to 400143 and Line by 1 to 49
+Special opcode 104: advance Address by 7 to 40014a and Line by 1 to 50
+Special opcode 104: advance Address by 7 to 400151 and Line by 1 to 51
+Special opcode 104: advance Address by 7 to 400158 and Line by 1 to 52
+Special opcode 104: advance Address by 7 to 40015f and Line by 1 to 53
+Special opcode 104: advance Address by 7 to 400166 and Line by 1 to 54
+Special opcode 62: advance Address by 4 to 40016a and Line by 1 to 55
+Special opcode 48: advance Address by 3 to 40016d and Line by 1 to 56
+Special opcode 48: advance Address by 3 to 400170 and Line by 1 to 57
+Special opcode 48: advance Address by 3 to 400173 and Line by 1 to 58
+Special opcode 62: advance Address by 4 to 400177 and Line by 1 to 59
+Special opcode 104: advance Address by 7 to 40017e and Line by 1 to 60
+Special opcode 62: advance Address by 4 to 400182 and Line by 1 to 61
+Special opcode 48: advance Address by 3 to 400185 and Line by 1 to 62
+Special opcode 104: advance Address by 7 to 40018c and Line by 1 to 63
+Special opcode 78: advance Address by 5 to 400191 and Line by 3 to 66
+Special opcode 34: advance Address by 2 to 400193 and Line by 1 to 67
+Special opcode 104: advance Address by 7 to 40019a and Line by 1 to 68
+Special opcode 48: advance Address by 3 to 40019d and Line by 1 to 69
+Special opcode 34: advance Address by 2 to 40019f and Line by 1 to 70
+Special opcode 104: advance Address by 7 to 4001a6 and Line by 1 to 71
+Special opcode 48: advance Address by 3 to 4001a9 and Line by 1 to 72
+Special opcode 48: advance Address by 3 to 4001ac and Line by 1 to 73
+Special opcode 34: advance Address by 2 to 4001ae and Line by 1 to 74
+Special opcode 34: advance Address by 2 to 4001b0 and Line by 1 to 75
+Special opcode 105: advance Address by 7 to 4001b7 and Line by 2 to 77
+Special opcode 48: advance Address by 3 to 4001ba and Line by 1 to 78
+Special opcode 34: advance Address by 2 to 4001bc and Line by 1 to 79
+Special opcode 20: advance Address by 1 to 4001bd and Line by 1 to 80
+Advance PC by 2 to 0x4001bf
+Extended opcode 1: End of Sequence
+DWARF LINE HEADER
+  total_length: -1817348803
+  version: 30069
+  header_length: : 1970631983
+  mininstlen: 117
+  is_stmt: 117
+  line_base: 117
+  line_range: 75
+  opcode_base: 61
+ op 1 61
+ op 2 61
+ op 3 75
+ op 4 117
+ op 5 75
+ op 6 61
+ op 7 117
+ op 8 91
+ op 9 47
+ op 10 117
+ op 11 61
+ op 12 47
+ op 13 117
+ op 14 61
+ op 15 61
+ op 16 47
+ op 17 47
+ op 18 118
+ op 19 61
+ op 20 47
+ op 21 33
+ op 22 2
+ op 23 2
+ op 24 0
+ op 25 1
+DWARF LINE HEADER
+  total_length: 1972612469
+  version: 12149
+  header_length: : 1970632053
+  mininstlen: 117
+  is_stmt: 117
+  line_base: 75
+  line_range: 61
+  opcode_base: 61
+ op 1 61
+ op 2 75
+ op 3 117
+ op 4 75
+ op 5 61
+ op 6 117
+ op 7 91
+ op 8 47
+ op 9 117
+ op 10 61
+ op 11 47
+ op 12 117
+ op 13 61
+ op 14 61
+ op 15 47
+ op 16 47
+ op 17 118
+ op 18 61
+ op 19 47
+ op 20 33
+ op 21 2
+ op 22 2
+ op 23 0
+ op 24 1
+DWARF LINE HEADER
+  total_length: 1970639789
+  version: 29999
+  header_length: : 1970632053
+  mininstlen: 117
+  is_stmt: 75
+  line_base: 61
+  line_range: 61
+  opcode_base: 61
+ op 1 75
+ op 2 117
+ op 3 75
+ op 4 61
+ op 5 117
+ op 6 91
+ op 7 47
+ op 8 117
+ op 9 61
+ op 10 47
+ op 11 117
+ op 12 61
+ op 13 61
+ op 14 47
+ op 15 47
+ op 16 118
+ op 17 61
+ op 18 47
+ op 19 33
+ op 20 2
+ op 21 2
+ op 22 0
+ op 23 1
+DWARF LINE HEADER
+  total_length: 796226963
+  version: 30069
+  header_length: : 1970632053
+  mininstlen: 75
+  is_stmt: 61
+  line_base: 61
+  line_range: 61
+  opcode_base: 75
+ op 1 117
+ op 2 75
+ op 3 61
+ op 4 117
+ op 5 91
+ op 6 47
+ op 7 117
+ op 8 61
+ op 9 47
+ op 10 117
+ op 11 61
+ op 12 61
+ op 13 47
+ op 14 47
+ op 15 118
+ op 16 61
+ op 17 47
+ op 18 33
+ op 19 2
+ op 20 2
+ op 21 0
+ op 22 1
+DWARF LINE HEADER
+  total_length: 1966044533
+  version: 30069
+  header_length: : 1265988981
+  mininstlen: 61
+  is_stmt: 61
+  line_base: 61
+  line_range: 75
+  opcode_base: 117
+ op 1 75
+ op 2 61
+ op 3 117
+ op 4 91
+ op 5 47
+ op 6 117
+ op 7 61
+ op 8 47
+ op 9 117
+ op 10 61
+ op 11 61
+ op 12 47
+ op 13 47
+ op 14 118
+ op 15 61
+ op 16 47
+ op 17 33
+ op 18 2
+ op 19 2
+ op 20 0
+ op 21 1
+DWARF LINE HEADER
+  total_length: 1970614133
+  version: 30069
+  header_length: : 1028355445
+  mininstlen: 61
+  is_stmt: 61
+  line_base: 75
+  line_range: 117
+  opcode_base: 75
+ op 1 61
+ op 2 117
+ op 3 91
+ op 4 47
+ op 5 117
+ op 6 61
+ op 7 47
+ op 8 117
+ op 9 61
+ op 10 61
+ op 11 47
+ op 12 47
+ op 13 118
+ op 14 61
+ op 15 47
+ op 16 33
+ op 17 2
+ op 18 2
+ op 19 0
+ op 20 1
+DWARF LINE HEADER
+  total_length: 1970631983
+  version: 30069
+  header_length: : 1027427189
+  mininstlen: 61
+  is_stmt: 75
+  line_base: 117
+  line_range: 75
+  opcode_base: 61
+ op 1 117
+ op 2 91
+ op 3 47
+ op 4 117
+ op 5 61
+ op 6 47
+ op 7 117
+ op 8 61
+ op 9 61
+ op 10 47
+ op 11 47
+ op 12 118
+ op 13 61
+ op 14 47
+ op 15 33
+ op 16 2
+ op 17 2
+ op 18 0
+ op 19 1
+DWARF LINE HEADER
+  total_length: 1970632053
+  version: 30069
+  header_length: : 1027423563
+  mininstlen: 75
+  is_stmt: 117
+  line_base: 75
+  line_range: 61
+  opcode_base: 117
+ op 1 91
+ op 2 47
+ op 3 117
+ op 4 61
+ op 5 47
+ op 6 117
+ op 7 61
+ op 8 61
+ op 9 47
+ op 10 47
+ op 11 118
+ op 12 61
+ op 13 47
+ op 14 33
+ op 15 2
+ op 16 2
+ op 17 0
+ op 18 1
+DWARF LINE HEADER
+  total_length: 1970632053
+  version: 19317
+  header_length: : 1262304573
+  mininstlen: 117
+  is_stmt: 75
+  line_base: 61
+  line_range: 117
+  opcode_base: 91
+ op 1 47
+ op 2 117
+ op 3 61
+ op 4 47
+ op 5 117
+ op 6 61
+ op 7 61
+ op 8 47
+ op 9 47
+ op 10 118
+ op 11 61
+ op 12 47
+ op 13 33
+ op 14 2
+ op 15 2
+ op 16 0
+ op 17 1
+DWARF LINE HEADER
+  total_length: 1970632053
+  version: 15691
+  header_length: : 1967865149
+  mininstlen: 75
+  is_stmt: 61
+  line_base: 117
+  line_range: 91
+  opcode_base: 47
+ op 1 117
+ op 2 61
+ op 3 47
+ op 4 117
+ op 5 61
+ op 6 61
+ op 7 47
+ op 8 47
+ op 9 118
+ op 10 61
+ op 11 47
+ op 12 33
+ op 13 2
+ op 14 2
+ op 15 0
+ op 16 1
+DWARF LINE HEADER
+  total_length: 1265988981
+  version: 15677
+  header_length: : 1265978173
+  mi[Sections]
+idx=00 vaddr=0x00000000 paddr=0x00000000 sz=0 vsz=0 perm=----- name=
+idx=01 vaddr=0x004000b0 paddr=0x000000b0 sz=271 vsz=271 perm=--r-x name=.text
+idx=02 vaddr=0x006001c0 paddr=0x000001c0 sz=30 vsz=30 perm=--rw- name=.data
+idx=03 vaddr=0x00000000 paddr=0x000001e0 sz=48 vsz=48 perm=----- name=.debug_aranges
+idx=04 vaddr=0x00000000 paddr=0x00000210 sz=92 vsz=92 perm=----- name=.debug_info
+idx=05 vaddr=0x00000000 paddr=0x0000026c sz=20 vsz=20 perm=----- name=.debug_abbrev
+idx=06 vaddr=0x00000000 paddr=0x00000280 sz=110 vsz=110 perm=----- name=.debug_line
+idx=07 vaddr=0x00000000 paddr=0x000002ee sz=92 vsz=92 perm=----- name=.shstrtab
+idx=08 vaddr=0x00000000 paddr=0x000005d0 sz=600 vsz=600 perm=----- name=.symtab
+idx=09 vaddr=0x00000000 paddr=0x00000828 sz=101 vsz=101 perm=----- name=.strtab
+idx=10 vaddr=0x00400000 paddr=0x00000000 sz=447 vsz=447 perm=m-r-x name=LOAD0
+idx=11 vaddr=0x006001c0 paddr=0x000001c0 sz=30 vsz=30 perm=m-rw- name=LOAD1
+idx=12 vaddr=0x00400000 paddr=0x00000000 sz=64 vsz=64 perm=m-rw- name=ehdr
+
+13 sections
+[Entrypoints]
+vaddr=0x004000b0 paddr=0x000000b0 baddr=0x00400000 laddr=0x00000000 type=program
+
+1 entrypoints
+[Imports]
+
+0 imports
+[Symbols]
+vaddr=0x006001da paddr=0x000001da ord=008 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=mntr
+vaddr=0x006001d9 paddr=0x000001d9 ord=009 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=expr
+vaddr=0x006001d8 paddr=0x000001d8 ord=010 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=sgnr
+vaddr=0x006001d4 paddr=0x000001d4 ord=011 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=mntf2
+vaddr=0x006001d3 paddr=0x000001d3 ord=012 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=expf2
+vaddr=0x006001d2 paddr=0x000001d2 ord=013 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=sgnf2
+vaddr=0x006001ce paddr=0x000001ce ord=014 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=mntf1
+vaddr=0x006001cd paddr=0x000001cd ord=015 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=expf1
+vaddr=0x006001cc paddr=0x000001cc ord=016 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=sgnf1
+vaddr=0x006001c8 paddr=0x000001c8 ord=017 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=rs
+vaddr=0x006001c4 paddr=0x000001c4 ord=018 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=f2
+vaddr=0x006001c0 paddr=0x000001c0 ord=019 fwd=NONE sz=0 bind=LOCAL type=NOTYPE name=f1
+vaddr=0x004000b0 paddr=0x000000b0 ord=021 fwd=NONE sz=0 bind=GLOBAL type=NOTYPE name=_start
+vaddr=0x006001de paddr=0x006001de ord=022 fwd=NONE sz=0 bind=GLOBAL type=NOTYPE name=__bss_start
+vaddr=0x006001de paddr=0x006001de ord=023 fwd=NONE sz=0 bind=GLOBAL type=NOTYPE name=_edata
+vaddr=0x006001e0 paddr=0x006001e0 ord=024 fwd=NONE sz=0 bind=GLOBAL type=NOTYPE name=_end
+
+16 symbols
+havecode true
+pic      false
+canary   false
+nx       false
+crypto   false
+va       true
+bintype  elf
+class    ELF64
+lang     c
+arch     x86
+bits     64
+machine  AMD x86-64 architecture
+os       linux
+minopsz  1
+maxopsz  16
+pcalign  0
+subsys   linux
+endian   little
+stripped false
+static   true
+linenum  true
+lsyms    true
+relocs   true
+rpath    NONE
+binsz    2189
+[Header fields]
+idx=00 vaddr=0x00000000 paddr=0x00000000 name=ehdr
+idx=01 vaddr=0x00000350 paddr=0x00000350 name=shoff
+idx=02 vaddr=0x00000040 paddr=0x00000040 name=phoff
+idx=03 vaddr=0x00000000 paddr=0x00000000 name=phdr_0
+idx=04 vaddr=0x000001c0 paddr=0x000001c0 name=phdr_1
+
+5 fields
+[Linked libraries]
+
+0 libraries
+[Relocations]
+
+0 relocations
+0x004000b0	ex06.asm	23
+0x004000b7	ex06.asm	24
+0x004000be	ex06.asm	25
+0x004000c1	ex06.asm	26
+0x004000c8	ex06.asm	27
+0x004000d0	ex06.asm	28
+0x004000d3	ex06.asm	29
+0x004000da	ex06.asm	30
+0x004000e5	ex06.asm	31
+0x004000ee	ex06.asm	34
+0x004000f5	ex06.asm	35
+0x004000fc	ex06.asm	36
+0x004000ff	ex06.asm	37
+0x00400106	ex06.asm	38
+0x0040010e	ex06.asm	39
+0x00400111	ex06.asm	40
+0x00400118	ex06.asm	41
+0x00400123	ex06.asm	42
+0x0040012c	ex06.asm	45
+0x00400133	ex06.asm	46
+0x0040013a	ex06.asm	47
+0x0040013c	ex06.asm	48
+0x00400143	ex06.asm	49
+0x0040014a	ex06.asm	50
+0x00400151	ex06.asm	51
+0x00400158	ex06.asm	52
+0x0040015f	ex06.asm	53
+0x00400166	ex06.asm	54
+0x0040016a	ex06.asm	55
+0x0040016d	ex06.asm	56
+0x00400170	ex06.asm	57
+0x00400173	ex06.asm	58
+0x00400177	ex06.asm	59
+0x0040017e	ex06.asm	60
+0x00400182	ex06.asm	61
+0x00400185	ex06.asm	62
+0x0040018c	ex06.asm	63
+0x00400191	ex06.asm	66
+0x00400193	ex06.asm	67
+0x0040019a	ex06.asm	68
+0x0040019d	ex06.asm	69
+0x0040019f	ex06.asm	70
+0x004001a6	ex06.asm	71
+0x004001a9	ex06.asm	72
+0x004001ac	ex06.asm	73
+0x004001ae	ex06.asm	74
+0x004001b0	ex06.asm	75
+0x004001b7	ex06.asm	77
+0x004001ba	ex06.asm	78
+0x004001bc	ex06.asm	79
+0x004001bd	ex06.asm	80
+0x004001bf	ex06.asm	80
+2189
+ninstlen: 61
+  is_stmt: 117
+  line_base: 91
+  line_range: 47
+  opcode_base: 117
+ op 1 61
+ op 2 47
+ op 3 117
+ op 4 61
+ op 5 61
+ op 6 47
+ op 7 47
+ op 8 118
+ op 9 61
+ op 10 47
+ op 11 33
+ op 12 2
+ op 13 2
+ op 14 0
+ op 15 1
+DWARF LINE HEADER
+  total_length: 1028355445
+  version: 15677
+  header_length: : 1028355403
+  mininstlen: 117
+  is_stmt: 91
+  line_base: 47
+  line_range: 117
+  opcode_base: 61
+ op 1 47
+ op 2 117
+ op 3 61
+ op 4 61
+ op 5 47
+ op 6 47
+ op 7 118
+ op 8 61
+ op 9 47
+ op 10 33
+ op 11 2
+ op 12 2
+ op 13 0
+ op 14 1
+DWARF LINE HEADER
+  total_length: 1027427189
+  version: 19261
+  header_length: : 1966951285
+  mininstlen: 91
+  is_stmt: 47
+  line_base: 117
+  line_range: 61
+  opcode_base: 47
+ op 1 117
+ op 2 61
+ op 3 61
+ op 4 47
+ op 5 47
+ op 6 118
+ op 7 61
+ op 8 47
+ op 9 33
+ op 10 2
+ op 11 2
+ op 12 0
+ op 13 1
+DWARF LINE HEADER
+  total_length: 1027423563
+  version: 30027
+  header_length: : 1534410059
+  mininstlen: 47
+  is_stmt: 117
+  line_base: 61
+  line_range: 47
+  opcode_base: 117
+ op 1 61
+ op 2 61
+ op 3 47
+ op 4 47
+ op 5 118
+ op 6 61
+ op 7 47
+ op 8 33
+ op 9 2
+ op 10 2
+ op 11 0
+ op 12 1
+DWARF LINE HEADER
+  total_length: 1262304573
+  version: 19317
+  header_length: : 794522941
+  mininstlen: 117
+  is_stmt: 61
+  line_base: 47
+  line_range: 117
+  opcode_base: 61
+ op 1 61
+ op 2 47
+ op 3 47
+ op 4 118
+ op 5 61
+ op 6 47
+ op 7 33
+ op 8 2
+ op 9 2
+ op 10 0
+ op 11 1
+DWARF LINE HEADER
+  total_length: 1967865149
+  version: 15691
+  header_length: : 1966037877
+  mininstlen: 61
+  is_stmt: 47
+  line_base: 117
+  line_range: 61
+  opcode_base: 61
+ op 1 47
+ op 2 47
+ op 3 118
+ op 4 61
+ op 5 47
+ op 6 33
+ op 7 2
+ op 8 2
+ op 9 0
+ op 10 1
+DWARF LINE HEADER
+  total_length: 1265978173
+  version: 30013
+  header_length: : 1031090011
+  mininstlen: 47
+  is_stmt: 117
+  line_base: 61
+  line_range: 61
+  opcode_base: 47
+ op 1 47
+ op 2 118
+ op 3 61
+ op 4 47
+ op 5 33
+ op 6 2
+ op 7 2
+ op 8 0
+ op 9 1
+DWARF LINE HEADER
+  total_length: 1028355403
+  version: 23413
+  header_length: : 792556847
+  mininstlen: 117
+  is_stmt: 61
+  line_base: 61
+  line_range: 47
+  opcode_base: 47
+ op 1 118
+ op 2 61
+ op 3 47
+ op 4 33
+ op 5 2
+ op 6 2
+ op 7 0
+ op 8 1
+DWARF LINE HEADER
+  total_length: 1966951285
+  version: 12123
+  header_length: : 1966030197
+  mininstlen: 61
+  is_stmt: 61
+  line_base: 47
+  line_range: 47
+  opcode_base: 118
+ op 1 61
+ op 2 47
+ op 3 33
+ op 4 2
+ op 5 2
+ op 6 0
+ op 7 1
+DWARF LINE HEADER
+  total_length: 1534410059
+  version: 29999
+  header_length: : 1031089981
+  mininstlen: 61
+  is_stmt: 47
+  line_base: 47
+  line_range: 118
+  opcode_base: 61
+ op 1 47
+ op 2 33
+ op 3 2
+ op 4 2
+ op 5 0
+ op 6 1
+DWARF LINE HEADER
+  total_length: 794522941
+  version: 15733
+  header_length: : 1027437871
+  mininstlen: 47
+  is_stmt: 47
+  line_base: 118
+  line_range: 61
+  opcode_base: 47
+ op 1 33
+ op 2 2
+ op 3 2
+ op 4 0
+ op 5 1
+DWARF LINE HEADER
+  total_length: 1966037877
+  version: 12093
+  header_length: : 792542581
+  mininstlen: 47
+  is_stmt: 118
+  line_base: 61
+  line_range: 47
+  opcode_base: 33
+ op 1 2
+ op 2 2
+ op 3 0
+ op 4 1
+DWARF LINE HEADER
+  total_length: 1031090011
+  version: 29999
+  header_length: : 791625021
+  mininstlen: 118
+  is_stmt: 61
+  line_base: 47
+  line_range: 33
+  opcode_base: 2
+ op 1 2
